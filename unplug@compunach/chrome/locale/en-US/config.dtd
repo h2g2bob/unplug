@@ -1,0 +1,76 @@
+<!--
+/*
+ *         _        ___
+ *    /\ / /___    / _ \ /\ /\  _ ___
+ *   / // // _ \  / // // // // // _ \
+ *  / // // // / / ___// // // // // /
+ *  \___//_//_/ /_/   /_/ \___/ \_  /
+ *                             \___/
+ * 
+ *  Compunach UnPlug
+ *  Copyright (C) 2009 David Batley <unplug@dbatley.com>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+-->
+
+<!ENTITY configheader.subtitle "Change settings">
+
+<!-- tab headings -->
+<!ENTITY tab.title.general "General options">
+<!ENTITY tab.title.opener "Opener">
+<!ENTITY tab.title.downloader "Downloader">
+<!ENTITY tab.title.advanced "Advanced">
+<!ENTITY tab.title.about "About UnPlug">
+
+<!-- general options -->
+<!ENTITY interface.title "Where to add UnPlug">
+<!ENTITY interface.toolsmenu "Add link in tools menu">
+<!ENTITY interface.toolsmenu.a "t">
+<!ENTITY interface.contextmenu "Add link in context (right-click) menu">
+<!ENTITY interface.contextmenu.a "x">
+<!ENTITY interface.toolbarbtn "Add toolbar button">
+<!ENTITY interface.toolbarbtn.a "b">
+<!ENTITY privacy.title "Privacy">
+<!ENTITY privacy.popcontest "Submit information on which websites you use UnPlug on">
+<!ENTITY privacy.popcontest.a "S">
+<!ENTITY privacy.infolink "About this">
+<!ENTITY privacy.infolink.a "A">
+<!ENTITY rulesxml.title "Rules.xml file">
+<!ENTITY rulesxml.description "Rules.xml holds information on how to discover media on web pages.">
+<!ENTITY rulesxml.default "Default">
+<!ENTITY rulesxml.default.a "D">
+
+<!-- opener tab -->
+
+<!-- downloader tab -->
+<!ENTITY downloader.auto "Automatic">
+<!ENTITY downloader.addons "Supported Add-ons">
+<!ENTITY downloader.dta "DownThemAll">
+<!ENTITY downloader.flashgot "FlashGot">
+
+<!-- advanced tab -->
+<!ENTITY showall.title "Show additional results">
+<!ENTITY showall.label "Show results which do not work correctly">
+<!ENTITY showall.label.a "S">
+
+<!-- about tab -->
+<!ENTITY about.title "Thanks for installing UnPlug">
+<!ENTITY about.description "UnPlug is free and open source.">
+<!ENTITY about.gpl "GNU General Public License">
+<!ENTITY about.updated "UnPlug's settings have been updated.">
+
+
+

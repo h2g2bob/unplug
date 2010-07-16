@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://unplug/content/config/configwrapper.css" type="text/css"?>
+<!DOCTYPE dialog [
+	<!ENTITY % dtdcommon SYSTEM "chrome://unplug/locale/common.dtd">
+	%dtdcommon;
+	<!ENTITY % dtdlocal SYSTEM "chrome://unplug/locale/config.dtd">
+	%dtdlocal;
+	<!ENTITY % dtdunplugresult SYSTEM "chrome://unplug/locale/unplug_result.dtd">
+	%dtdunplugresult;
+	]>
+<!--
+/*
+ *         _        ___
+ *    /\ / /___    / _ \ /\ /\  _ ___
+ *   / // // _ \  / // // // // // _ \
+ *  / // // // / / ___// // // // // /
+ *  \___//_//_/ /_/   /_/ \___/ \_  /
+ *                             \___/
+ * 
+ *  Compunach UnPlug
+ *  Copyright (C) 2009 David Batley <unplug@dbatley.com>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+-->
+<dialog id="cn_unplug2_config"
+  title="&dialog.title; - &configheader.subtitle;"
+  flex="1"
+  buttons="cancel,accept"
+  defaultButton="accept"
+
+  width="500"
+  height="500"
+  
+  onload="do_load();"
+  ondialogaccept="save_configs()"
+  ondialogcancel=""
+  
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	<script type="application/javascript" src="chrome://unplug/content/common.js" />
+	<script type="application/javascript" src="chrome://unplug/content/config/config.js" />
+	<dialogheader title="&header.title;" description="&configheader.subtitle;"/>
+	<tabbox id="tabbox">
+		<tabs>
+			<tab label="&tab.title.general;" />
+			<tab label="&tab.title.downloader;" />
+			<tab label="&tab.title.advanced;" />
+			<tab label="&tab.title.about;" />
+		</tabs>
+		<tabpanels>
+			<tabpanel id="tabgeneral" orient="vertical">
+				<groupbox>
+					<caption label="&interface.title;" />
+					<configwrapper name="add_to_toolsmenu">
+						<checkbox label="&interface.toolsmenu;" accesskey="&interface.toolsmenu.a;" />
+					</configwrapper>
+					<configwrapper name="add_to_contextmenu">
+						<checkbox label="&interface.contextmenu;" accesskey="&interface.contextmenu.a;" />
+					</configwrapper>
+					<checkbox id="add_toolbar_button" label="&interface.toolbarbtn;" accesskey="&interface.toolbarbtn.a;" disabled="true" oncommand="toggle_toolbarbutton();" />
+				</groupbox>
+				<groupbox>
+					<caption label="&privacy.title;" />
+					<configwrapper name="popularity_contest">
+						<checkbox label="&privacy.popcontest;" accesskey="&privacy.popcontest.a;" />
+					</configwrapper>
+					<label onclick="window.open(&quot;http://unplug.dbatley.com/popularity_contest/&quot;);" class="text-link" value="&privacy.infolink;" accesskey="&privacy.infolink.a;" />
+				</groupbox>
+				<groupbox>
+					<caption label="&rulesxml.title;" />
+					<description> &rulesxml.description; </description>
+					<textbox value="chrome://unplug/content/rules.xml" disabled="true" />
+					<hbox>
+						<spacer flex="1" />
+						<button label="&rulesxml.default;" accesskey="&rulesxml.default.a;" disabled="true" />
+					</hbox>
+				</groupbox>
+				<spacer flex="1" />
+			</tabpanel>
+			<tabpanel id="tabdownload" orient="vertical">
+				<configwrapper name="downloader" id="downloader_config">
+					<menulist>
+						<menupopup>
+							<menuitem label="&downloader.auto;" value="auto"/>
+							<menuitem label="&dl.saveas.label;" value="saveas"/>
+							<menuitem label="&open.over.label;" value="openover"/>
+						</menupopup>
+					</menulist>
+				</configwrapper>
+				<groupbox>
+					<caption label="&downloader.addons;" />
+					<label onclick="window.open(&quot;https://addons.mozilla.org/en-US/firefox/addon/201&quot;);" class="text-link" value="&downloader.dta;" />
+					<label onclick="window.open(&quot;https://addons.mozilla.org/en-US/firefox/addon/220&quot;);" class="text-link" value="&downloader.flashgot;" />
+				</groupbox>
+				<spacer flex="1" />
+			</tabpanel>
+			<tabpanel id="tabadvanced" orient="vertical">
+				<groupbox>
+					<caption label="&showall.title;" />
+					<configwrapper name="show_all">
+						<checkbox label="&showall.label;" accesskey="&showall.label.a;" />
+					</configwrapper>
+				</groupbox>
+				<spacer flex="1" />
+			</tabpanel>
+			<tabpanel id="tababout" orient="vertical">
+				<groupbox>
+					<caption label="&about.title;" />
+					<description> &about.description; </description>
+					<label class="text-link" onclick="window.open(&quot;http://www.gnu.org/licenses/gpl-2.0.html&quot;);" value="&about.gpl;" tabindex="2"/>
+
+				</groupbox>
+				<groupbox>
+					<vbox id="setup_complete" style="display: none;">
+						<description>&about.updated;</description>
+					</vbox>
+					<button label="&configure;" accesskey="&configure.a;" oncommand="goto_tab('main');" style="height: 3em;" tabindex="1" />
+				</groupbox>
+				<spacer flex="1" />
+				<label id="version" />
+			</tabpanel>
+		</tabpanels>
+	</tabbox>
+</dialog>
+

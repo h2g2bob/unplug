@@ -1,0 +1,781 @@
+<?xml version="1.0"?>
+<!DOCTYPE unplug>
+<!--
+/*
+ *         _        ___
+ *    /\ / /___    / _ \ /\ /\  _ ___
+ *   / // // _ \  / // // // // // _ \
+ *  / // // // / / ___// // // // // /
+ *  \___//_//_/ /_/   /_/ \___/ \_  /
+ *                             \___/
+ * 
+ *  Compunach UnPlug
+ *  Copyright (C) 2009 David Batley <unplug@dbatley.com>
+ *
+ *  Most of UnPlug is distributed under the GNU General Public License.
+ *  This file is also distributed under the GNU Lesser General Public
+ *  License.
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This single file is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  and/or the GNU Lesser General Public License along with this program.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+-->
+<unplug>
+	<rule id="generic_flv_string">
+		<each_re ref="flvre" re="[&quot;']((?:http|/)[^&quot;']+\.flv(?:\?[^&quot;']+)?)[&quot;']">
+			<media url="${flvre.1}" certainty="low" />
+		</each_re>
+	</rule>
+	<rule id="clipfish.de">
+		<if_url host="clipfish.de" ref="url" />
+		<rule>
+			<if_re ref="videoid" string="${url.path}"> /video/(\d+)/ </if_re>
+			<download url="http://www.clipfish.de/video_n.php?p=0|DE&amp;vid=${videoid.1}">
+				<if_re ref="flvurl"> url=(.*?)&amp; </if_re>
+				<media url="${flvurl.1}" />
+			</download>
+		</rule>
+	</rule>
+	<rule>
+		<if_url host="joy69.com" ref="url" />
+		<rule>
+			<if_re ref="videoid" string="${url.path}"> id=(\d+) </if_re>
+			<download url="http://www.joy69.com/getmedia/?id=${videoid.1}&amp;limit=15">
+				<!-- this actually has links to several different files with the tags below repeated in different <item> tags. Plus its poorly formatted xml -->
+				<if_re ref="content"> (http://[^"]+\.flv[^"]*)" </if_re>
+				<if_re ref="poster"> &lt;poster url="([^"]+jpg)" </if_re>
+				<media url="${content.1}" thumbnail="${poster.1}" />
+			</download>
+		</rule>
+	</rule>
+	<rule id="supernovatube.com">
+		<if_url host="supernovatube.com" />
+		<if_re ref="param" tagname="script"> so\.addVariable\("file",\s*"(http://[^"]+)"\) </if_re>
+		<media url="${param.1}" type="flv" />
+	</rule>
+	<rule id="veoh.com">
+		<if_url host="veoh.com" />
+		<if_re ref="videoid" tagname="textarea"> "videoId":"([^"]+)" </if_re>
+		<rule id="veoh" target="veoh">
+			<download url="http://www.veoh.com/rest/video/${videoid.1}/details">
+				<each_element ref="video" tagname="video" attrs="fullPreviewHashLowPath,fullPreviewHashPath,ipodLink,fullMedResImagePath,description">
+					<!-- TODO this ipod one doesn't seem to work -->
+					<!-- NOTE - the final urls are at content.veoh.com, but the referers must not be from content.veoh.com (can be anywhere else) -->
+					<media url="${video.ipodLink}" description="mp4" thumbnail="${video.fullMedResImagePath}" typy="mp4" />
+					<media url="${video.fullPreviewHashLowPath}" description="${translate:low_quality}" thumbnail="${video.fullMedResImagePath}" type="flv" />
+					<media url="${video.fullPreviewHashPath}" description="${translate:mid_quality}" thumbnail="${video.fullMedResImagePath}" type="flv" />
+				</each_element>
+			</download>
+		</rule>
+	</rule>	
+	<rule id="tudou.com">
+		<if_url host="tudou.com" />
+		<if_re ref="iid" tagname="script"> iid\s*=\s*(\d+) </if_re>
+		<!-- nocatch is a random number, i think. xml gives a list of flv files from different servers. -->
+		<download url="http://v2.tudou.com/v2/cdn?id=${iid.1}&amp;noCatch=0000&amp;safekey=IAlsoNeverKnow">
+			<each_element ref="f" tagname="f" require_attrs="innerHTML">
+				<media url="${f.innerHTML}" type="flv" />
+			</each_element>
+		</download>
+	</rule>
+	<rule id="playlist..tudou.com">
+		<if_url ref="url" host="tudou.com" />
+		<!-- nocatch is a random number, i think. xml gives a list of flv files from different servers. -->
+		<download url="http://v2.tudou.com/v2/cdn?id=${qparam:iid:url.url}&amp;noCatch=0000&amp;safekey=IAlsoNeverKnow">
+			<each_element ref="f" tagname="f" require_attrs="innerHTML">
+				<media url="${f.innerHTML}" type="flv" />
+			</each_element>
+		</download>
+	</rule>
+	<rule id="hd.tudou.com">
+		<if_url host="tudou.com" />
+		<if_re ref="iid" tagname="script"> iid\s*:\s*&quot;(\d+)&quot; </if_re>
+		<optional_re ref="title" tagname="script"> title\s*:\s*&quot;(.*?)&quot; </optional_re>
+		<!-- nocatch is a random number, i think. xml gives a list of flv files from different servers. -->
+		<download url="http://v2.tudou.com/v2/kili?id=${iid.1}&amp;safekey=YouNeverKnowThat&amp;noCatch=0000">
+			<each_element ref="f" tagname="f" require_attrs="innerHTML">
+				<media url="${f.innerHTML}" type="flv" description="${translate:hd_quality} ${optional:title.1}" />
+			</each_element>
+		</download>
+	</rule>
+	<rule id="movies.apple.com">
+		<!-- TODO - when we have binary downloads, we can treat the orignial .mov file as a playlist element -->
+		<if_url host="apple.com" />
+		<each_re ref="movredirect" re="(http://[^&quot;']*?apple\.com/[^&quot;']+?_)(\d+p\.mov)">
+			<media url="${movredirect.1}h${movredirect.2}" type="mov" description="${translate:hd_quality}" />
+		</each_re>
+		<each_re ref="movredirect" re="(http://[^&quot;']*?apple\.com/[^&quot;']+?_h)\.(\d+\.mov)">
+			<media url="${movredirect.1}${movredirect.2}" type="mov" />
+		</each_re>
+	</rule>
+	<rule id="wat.tv">
+		<if_re ref="videoid" re="videoId\s*:\s*&quot;(\d+)&quot;" tagname="script" />
+		<download url="http://www.wat.tv/interface/contentv2/${videoid.1}">
+			<if_re ref="videourl" re="&quot;url&quot;:&quot;(http[^&quot;]*wat\.tv[^&quot;]*get[^&quot;]*flv)&quot;" />
+			<media url="${jsdecode:videourl.1}" />
+		</download>
+	</rule>
+	<rule id="megavideo.com" target="megavideo.com">
+		<if_url host="megavideo.com" />
+		<optional_re ref="title" re="flashvars\.title = &quot;([^&quot;]+)&quot;" />
+		<if_re ref="un" re="flashvars\.un = &quot;([0-9a-f]+)&quot;" />
+		<if_re ref="k1" re="flashvars\.k1 = &quot;(\d+)&quot;" />
+		<if_re ref="k2" re="flashvars\.k2 = &quot;(\d+)&quot;" />
+		<if_re ref="s" re="flashvars\.s = &quot;(\d+)&quot;" />
+		<media type="flv" description="${title.1}" url="http://www${s.1}.megavideo.com/files/${megavideo:un.1:k1.1:k2.1}/" />
+	</rule>
+	<rule id="wikipedia_file_link">
+		<if_url host="wikipedia.org" />
+		<each_element tagname="button" require_attrs="onclick" ref="btn">
+			<if_re ref="fileloc" string="${btn.onclick}"> "videoUrl"\s*:\s*"(http://[^"]+)", </if_re>
+			<media url="${fileloc.1}" />
+		</each_element>
+	</rule>
+	<!--
+		The current flashblock workaround is to:
+		 * re-download page
+			 * This is just a GET of the url, so POSTed pages dont work (not that we'd want to refetch them anyway
+			 * Dynamically made changes are lost
+			 * it's slower!
+		 * Run <each_element> on it
+			 * Each_element runs slowly in this situation because it's a regular expression
+			 * ${embedelem.innerHTML} won't work
+	-->
+	<download id="flashblock_workaround" url="${.url}">
+		<rule id="youtube.com" target="youtube.com">
+			<if_url host="youtube.com" />
+			<if_re ref="fmt_stream_map" re="&amp;fmt_stream_map=([^&amp;]+)" />
+			<optional_re ref="title" re="&lt;title&gt;\s*YouTube\s+\-\s+(.*)\s*&lt;/title&gt;" />
+			<optional_re ref="video_id" re="&lt;input type=&quot;hidden&quot; name=&quot;video_id&quot; value=&quot;([^&quot;]+)&quot; /&gt;" />
+			<each_re ref="fmt_part" string="${urldecode:fmt_stream_map.1}" re="([^,]+)">
+				<if_re ref="fmt_url" re="^(\d+)\|(http[^\|]+)(?:\|.*)?$" string="${fmt_part.1}" />
+				<rule>
+					<if_re string="${fmt_url.1}" re="^(22)$" />
+					<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+						description="${translate:hd_quality} - ${optional:title.1}" type="mp4" />
+				</rule>
+				<rule>
+					<if_re string="${fmt_url.1}" re="^(5)$" />
+					<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+						description="${translate:low_quality} - ${optional:title.1}" type="flv" />
+				</rule>
+				<rule>
+					<if_re string="${fmt_url.1}" re="^(34|4)$" />
+					<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+						description="${translate:mid_quality} - ${optional:title.1}" type="flv" />
+				</rule>
+				<rule>
+					<if_re string="${fmt_url.1}" re="^(18)$" />
+					<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+						description="${translate:mid_quality} (mp4) - ${optional:title.1}" type="mp4" />
+				</rule>
+				<rule>
+					<if_re string="${fmt_url.1}" re="^(35)$" />
+					<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+						description="${translate:high_quality} - ${optional:title.1}" type="flv" />
+				</rule>
+				<rule>
+					<if_not_re string="${fmt_url.1}" re="^(4|5|18|22|34|35)$" />
+					<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+						description="Unknown quality code ${fmt_url.1} - ${optional:title.1}" type="flv" />
+				</rule>
+			</each_re>
+		</rule>
+		<rule id="embed-youtube-2010">
+			<each_re ref="video_id" re="http://(?:www\.)?youtube\.com/v/([a-zA-Z0-9_\-]+)">
+				<download url="http://www.youtube.com/watch?v=${video_id.1}">
+					<rule goto="youtube.com" />
+				</download>
+			</each_re>
+		</rule>
+		<rule id="alluc.org">
+			<if_url ref="url" host="alluc.org" />
+			<rule>
+				<if_re string="${url.path}" re="^(/.*/)[^/]+$" ref="firstpath" />
+				<each_re ref="hcvalue" re="&lt;a href=&quot;([^/&quot;][^&quot;]+/watch\d+\.html\?hc=[^&quot;]+)&quot; target=&quot;_blank&quot; title=">
+					<download url="http://${url.host}${firstpath.1}${htmldecode:hcvalue.1}">
+						<rule goto="*" />
+					</download>
+				</each_re>
+			</rule>
+		</rule>
+		<rule id="generic_embedded">
+			<each_element ref="embedelem" tagname="embed" require_attrs="src" attrs="flashvars">
+				<rule id="all_embed">
+					<media url="${embedelem.src}" />
+				</rule>
+				<rule id="embed_with_media_ext">
+					<if_ext is_media="yes" filename="${embedelem.src}" />
+					<media url="${embedelem.src}" />
+				</rule>
+				<rule id="embed.veoh.com">
+					<if_re string="${embedelem.src}"> veoh\.com.*\.swf </if_re>
+					<rule>
+						<if_re string="${htmldecode:embedelem.src}" ref="videoid"> (?:\?|&amp;)permalinkId=([^&amp;]+) </if_re>
+						<rule goto="veoh" />
+					</rule>
+				</rule>
+				<rule id="smotri.com">
+					<if_re re="//pics.smotri.com/" string="${embedelem.src}" />
+					<if_re ref="vid_id" re="file=([^&amp;]+)&amp;" string="${embedelem.flashvars}" />
+					<download url="http://smotri.com/video/view/url/bot/?video_url=1&amp;ticket=${vid_id.1}">
+						<if_re ref="vid_url" re="&quot;_vidURL&quot;\s*:\s*&quot;([^&quot;]+)&quot;" />
+						<media url="${jsdecode:vid_url.1}" type="flv" />
+					</download>
+				</rule>
+				<rule id="magnatune.com.embed">
+					<if_re ref="playlisturl" string="${embedelem.src}"> embed\.magnatune\.com.*playlist_url=([^&amp;]+) </if_re>
+					<download url="${playlisturl.1}">
+						<rule id="xspf">
+							<each_re ref="track" re="&lt;track&gt;([\s\S]*?)&lt;/track&gt;" flags="m">
+								<if_re ref="loc" string="${track.1}"> &lt;location&gt;(.*?)&lt;/location&gt; </if_re>
+								<optional_re ref="image" string="${track.1}"> &lt;image&gt;(.*?)&lt;/image&gt; </optional_re>
+								<optional_re ref="ann" string="${track.1}"> &lt;annotation&gt;(.*?)&lt;/annotation&gt; </optional_re>
+								<media url="${loc.1}" description="${ann.1}" thumbnail="${image.1}" />
+							</each_re>
+						</rule>
+					</download>
+				</rule>
+				<rule id="metacafe">
+					<if_url ref="url" host="metacafe.com" />
+					<media
+						url="${qparam:mediaURL:embedelem.flashvars}?__gda__=${urlencode:qparam:gdaKey:embedelem.flashvars}"
+						description="${qparam:description:embedelem.flashvars}"
+						thumbnail="${qparam:staticURL:embedelem.flashvars}/thumb/${qparam:itemID:embedelem.flashvars}.jpg"
+						/>
+				</rule>
+				<rule id="embed.video.google.com">
+					<!-- possibly not working as we don't serialize page any more -->
+					<if_re ref="googlevidurl" string="${embedelem.src}">
+						/googleplayer\.swf\?videoUrl=([^&amp;]+)&amp;thumbnailUrl=([^&amp;]*)
+					</if_re>
+					<media url="${urldecode:googlevidurl.1}" thumbnail="${urldecode:googlevidurl.2}" />
+				</rule>
+				<rule id="embed.youtube.com">
+					<if_re ref="embedyoutube" string="${embedelem.src}">
+						youtube\.com\/v\/([^&amp;]+)
+					</if_re>
+					<download url="http://www.youtube.com/get_video_info?&amp;video_id=${embedyoutube.1}&amp;el=embedded&amp;ps=default">
+						<if_re ref="token"> token=([^&amp;]+)&amp; </if_re>
+						<if_re ref="title" optional="yes"> title=([^&amp;]+)&amp; </if_re>
+						<media description="${urldecode:title.1}" url="http://www.youtube.com/get_video?video_id=${embedyoutube.1}&amp;t=${token.1}" type="flv" thumbnail="http://i4.ytimg.com/vi/${embedyoutube.1}/default.jpg"/>
+					</download>
+				</rule>
+				<rule id="embed.vimeo.com" >
+					<if_re ref="vimeoscript" string="${embedelem.src}">
+						vimeo\.com/moogaloop\.swf\?clip_id=(\d+)&amp;
+					</if_re>
+					<rule goto="vimeodownload" />
+				</rule>
+				<rule id="embed.megavideo.com">
+					<if_re ref="videoid" string="${embedelem.src}" re="megavideo\.com/(?:.*/)?mv_player\.swf\?(?:.*&amp;)?v=([^&amp;]+)(?:&amp;|$)" />
+					<download url="http://www.megavideo.com/?v=${videoid.1}">
+						<rule goto="megavideo.com" />
+					</download>
+				</rule>
+				<!--
+				<rule id="metacafe">
+					http://www.metacafe.com/fplayer/2384460/crazy_old_man.swf
+					<if_re ref="embedsrc" string="${embedelem.src}">
+						^http://www.metacafe.com/fplayer/([^/]+)
+					</if_re>
+				</rule>
+				-->
+				<rule id="adultmult.ru">
+					<if_url host="adultmult.ru" />
+					<media url="${qparam:file:embedelem.flashvars}" thumbnail="${qparam:image:embedelem.flashvars}" type="flv" />
+				</rule>
+				<rule id="embed.xvidoes">
+					<if_re re="xvideos\.com" string="${embedelem.src}" />
+					<media url="${qparam:flv_url:htmldecode:embedelem.flashvars}" thumbnail="${qparam:url_bigthumb:htmldecode:embedelem.flashvars}" type="flv" />
+				</rule>
+				<rule id="generic_flashvars">
+					<!-- TODO - have some special tag to parse this sort of thing? -->
+					<each_re ref="queryparam" string="${embed.flashvars}" re="([^&amp;]+)=([^&amp;]+)">
+						<rule>
+							<if_re string="${queryparam.2}"> \.flv(?:\?|$) </if_re>
+							<media url="${queryparam.2}" type="flv" />
+						</rule>
+					</each_re>
+				</rule>
+				<rule id="embedsrc" priority="low">
+					<!-- normally swf files, can be any embed -->
+					<media src="${embedelem.src}" description="${translate:embedplayer}"/>
+				</rule>
+				<rule id="videmo">
+					<!-- for embedded players and the site iself -->
+					<if_re ref="vid" re="embed\.vidoemo\.com\/video\d+\/([A-Za-z0-9_-]+)$" string="${embedelem.src}" />
+					<download url="http://embed.vidoemo.com/player/vidoemo4.php?id=${vid.1}">
+						<if_re ref="flvpath" re="Name=&quot;FLVPath&quot;\s+Value=&quot;(https?://[^&quot;]+)&quot;" />
+						<media url="${flvpath.1}" type="flv" />
+					</download>
+				</rule>
+				<rule id="myspace">
+					<if_re string="${embedelem.src}" re="lads\.myspace\.com/videos/c\.swf.*m=(\d+)&amp;" ref="m" />
+					<download url="http://mediaservices.myspace.com/services/rss.ashx?videoID=${m.1}&amp;type=video">
+						<optional_element ref="title" tagname="title" attrs="innerHTML" />
+						<optional_element ref="thumb" tagname="media:thumbnail" attrs="url" />
+						<if_element ref="content" tagname="media:content" require_attrs="url" />
+						<media url="${content.url}" thumbnail="${thumb.url}" type="flv" description="${title.innerHTML}" />
+					</download>
+				</rule>
+			</each_element>
+			<each_element ref="param" tagname="param" require_attrs="name,value">
+				<rule id="pram.default">
+					<if_re string="${param.name}" flags="i"> (movie|src|href) </if_re>
+					<media url="${param.value}" description="${translate:embedplayer}"/>
+				</rule>
+				<rule id="param.youtube.com">
+					<if_re ref="embedyoutube" string="${param.value}">
+						youtube\.com\/v\/([^&amp;]+)
+					</if_re>
+					<download url="http://www.youtube.com/get_video_info?&amp;video_id=${embedyoutube.1}&amp;el=embedded&amp;ps=default">
+						<if_re ref="token"> token=([^&amp;]+)&amp; </if_re>
+						<if_re ref="title" optional="yes"> title=([^&amp;]+)&amp; </if_re>
+						<media description="${urldecode:title.1}" url="http://www.youtube.com/get_video?video_id=${embedyoutube.1}&amp;t=${token.1}" />
+					</download>
+				</rule>
+			</each_element>
+		</rule>
+		<!-- other rules which need re-download -->
+		<rule id="darktube.com">
+			<if_url host="darktube.com" />
+			<if_re ref="vid"> addVariable\(&quot;content_video&quot;,\s*&quot;([^&quot;]+)&quot;\) </if_re>
+			<optional_re ref="thumb"> &quot;unit_long(\d+)&quot; </optional_re>
+			<media url="http://media.darktube.com/${vid.1}" thumbnail="http://ss.darktube.com/thumbs/${thumb.1}.jpg" />
+		</rule>
+		<rule id="itsyourporn">
+			<if_url inhost="playah." />
+			<if_re ref="loc" re="autoStart=true&amp;phpPath=(playah.*?com)&amp;movieName=(movies/.*?\.flv)" />
+			<media url="http://${loc.1}/flvstream.php?file=${loc.2}&amp;position=0" type="flv" description="Flash video stream" />
+		</rule>
+		<rule id="2.dailymotion.com">
+			<if_url host="dailymotion.com"/>
+			<if_re ref="urllist" re="addVariable\(&quot;video&quot;,\s*&quot;([^&quot;]+?)&quot;\)" />
+			<optional_re ref="thumb" re="addVariable\(&quot;preview&quot;,\s*&quot;([^&quot;]+?)&quot;\)" />
+			<each_re ref="urlitem" string="${urldecode:urllist.1}" re="(?:^|\|)(.*?)@@(.*?)(?:$|\|)">
+				<rule id="2.dailymotion.com.spark">
+					<if_equal a="${urlitem.2}" b="spark" />
+					<media url="${urlitem.1}" description="${translate:mid_quality} - ${urlitem.2}" thumbnail="${urldecode:thumb.1}" type="flv" />
+				</rule>
+				<rule id="2.dailymotion.com.spak-mini">
+					<if_equal a="${urlitem.2}" b="spak-mini" />
+					<media url="${urlitem.1}" description="${translate:low_quality} - ${urlitem.2}" thumbnail="${urldecode:thumb.1}" type="flv" />
+				</rule>
+				<rule id="2.dailymotion.com.v6-hd">
+					<if_equal a="${urlitem.2}" b="vp6-hd" />
+					<media url="${urlitem.1}" description="${translate:hd_quality} - ${urlitem.2}" thumbnail="${urldecode:thumb.1}" type="vp6" />
+				</rule>
+				<rule id="2.dailymotion.com.vp6-hq">
+					<if_equal a="${urlitem.2}" b="vp6-hq" />
+					<media url="${urlitem.1}" description="${translate:high_quality} - ${urlitem.2}" thumbnail="${urldecode:thumb.1}" type="vp6" />
+				</rule>
+				<rule id="2.dailymotion.com.vp6">
+					<if_equal a="${urlitem.2}" b="vp6" />
+					<media url="${urlitem.1}" description="${translate:mid_quality} - ${urlitem.2}" thumbnail="${urldecode:thumb.1}" type="vp6" />
+				</rule>
+				<rule id="2.dailymotion.com.h264">
+					<if_equal a="${urlitem.2}" b="h264" />
+					<media url="${urlitem.1}" description="${translate:mid_quality} - ${urlitem.2}" thumbnail="${urldecode:thumb.1}" type="h264" />
+				</rule>
+				<rule id="2.dailymotion.com.default">
+					<!-- catch-all which duplicates all of those above -->
+					<media url="${urlitem.1}" description="${urlitem.2}" thumbnail="${urldecode:thumb.1}" />
+				</rule>
+			</each_re>
+		</rule>
+		<rule>
+			<if_url host="sevenload.com" />
+			<if_re ref="configpath" re="&lt;param name=&quot;flashVars&quot; value=&quot;configPath=(http%3A%2F%2Fflash.sevenload.com[^&quot;]+)&quot;" />
+			<download url="${urldecode:configpath.1}">
+				<each_re ref="loc" re="&lt;location[^&gt;]*&gt;\s*([^&lt;]+)\s*&lt;/location&gt;">
+					<media url="${loc.1}" />
+				</each_re>
+			</download>
+		</rule>
+	</download>
+	<rule id="generic_param">
+		<each_element tagname="param" ref="p" require_attrs="name,value">
+			<if_re string="${p.name}" flags="i"> (?:filename|url) </if_re>
+			<media url="${p.value}" />
+		</each_element>
+	</rule>
+	<rule id="comedycentral.com">
+		<if_url host="comedycentral.com" />
+		<if_re ref="mgid" re="/media/(mgid:cms:video:comedycentral.com:\d+)&quot;" />
+		<rule>
+			<download id="ccmgid" url="http://www.comedycentral.com/comedycentral/video/data/mrss.jhtml?useMediaGen=clip&amp;uri=${urlencode:mgid.1}&amp;poe=">
+				<optional_element ref="thumbnail" tagname="media:thumbnail" require_attrs="url" />
+				<each_element ref="videoxml" tagname="media:content" require_attrs="url">
+					<download id="ccxml" url="${videoxml.url}">
+						<each_re ref="src" re="&lt;src&gt;\s*([a-z]+)://(.*?)\s*&lt;/src&gt;">
+							<rule id="ccall">
+								<if_config name="show_all" value="true" />
+								<!--
+								rtmp link we can't download yet
+								-->
+								<media url="${src.1}://${src.2}" thumbnail="${thumbnail.url}" />
+							</rule>
+						</each_re>
+					</download>
+				</each_element>
+			</download>
+		</rule>
+	</rule>
+	<rule id="crunchyroll.com">
+		<if_url host="crunchyroll.com" />
+		<if_re ref="videoid"> video_id%3D%27(\d+)%27 </if_re>
+		<if_re ref="mediaid"> media_id%3D%27(\d+)%27 </if_re>
+		<media url="http://www.crunchyroll.com/getitem?videoid=${videoid.1}&amp;mediaid=${mediaid.1}" />
+	</rule>
+	<rule id="pornhub.com">
+		<if_url host="pornhub.com" />
+		<if_re ref="configurl" elem="script">
+			addVariable\("options", "(http%3A%2F%2Fwww.pornhub.com%2Fmx_player_(?:dev_)?config\.php.*?)"\);
+		</if_re>
+		<download url="${urldecode:configurl.1}">
+			<!-- badly formatted xml response -->
+			<if_re ref="flv_url">&lt;flv_url&gt;(.*?)&lt;/flv_url&gt;</if_re>
+			<optional_re ref="thumb_url">/videos/(\d+/\d+/\d+)/\d+.flv</optional_re>
+			<media url="${flv_url.1}" type="flv" thumbnail="http://pics1.pornhub.com/thumbs/${thumb_url.1}//small.jpg" />
+		</download>
+	</rule>
+	<rule id="videosz.com">
+		<rule id="videosz_movie">
+			<if_url host="videosz.com" ref="url" />
+			<rule>
+				<if_re string="${url.url}" re="dvd_id=(\d+)" ref="dvd_id" />
+				<each_re ref="vzinfo" re="var scene = new Array([\s\S]*?)scenesInfo\[(\d+)\] = scene;">
+					<if_re string="${vzinfo.1}" ref="scene" re="scene\['scene'\] = &quot;([^&quot;]+)&quot;;" />
+					<optional_re ref="place" string="${vzinfo.1}" re="scene\['place'\] = &quot;(\d+)&quot;;" />
+					<rule>
+						<optional_re ref="thumb" re="&quot;(http://ss\d+\.videosz\.com/${dvd_id.1}/.*/${place.1}/thumbs\d+/\d+\.jpg)&quot;" />
+						<rule>
+							<if_re string="${vzinfo.1}" re="scene\['host'\] = &quot;flv1&quot;;" />
+							<media url="http://galleries.videosz.com/${scene.1}_1/videosz-${scene.1}-1${place.1}.flv"  thumbnail="${thumb.1}" type="flv" description="flv ${scene.1}" />
+						</rule>
+						<rule>
+							<if_re string="${vzinfo.1}" re="scene\['host'\] = &quot;flv2&quot;;" />
+							<media url="http://largesamples.videosz.com/${dvd_id.1}/videosz-${scene.1}.flv"  thumbnail="${thumb.1}" type="flv" description="flv ${scene.1}" />
+							<media url="http://largesamples.videosz.com/${dvd_id.1}/videosz-${scene.1}.avi"  thumbnail="${thumb.1}" type="avi" description="avi ${scene.1}" />
+						</rule>
+					</rule>
+				</each_re>
+			</rule>
+		</rule>
+		<rule id="videosz_img">
+			<ifnot_url host="videosz.com" />
+			<if_re ref="vzimgurl" re="ss\d+\.videosz\.com/(\d+)/movie/\d+/\d+.jpg" />
+			<download url="http://videosz.com/movie.php?dvd_id=${vzimgurl.1}">
+				<rule goto="videosz_movie" />
+			</download>
+		</rule>
+	</rule>
+	<rule id="spankwire.com">
+		<if_url host="spankwire.com" ref="loc" />
+		<rule>
+			<if_re string="${loc.path}" ref="id"> /video(\d+)/ </if_re>
+			<download url="http://www.spankwire.com/Player/VideoXML.aspx?id=${id.1}&amp;pid=0&amp;r=${random:float}">
+				<each_element ref="xmlurl" tagname="url" require_attrs="innerHTML">
+					<media url="${xmlurl.innerHTML}" />
+				</each_element>
+			</download>
+		</rule>
+	</rule>
+	<rule>
+		<if_url host="metacafe.com" />
+		<if_re string="${.url}" ref="reurl" >
+			/watch/([^/]+)
+		</if_re>
+		<media url="http://www.metacafe.com/fplayer.php?itemID=${reurl.1}&amp;fs=n&amp;t=embedded" type="flv" />
+	</rule>
+	<rule id="vimeo.com">
+		<if_url host="vimeo.com" />
+		<if_re ref="vimeoscript" elem="script">
+			clip_id: '(\d+)',
+		</if_re>
+		<rule id="vimeodownload" target="vimeodownload">
+			<!-- download url should end in &amp;param_context=user:${user_id}&amp;context=user:${user_id} -->
+			<download url="http://vimeo.com/moogaloop/load/clip:${vimeoscript.1}/local?param_md5=0&amp;param_context_id=&amp;param_force_embed=0&amp;param_clip_id=${vimeoscript.1}&amp;param_show_portrait=0&amp;param_multimoog=&amp;param_server=vimeo.com&amp;param_show_title=0&amp;param_color=00ADEF&amp;param_autoplay=0&amp;param_show_byline=0&amp;param_fullscreen=1">
+				<each_element tagname="request_signature" ref="sig" attrs="innerHTML">
+					<each_element tagname="request_signature_expires" ref="expires" attrs="innerHTML">
+						<!-- <if_element tagname="clip_id" ref="clipid" attrs="innerHTML" /> -->
+						<optional_element tagname="thumbnail" ref="thumb" attrs="innerHTML" />
+						<optional_element tagname="caption" ref="caption" attrs="innerHTML" />
+						<media url="http://vimeo.com/moogaloop/play/clip:${vimeoscript.1}/${sig.innerHTML}/${expires.innerHTML}/?q=sd&amp;type=local" type="flv" thumbnail="${thumb.innerHTML}" description="${optional:caption.innerHTML}" />
+					</each_element>
+				</each_element>
+			</download>
+		</rule>
+	</rule>
+	<rule id="html5">
+		<each_element ref="vid" tagname="video" require_attrs="src" attrs="poster">
+			<media url="${vid.src}" thumbnail="${vid.poster}" />
+		</each_element>
+		<each_element ref="aud" tagname="audio" require_attrs="src">
+			<media url="${aud.src}" />
+		</each_element>
+		<each_element ref="sou" tagname="source" require_attrs="src">
+			<media url="${sou.src}" />
+		</each_element>
+	</rule>
+	<rule id="spiegel.de">
+		<if_url host="spiegel.de" path="/video/" ref="url" />
+		<rule>
+			<if_re string="${url.path}" ref="videoid"> /video/video\-(\d+)\.html </if_re>
+			<download url="http://video.spiegel.de/flash/${videoid.1}.xml">
+				<each_element tagname="filename" ref="filename" require_attrs="innerHTML">
+					<media url="http://video.spiegel.de/flash/${filename.innerHTML}" />
+				</each_element>
+			</download>
+		</rule>
+	</rule>
+	<rule id="search.googlevideo">
+		<!-- for google video search, grab the link to the page the video is really on -->
+		<if_url inhost="google" />
+		<rule id="video.google.com">
+			<if_re ref="div" flags="mi"> &lt;div\s+id=[&quot;']current\-title[&quot;']\s*&gt;([\s\S]*?)&lt;/div\s*&gt; </if_re>
+			<rule>
+				<if_re ref="url" string="${div.1}"> href=[&quot;'](http://[^&quot;']+)[&quot;'] </if_re>
+				<download url="${url.1}">
+					<rule goto="*" />
+				</download>
+			</rule>
+		</rule>
+		<rule id="video.google.de">
+			<each_element ref="alink" tagname="a" require_attrs="id,href">
+				<if_equal a="${alink.id}" b="hs_title_link" />
+				<download url="${alink.href}">
+					<rule goto="*" />
+				</download>
+			</each_element>
+		</rule>
+	</rule>
+	<rule id="keezmovies.com">
+		<if_url ref="url" host="keezmovies.com"/>
+		<rule>
+			<if_re ref="vidid" string="${url.path}"> /(\d+) </if_re>
+			<download url="http://www.keezmovies.com/watch_player.php?id=${vidid.1}">
+				<each_element ref="flvurl" tagname="flv_url" require_attrs="innerHTML">
+					<media url="${flvurl.innerHTML}" />
+				</each_element>
+			</download>
+		</rule>
+	</rule>
+	<rule id="animez.com.go4ent">
+		<if_url ref="azurl" host="go4ent.com" />
+		<rule>
+			<if_re ref="hexres" string="${hextostr:reversed:padprefix:0:2:qparam:urls:azurl.url}" > (http.*?\.flv) </if_re>
+			<media url="${hexres.1}" type="flv" />
+		</rule>
+	</rule>
+	<rule id="rutube.ru">
+		<if_url host="rutube.ru"/>
+		<each_re ref="playurl" re="'(http[^']+player\.swf\?[^']+)'" tagname="script">
+			<media url="${urldecode:qparam:file:htmldecode:playurl.1}" thumbnail="${urldecode:qparam:image:htmldecode:playurl.1}" />
+		</each_re>
+	</rule>
+	<rule id="revver.com">
+		<if_url ref="url" host="revver.com" path="/video" />
+		<rule>
+			<if_re ref="videoid" string="${url.url}"> /video/(\d+) </if_re>
+			<rule id="revver.com.downloadmov">
+				<!-- TODO - not always available? -->
+				<media url="http://media.revver.com/qt;download/${videoid.1}.mov" />
+			</rule>
+		</rule>
+	</rule>
+	<rule id="addvariable">
+		<!--
+		Applies to many sites:
+			* xn-/-hentaienespaol-1nb.com
+			* xhamster.com
+		-->
+		<each_element ref="script" tagname="script" require_attrs="innerHTML">
+			<each_re ref="video" string="${script.innerHTML}" re="(addParam|addVariable)\s*\(\s*[&quot;'](file|content_video|video)[&quot;']\s*,\s*[&quot;'](.*?)[&quot;']\s*\)">
+				<optional_re ref="thumbnail" string="${script.innerHTML}"> (addParam|addVariable)\s*\(\s*[&quot;'](image|thumbnail)[&quot;']\s*,\s*[&quot;'](.*?)[&quot;']\s*\) </optional_re>
+				<rule>
+					<!-- same server == default -->
+					<ifnot_url host="xhamster.com" />
+					<media url="${video.3}" thumbnail="${thumbnail.3}" />
+				</rule>
+				<rule>
+					<if_url host="xhamster.com" />
+					<if_re ref="srv"> addVariable\('srv','([^']+)'\) </if_re>
+					<media url="http://dl${srv.1}.xhamster.com/flv2/${video.3}" thumbnail="${thumbnail.3}" />
+				</rule>
+			</each_re>
+		</each_element>
+	</rule>
+	<rule id="mtv.de">
+		<!-- <if_url host="mtv.de" inpath="videos" /> -->
+		<if_re> intl\.esperanto\.mtvi\.com </if_re>
+		<if_re tagname="script" ref="videoid"> var uri\s*=\s*&quot;(.*?)&quot; </if_re>
+		<download url="http://intl.esperanto.mtvi.com/www/xml/video.jhtml?uri=${urlencode:videoid.1}" >
+			<optional_element ref="image" tagname="media:thumbnail" attrs="url" />
+			<each_element ref="content" tagname="media:content" require_attrs="url">
+				<download url="${content.url}">
+					<if_element ref="src" tagname="src" require_attrs="innerHTML" />
+					<media url="${src.innerHTML}" thumbnail="${image.url}" />
+				</download>
+			</each_element>
+		</download>
+	</rule>
+	<rule id="noembed.video.google.com">
+		<if_url inhost="google" />
+		<if_re ref="playerurl" tagname="script"> (googleplayer\.swf\?[^&quot;']+)[&quot;'] </if_re>
+		<media url="${qparam:videoUrl:jsdecode:playerurl.1}" thumbnail="${qparam:thumbnailUrl:jsdecode:playerurl.1}" />
+	</rule>
+	<!--
+	Lower priority
+	-->
+	<rule id="generic_link" priority="low">
+		<each_element ref="alink" tagname="a" require_attrs="href" attrs="innerHTML" slow="yes">
+			<rule id="generic_media_link">
+				<if_ext is_media="yes" filename="${alink.href}" />
+				<media url="${alink.href}" description="${alink.innerHTML}" />
+			</rule>
+			<rule id="a.multiply.com">
+				<!-- replace this with flash player one. -->
+				<if_url host="multiply.com" />
+				<if_re string="${qparam:xurl:alink.href}"> /playlist/ </if_re>
+				<playlist url="${qparam:xurl:alink.href}" type="m3u">
+					<each_re ref="m3u" re="(.+)">
+						<media url="${m3u.1}" />
+					</each_re>
+				</playlist>
+			</rule>
+		</each_element>
+	</rule>
+	<!--
+	=====================================================================
+	NOTICE: rules below this line are for testing only
+	=====================================================================
+	-->
+	<rule id="show_all">
+		<if_config name="show_all" value="true" />
+		<rule id="test_only">
+			<media url="http://example.com/example_result" description="You have enabled showing additional results." post="NODOWNLOAD" />
+			<media url="http://example.com/example_result" description="This is a duplicate" post="NODOWNLOAD" thumbnail="chrome://unplug/skin/unplug-32.png" />
+		</rule>
+		<rule id="npr.org">
+			<if_url host="npr.org" />
+			<rule id="npr.playerpage">
+				<if_url inpath="mediaPlayer.html" />
+				<download url="http://www.npr.org/templates/xanadu/xplayer.php?id=${qparam:id:.url}&amp;t=${qparam:t:.url}&amp;m=${qparam:m:.url}">
+					<each_re ref="mediaurl" re="&lt;mediaUrl&gt;(.*?)&lt;/mediaUrl&gt;">
+						<media url="http://92.122.210.172${htmldecode:mediaurl.1}" />
+					</each_re>
+				</download>
+			</rule>
+			<rule id="npr.link">
+				<each_re ref="nprlink" re="NPR\.Player\.openPlayer\((\d+),\s*(\d+),">
+					<download url="http://www.npr.org/templates/xanadu/xplayer.php?id=${nprlink.1}&amp;t=1&amp;m=${nprlink.2}">
+						<each_re ref="mediaurl" re="&lt;mediaUrl&gt;(.*?)&lt;/mediaUrl&gt;">
+							<media url="http://a92-122-210-172.deploy.akamaitechnologies.com${htmldecode:mediaurl.1}" />
+						</each_re>
+					</download>
+				</each_re>
+			</rule>
+		</rule>
+		<rule id="multiply.com">
+			<if_url ref="url" host="multiply.com" />
+			<rule>
+				<if_re ref="musicid"> /music/item/(\d+) </if_re>
+				<download url="http://${url.host}/api/music/item/${musicid.1}" post="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&lt;request xmlns=&quot;http://multiply.com/api/0.1&quot;&gt;&lt;params&gt;&lt;item_id&gt;${musicid.1}&lt;/item_id&gt;&lt;/params&gt;&lt;method&gt;music.item&lt;/method&gt;&lt;/request&gt;">
+					<each_re ref="data" re="&lt;src&gt;(.*?)&lt;/src&gt;(?:&lt;subject&gt;(.*?)&lt;/subject&gt;)?">
+						<media url="${data.1}" description="${data.2}" />
+					</each_re>
+				</download>
+			</rule>
+		</rule>
+		<rule>
+			<if_url host="metacafe.com" />
+			grab the video id
+			<if_re string="${.url}" ref="reurl" >
+				/watch/([^/]+)
+			</if_re>
+			<media url="http://www.metacafe.com/fplayer.php?itemID=${reurl.1}&amp;fs=n&amp;t=embedded" type="flv" />
+		</rule>
+		<rule id="bbciplayer">
+			<if_url ref="url" host="bbc.co.uk" inurl="/iplayer/episode/" />
+			<rule id="iplayer_1">
+				<if_re ref="groupid" string="${url.path}"> /iplayer/episode/([^/]+) </if_re>
+				<download url="http://www.bbc.co.uk/iplayer/playlist/${groupid.1}">
+					<!--
+					thumbnail:
+						playlist > link
+							rel="holding"
+							href="http://node1.bbcimg.co.uk/iplayer/images/episode/b00hvwp9_640_360.jpg"
+					-->
+					<optional_element ref="title" tagname="title" require_attrs="innerHTML" />
+					<each_element ref="item" tagname="item" require_attrs="kind,identifier">
+						<if_equal a="programme" b="${item.kind}" />
+						<!-- TODO - where do these other numbers come from? -->
+						<!-- the full url here has a ?cb=42483 at the end of it -->
+						<download url="http://www.bbc.co.uk/mediaselector/4/mtis/stream/${item.identifier}">
+							<each_element ref="conn" tagname="connection" attrs="kind,server,identifier,href,authString">
+								<!-- TODO - there are other items in the file for streaming flv versions, etc -->
+								<rule id="iplayer_directdl">
+									<if_isset name="${conn.href}" />
+									<!-- this is encrypted video -->
+									<if_re string="${conn.href}"> directdl\.iplayer\.bbc\.co\.uk </if_re>
+									<media url="${conn.href}" description="ENCRYPTED VIDEO" />
+								</rule>
+								<rule id="iplayer_subtitles">
+									<if_isset name="${conn.href}" />
+									<if_re string="${conn.href}"> live\.xml </if_re>
+									<media url="${conn.href}" type="subtitles" />
+								</rule>
+								<rule id="iplayer_rtmp">
+									<if_equal a="${conn.kind}" b="akamai" />
+									<media url="rtmp://92.122.210.174:1935/ondemand?_fcs_vhost=${conn.server}&amp;auth=${conn.authString}=v001&amp;slist=${conn.identifier}" />
+								</rule>
+							</each_element>
+						</download>
+					</each_element>
+				</download>
+			</rule>
+		</rule>
+		<rule id="testing.ubuntu">
+			<if_url host="start.ubuntu.com" inurl="8.10" />
+			<download url="http://dbatley.com/echo.php?foo=yay">
+				<media url="http://dbatley.com/test_only" type="txt" />
+			</download>
+		</rule>
+		<rule id="youku.com">
+			
+			<!-- transcribed from http://gist.github.com/4745 -->
+			<if_url ref="url" inhost="youku.com" />
+			<rule>
+				<if_re ref="videoid" re="var videoId=&quot;(.*?)&quot;;" />
+				<if_re ref="fid" string="${url.path}" re="/cd00(.*?)\.html" />
+				<download url="http://v.youku.com/v/playlistsummary/vid/${videoid.1}/url/${fid.1}?__rt=1&amp;__ro=video_show_summary" >
+					<if_re ref="fname" re="&lt;a title=&quot;.*?&quot; href=&quot;javascript:sendVideoLink\('.*?','(.*?)'\);&quot; charset=&quot;.*&quot;&gt;.*&lt;/a&gt;" />
+					<rule>
+						<if_re ref="fname_parts" re='^(.*?)0200010700(.*?)$' string="${fname.1}" />
+						<media url="http://60.217.252.21/${fname_parts.1}020001070[0-6]${fname_parts.2}.flv" type="flv" />
+					</rule>
+				</download>
+			</rule>
+		</rule>
+	</rule>
+</unplug>
+

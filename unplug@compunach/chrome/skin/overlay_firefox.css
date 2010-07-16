@@ -1,0 +1,13 @@
+toolbarbutton#unplug2_toolbarbutton {
+	list-style-image : url(chrome://unplug/skin/unplug-24.png);
+}
+
+toolbar[iconsize="small"] toolbarbutton#unplug2_toolbarbutton {
+	list-style-image : url(chrome://unplug/skin/unplug-16.png);
+}
+
+menuitem#unplug2_toolsmenu ,
+menuitem#unplug2_contextmenu {
+	list-style-image : url(chrome://unplug/skin/unplug-16.png);
+}
+

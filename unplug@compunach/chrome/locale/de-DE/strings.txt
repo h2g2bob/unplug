@@ -1,0 +1,27 @@
+extensions.{unplug@compunach}.description=Download embedded media
+
+# Confirmation after clicking on "Nothing found" button
+nothing_found_send_data=M\u00F6chten Sie den Entwicklern von UnPlug Informationen \u00FCber diese Webseite zukommen lassen?
+
+# Short status strings during/after clicking "Nothing found" button
+nothing_found_sending=Sended...
+nothing_found_done=Danke!
+nothing_found_failed=Fehlgeschlagen
+
+# for below the search box
+search_done=Fertig
+search_busy=Arbeitet
+search_1_active_download=1 aktiver Download
+search_n_active_downloads=# aktive Downloads
+search_no_results_yet=Keine Ergebnisse bis jetzt
+search_1_result=1 Ergebnis
+search_n_results=# Ergebnisse
+search_no_results=keine Ergebnisse
+
+# for rules.xml
+high_quality=Hohe Qualit\u00E4t
+low_quality= Niedrige Qualit\u00E4t
+mid_quality=Normale Qualit\u00E4t
+hd_quality=HD Qualit\u00E4t
+embedplayer=Eingebettetes Odjekt (vielleicht ein MediaPlayer und kein Video)
+

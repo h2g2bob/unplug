@@ -1,0 +1,15 @@
+content     unplug                chrome/content/
+# application={ec8030f7-c20a-464f-9b0e-13a3a9e97384}
+overlay chrome://browser/content/browser.xul chrome://unplug/content/overlay/firefox.xul
+
+skin        unplug     default    chrome/skin/
+
+#testing
+#locale      unplug     en-US      chrome/locale/pl-PL/
+
+locale      unplug     en-US      chrome/locale/en-US/
+locale      unplug     de-DE      chrome/locale/de-DE/
+locale      unplug     pl-PL      chrome/locale/pl-PL/
+
+
+

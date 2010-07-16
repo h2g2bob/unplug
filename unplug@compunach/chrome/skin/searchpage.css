@@ -1,0 +1,92 @@
+image#thumbnail {
+	width: 4.8em;
+	height: 2.8em;
+	border: 1px black solid;
+	margin: 0.2em;
+	background: #000000;
+}
+
+#name {
+	font-weight: bold;
+}
+
+#host {
+	font-size: smaller;
+	color: #008000;
+}
+
+#protocol {
+}
+
+#description {
+}
+
+unplug_result.swf {
+	color: #666666;
+}
+
+toolbarbutton.config,
+menuitem.config {
+	list-style-image: url("chrome://unplug/skin/tango-16/preferences-system.png");
+}
+
+toolbarbutton.saveas,
+menuitem.saveas {
+	list-style-image: url("chrome://unplug/skin/tango-16/document-save-as.png");
+}
+
+toolbarbutton.dta,
+menuitem.dta {
+	list-style-image: url("chrome://dta/skin/common/dta.png");
+}
+
+toolbarbutton.flashgot,
+menuitem.flashgot {
+	list-style-image: url("chrome://flashgot/skin/fg1.png");
+}
+
+toolbarbutton.fallback,
+menuitem.fallback {
+	list-style-image: url("chrome://unplug/skin/tango-16/dialog-error.png");
+}
+
+
+toolbarbutton.copyurl,
+menuitem.copyurl {
+	list-style-image: url("chrome://unplug/skin/tango-16/edit-copy.png");
+}
+
+toolbarbutton.opentab,
+menuitem.opentab {
+	list-style-image: url("chrome://unplug/skin/tango-16/tab-new.png");
+}
+
+toolbarbutton.opennew,
+menuitem.opennew {
+	list-style-image: url("chrome://unplug/skin/tango-16/window-new.png");
+}
+
+toolbarbutton.openover,
+menuitem.openover {
+	list-style-image: url("chrome://unplug/skin/tango-16/window.png");
+}
+
+toolbarbutton > toolbarbutton > label {
+	/* this aligns the label on the drop-down buttons correctly (ie: not just on the top) */
+	max-height : 1em;
+}
+
+#dynamic_results.failed {
+	color: #cc0000;
+	font-weight: bold;
+}
+
+#stop_button {
+	list-style-image: url("chrome://unplug/skin/tango-16/process-stop.png");
+}
+
+#stop_button[disabled] {
+	/* greyscale; brightness + 100% */
+	list-style-image: url("chrome://unplug/skin/tango-16/process-stop-disabled.png");
+}
+

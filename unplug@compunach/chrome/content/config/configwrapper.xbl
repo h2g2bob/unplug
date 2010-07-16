@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
+<!DOCTYPE bindings SYSTEM "chrome://unplug/locale/unplug_result.dtd" >
+<!--
+/*
+ *         _        ___
+ *    /\ / /___    / _ \ /\ /\  _ ___
+ *   / // // _ \  / // // // // // _ \
+ *  / // // // / / ___// // // // // /
+ *  \___//_//_/ /_/   /_/ \___/ \_  /
+ *                             \___/
+ * 
+ *  Compunach UnPlug
+ *  Copyright (C) 2009 David Batley <unplug@dbatley.com>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+This binding accepts a single child element and provides two methods .setValue and .getValue which can set its value in the same way (regardless of what the child element actually is)
+
+-->
+<bindings xmlns="http://www.mozilla.org/xbl" xmlns:xbl="http://www.mozilla.org/xbl" xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	<binding id="configwrapper">
+		<implementation>
+			<!-- name of config option -->
+			<field name="name" readonly="false" />
+			<!-- default value of option -->
+			<field name="default" readonly="false" />
+			<!-- set this config item's value -->
+			<method name="setValue">
+				<parameter name="value"/>
+				<body>
+					// search child nodes and set value
+					var target = this.firstChild;
+					switch (target.tagName) {
+						case "checkbox":
+							target.setAttribute("checked", value ? "true" : "false");
+							break;
+						case "menulist":
+							// Firefox 3.0+
+							// TODO - broke this too :)
+							for (var i=0; i &lt; target.itemCount; i++) {
+								if (target.getItemAtIndex(i).value == value)
+									target.selectedIndex = i;
+							}
+							break;
+						default:
+							alert(target.tagName + " is not an XUL element which can be configwrappered");
+							break;
+					}
+				</body>
+			</method>
+			<!-- get this config item's value -->
+			<method name="getValue">
+				<body>
+					// search child nodes and get value
+					var target = this.firstChild;
+					switch (target.tagName) {
+						case "checkbox":
+							return target.getAttribute("checked") == "true";
+						case "menulist":
+							return String(target.selectedItem.value);
+						default:
+							alert(target.tagName + " is not an XUL element which can be configwrappered");
+							return null;
+					}
+				</body>
+			</method>
+		</implementation>
+		<content>
+			<children />
+		</content>
+	</binding>
+
+</bindings>
+

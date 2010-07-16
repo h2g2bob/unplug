@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://unplug/skin/searchpage.css" type="text/css"?>
+<?xml-stylesheet href="chrome://unplug/content/display/pop/unplug_result.css" type="text/css"?>
+<!DOCTYPE dialog [
+	<!ENTITY % dtdcommon SYSTEM "chrome://unplug/locale/common.dtd">
+	%dtdcommon;
+	<!ENTITY % dtdlocal SYSTEM "chrome://unplug/locale/searchpage.dtd">
+	%dtdlocal;
+	]>
+<!--
+/*
+ *         _        ___
+ *    /\ / /___    / _ \ /\ /\  _ ___
+ *   / // // _ \  / // // // // // _ \
+ *  / // // // / / ___// // // // // /
+ *  \___//_//_/ /_/   /_/ \___/ \_  /
+ *                             \___/
+ * 
+ *  Compunach UnPlug
+ *  Copyright (C) 2009 David Batley <unplug@dbatley.com>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+-->
+<dialog id="cn_unplug2_search"
+  title="&dialog.title;"
+  flex="1"
+  buttons="extra1,accept"
+  defaultButton="accept"
+
+  width="600"
+  height="500"
+  
+  buttonlabelextra1="&configure;"
+  buttonaccesskeyextra1="&configure.a;"
+  
+  onload="UnPlug2SearchPage.do_search();"
+  ondialogaccept=""
+  ondialogextra1="window.openDialog(&quot;chrome://unplug/content/config/config.xul&quot;)"
+  onbeforeunload="UnPlug2SearchPage.abort();"
+  
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	
+	<script type="application/x-javascript" src="chrome://unplug/content/common.js" />
+	<script type="application/x-javascript" src="chrome://unplug/content/search/search.js" />
+	<script type="application/x-javascript" src="chrome://unplug/content/search/rules.js" />
+	<script type="application/x-javascript" src="chrome://unplug/content/display/pop/pop.js" />
+	
+	<script src="chrome://global/content/nsDragAndDrop.js" />
+	<script src="chrome://global/content/nsTransferable.js" />
+	
+	<dialogheader title="&header.title;" description="&header.subtitle;"/>
+	<vbox id="results" style="overflow: -moz-scrollbars-vertical; border: 1px #666666 solid;" flex="1" />
+	<spacer height="0.5em;" />
+	<hbox>
+		<label id="dynamic_download" value="" />
+		<spacer flex="1" />
+		<label id="dynamic_results" value="" />
+	</hbox>
+	<hbox>
+		<button oncommand="UnPlug2SearchPage.abort();" id="stop_button" label="&stop.label;"  accesskey="&stop.accesskey;" />
+		<spacer flex="1" />
+		<button oncommand="UnPlug2SearchPage.send_nothing_found_msg();" id="notfound_button" label="&notfound.label;"  accesskey="&notfound.accesskey;" />
+	</hbox>
+	<spacer height="0.5em;" />
+	<progressmeter id="search_progress" mode="determined" value="0"/>
+</dialog>
+

@@ -1,0 +1,76 @@
+<!--
+/*
+ *         _        ___
+ *    /\ / /___    / _ \ /\ /\  _ ___
+ *   / // // _ \  / // // // // // _ \
+ *  / // // // / / ___// // // // // /
+ *  \___//_//_/ /_/   /_/ \___/ \_  /
+ *                             \___/
+ * 
+ *  Compunach UnPlug
+ *  Copyright (C) 2009 David Batley <unplug@dbatley.com>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+-->
+
+<!ENTITY configheader.subtitle "Zmieñ ustawienia">
+
+<!-- tab headings -->
+<!ENTITY tab.title.general "Opcje ogólne">
+<!ENTITY tab.title.opener "Otwieracz">
+<!ENTITY tab.title.downloader "Pobieracz">
+<!ENTITY tab.title.advanced "Zaawansowane">
+<!ENTITY tab.title.about "O wtytczce UnPlug">
+
+<!-- general options -->
+<!ENTITY interface.title "Gdzie dodaæ UnPlug">
+<!ENTITY interface.toolsmenu "Dodaj skrót do menu &quot;Narzêdzia&quot;">
+<!ENTITY interface.toolsmenu.a "t">
+<!ENTITY interface.contextmenu "Dodaj skrót do menu kontekstowego (prawoklik)">
+<!ENTITY interface.contextmenu.a "x">
+<!ENTITY interface.toolbarbtn "Dodaj przycisk do paska narzêdzi">
+<!ENTITY interface.toolbarbtn.a "b">
+<!ENTITY privacy.title "Prywatnoæ">
+<!ENTITY privacy.popcontest "Wysy³aj informacje na jakich stronach u¿ywasz UnPlug">
+<!ENTITY privacy.popcontest.a "S">
+<!ENTITY privacy.infolink "O tej funkcji">
+<!ENTITY privacy.infolink.a "A">
+<!ENTITY rulesxml.title "Plik rules.xml">
+<!ENTITY rulesxml.description "Plik rules.xml posiada informacje jak odnajdywaæ media na stronie internetowej.">
+<!ENTITY rulesxml.default "Domylne">
+<!ENTITY rulesxml.default.a "D">
+
+<!-- opener tab -->
+
+<!-- downloader tab -->
+<!ENTITY downloader.auto "Automatycznie">
+<!ENTITY downloader.addons "Wspierane rozszerzenia">
+<!ENTITY downloader.dta "DownThemAll">
+<!ENTITY downloader.flashgot "FlashGot">
+
+<!-- advanced tab -->
+<!ENTITY showall.title "Poka¿ dodatkowe rezultaty">
+<!ENTITY showall.label "Poka¿ rezultaty które mog¹ dzia³aæ le">
+<!ENTITY showall.label.a "S">
+
+<!-- about tab -->
+<!ENTITY about.title "Dziêkujê Ci za zainstalowanie UnPlug">
+<!ENTITY about.description "UnPlug jest darmowy and open source.">
+<!ENTITY about.gpl "GNU General Public License">
+<!ENTITY about.updated "Zmieniono ustawienia UnPlug.">
+
+
+

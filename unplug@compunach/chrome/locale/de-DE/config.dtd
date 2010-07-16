@@ -1,0 +1,76 @@
+<!--
+/*
+ *         _        ___
+ *    /\ / /___    / _ \ /\ /\  _ ___
+ *   / // // _ \  / // // // // // _ \
+ *  / // // // / / ___// // // // // /
+ *  \___//_//_/ /_/   /_/ \___/ \_  /
+ *                             \___/
+ * 
+ *  Compunach UnPlug
+ *  Copyright (C) 2009 David Batley <unplug@dbatley.com>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+-->
+
+<!ENTITY configheader.subtitle "Einstellungen &#228;ndern">
+
+<!-- tab headings -->
+<!ENTITY tab.title.general "Allgemein">
+<!ENTITY tab.title.opener "	&#214;ffner">
+<!ENTITY tab.title.downloader "Downloader">
+<!ENTITY tab.title.advanced "Erweitert">
+<!ENTITY tab.title.about "&#220;ber UnPlug">
+
+<!-- general options -->
+<!ENTITY interface.title "Firefox Men&#252;s">
+<!ENTITY interface.toolsmenu "UnPlug im Men&#252; 'Extras' anzeigen">
+<!ENTITY interface.toolsmenu.a "E">
+<!ENTITY interface.contextmenu "UnPlug im Kontextmen&#252; (Rechtsklick) anzeigen">
+<!ENTITY interface.contextmenu.a "x">
+<!ENTITY interface.toolbarbtn "UnPlug in der Symbolleiste anzeigen">
+<!ENTITY interface.toolbarbtn.a "S">
+<!ENTITY privacy.title "Privatsph&#228;re">
+<!ENTITY privacy.popcontest "&#220;bermittle Informationen, auf welchen Webseiten Sie UnPlug benutzen">
+<!ENTITY privacy.popcontest.a "I">
+<!ENTITY privacy.infolink "Mehr dar&#252;ber">
+<!ENTITY privacy.infolink.a "M">
+<!ENTITY rulesxml.title "Rules.xml">
+<!ENTITY rulesxml.description "Rules.xml beinhaltet Information dar&#252;ber, wie Sie Medien auf Webseiten entdecken.">
+<!ENTITY rulesxml.default "Standard">
+<!ENTITY rulesxml.default.a "S">
+
+<!-- opener tab -->
+
+<!-- downloader tab -->
+<!ENTITY downloader.auto "Automatisch">
+<!ENTITY downloader.addons "Unterst&#252;tzte Add-ons">
+<!ENTITY downloader.dta "DownThemAll">
+<!ENTITY downloader.flashgot "FlashGot">
+
+<!-- advanced tab -->
+<!ENTITY showall.title "Zeige zus&#228;tzliche Ergebnisse">
+<!ENTITY showall.label "Zeige Ergebnisse, die nicht korrekt funktionieren">
+<!ENTITY showall.label.a "f">
+
+<!-- about tab -->
+<!ENTITY about.title "Danke, dass Sie UnPlug installiert haben">
+<!ENTITY about.description "UnPlug ist kostenlos und OpenSource.">
+<!ENTITY about.gpl "GNU General Public License">
+<!ENTITY about.updated "UnPlugs Einstellungen wurden ge&#228;ndert.">
+
+
+

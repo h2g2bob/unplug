@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://unplug/skin/overlay_firefox.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://unplug/locale/overlay.dtd" >
+<!--
+/*
+ *         _        ___
+ *    /\ / /___    / _ \ /\ /\  _ ___
+ *   / // // _ \  / // // // // // _ \
+ *  / // // // / / ___// // // // // /
+ *  \___//_//_/ /_/   /_/ \___/ \_  /
+ *                             \___/
+ * 
+ *  Compunach UnPlug
+ *  Copyright (C) 2009 David Batley <unplug@dbatley.com>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+-->
+<overlay id="unplug2_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	<script type="application/x-javascript" src="chrome://unplug/content/common.js" />
+	<script type="application/x-javascript" src="chrome://unplug/content/overlay/all.js" />
+	<script type="application/x-javascript" src="chrome://unplug/content/overlay/firefox.js" />
+	
+	<popup id="contentAreaContextMenu">
+		<menuitem id="unplug2_contextmenu" label="&menuitem.unplug;" accesskey="&menuitem.u;" insertbefore="context-viewpartialsource-selection" oncommand="UnPlug2Overlay.run();" class="menuitem-iconic" />
+	</popup>
+	
+	<menupopup id="menu_ToolsPopup">
+		<menuitem id="unplug2_toolsmenu" label="&menuitem.unplug;" accesskey="&menuitem.u;" insertafter="javascriptConsole" oncommand="UnPlug2Overlay.run();" class="menuitem-iconic" />
+	</menupopup>
+	
+	<toolbarpalette id="BrowserToolbarPalette">
+		<toolbarbutton id="unplug2_toolbarbutton" class="toolbarbutton" name="unplug2_toolbarbutton" tooltiptext="&toolbarbutton.unplug.tip;" oncommand="UnPlug2Overlay.run();" label="&toolbarbutton.unplug;" />
+	</toolbarpalette> 
+</overlay>
+
