@@ -146,7 +146,7 @@ UnPlug2Rules = {
 	 */
 	exec_statement : function (rule, node, variables, url, text, doc) {
 		if (!rule)
-			throw statement_name + " is not a rule which has been implemented in " + UnPlug2.version + " " + UnPlug2.revision;
+			throw "Rule " + rule + " is not a rule which has been implemented in " + UnPlug2.version + " " + UnPlug2.revision;
 		if (node.hasAttribute("debug")) {
 			alert("Rule: " + rule + " Node: " + node + "\nVar: " + variables.toSource() + "\nUrl: " + url + "\nDoc: " + doc + "\n\n" + text);
 		}
@@ -473,6 +473,7 @@ UnPlug2Rules = {
 					var got_all_req = true;
 					for (var i = 0; i < require_attrs.length; i++) {
 						var x = UnPlug2Rules._get_attrib_from_tagname_string(tag, require_attrs[i]);
+						// x = (x || "").replace(RegExp("^\\s+|\\s+$", "g"), "") // strip whitespace
 						if (!x) {
 							got_all_req = false;
 							break;
@@ -521,6 +522,9 @@ UnPlug2Rules = {
 					switch (req_attr) {
 						case "innerHTML" : 
 							result.innerHTML = elem.textContent;
+							if (!result.innerHTML) {
+								got_all_required = false;
+							}
 							break;
 						case "":
 							break;
