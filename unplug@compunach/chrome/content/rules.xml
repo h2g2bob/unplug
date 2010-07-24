@@ -39,6 +39,7 @@
 -->
 <unplug>
 	<rule id="generic_flv_string">
+		<!-- possible alternative? <each_re ref="flvre" re="(https?://[a-z0-9_/\.\-]+\.flv(?:\?[a-z0-9_/\.%=&amp;\-]*)?)" flags="i"> -->
 		<each_re ref="flvre" re="[&quot;']((?:http|/)[^&quot;']+\.flv(?:\?[^&quot;']+)?)[&quot;']">
 			<media url="${flvre.1}" certainty="low" />
 		</each_re>
@@ -410,7 +411,46 @@
 				</each_re>
 			</download>
 		</rule>
-	</download>
+		<rule id="addvariable">
+			<!--
+			Applies to many sites:
+				* xn-/-hentaienespaol-1nb.com
+				* xhamster.com
+				* www.movshare.net
+			-->
+			<each_re ref="video" re="(addParam|addVariable)\s*\(\s*[&quot;'](file|content_video|video)[&quot;']\s*,\s*[&quot;'](.*?)[&quot;']\s*\)">
+				<optional_re ref="thumbnail">(addParam|addVariable)\s*\(\s*[&quot;'](image|thumbnail)[&quot;']\s*,\s*[&quot;'](.*?)[&quot;']\s*\) </optional_re>
+				<rule>
+					<!-- same server == default -->
+					<ifnot_url host="xhamster.com" />
+					<media url="${video.3}" thumbnail="${thumbnail.3}" />
+				</rule>
+				<rule>
+					<if_url host="xhamster.com" />
+					<if_re ref="srv"> addVariable\('srv','([^']+)'\) </if_re>
+					<media url="http://dl${srv.1}.xhamster.com/flv2/${video.3}" thumbnail="${thumbnail.3}" />
+				</rule>
+			</each_re>
+		</rule>
+		<rule id="vidz-sample">
+			<if_url host="vidz.com" />
+			<if_re ref="vid" re="&quot;http://phone\.vidz\.com/(.*?)\.3gp&quot;" />
+			<media url="http://phone.vidz.com/${vid.1}.3gp" description="${translate:low_quality} (3gp / phone)" type="3gp" />
+			<media url="http://streaming.vidz.com/${vid.1}.flv" description="${translate:mid_quality}" type="flv" />
+		</rule>
+		<rule id="pornhub.com">
+			<!-- pornhub, extremetube, etc -->
+			<if_re ref="vidid" re="&lt;param name=&quot;FlashVars&quot; value=&quot;options=(http://[^/]+/embed_player\.php\?id=\d+)&quot;/&gt;" />
+			<!--<if_re ref="vidid" re="&lt;input type=&quot;hidden&quot; id=&quot;video_0&quot; value=&quot;(\d+)&quot;/>" />-->
+			<download url="${vidid.1}">
+				<if_element ref="flv_url" tagname="flv_url" require_attrs="innerHTML" />
+				<rule>
+					<optional_re string="${flv_url.innerHTML}" ref="thumbpart" re="/videos/(\d+/\d+/\d+)/\d+\.flv$" />
+					<media url="${flv_url.innerHTML}" type="flv" thumbnail="http://ph-pics.phncdn.com/thumbs/${thumbpart.1}/small.jpg" />
+				</rule>
+			</download>
+		</rule>
+	</download><!-- flashblock workaround -->
 	<rule id="generic_param">
 		<each_element tagname="param" ref="p" require_attrs="name,value">
 			<if_re string="${p.name}" flags="i"> (?:filename|url) </if_re>
@@ -444,18 +484,6 @@
 		<if_re ref="videoid"> video_id%3D%27(\d+)%27 </if_re>
 		<if_re ref="mediaid"> media_id%3D%27(\d+)%27 </if_re>
 		<media url="http://www.crunchyroll.com/getitem?videoid=${videoid.1}&amp;mediaid=${mediaid.1}" />
-	</rule>
-	<rule id="pornhub.com">
-		<if_url host="pornhub.com" />
-		<if_re ref="configurl" elem="script">
-			addVariable\("options", "(http%3A%2F%2Fwww.pornhub.com%2Fmx_player_(?:dev_)?config\.php.*?)"\);
-		</if_re>
-		<download url="${urldecode:configurl.1}">
-			<!-- badly formatted xml response -->
-			<if_re ref="flv_url">&lt;flv_url&gt;(.*?)&lt;/flv_url&gt;</if_re>
-			<optional_re ref="thumb_url">/videos/(\d+/\d+/\d+)/\d+.flv</optional_re>
-			<media url="${flv_url.1}" type="flv" thumbnail="http://pics1.pornhub.com/thumbs/${thumb_url.1}//small.jpg" />
-		</download>
 	</rule>
 	<rule id="videosz.com">
 		<rule id="videosz_movie">
@@ -601,28 +629,6 @@
 				<media url="http://media.revver.com/qt;download/${videoid.1}.mov" />
 			</rule>
 		</rule>
-	</rule>
-	<rule id="addvariable">
-		<!--
-		Applies to many sites:
-			* xn-/-hentaienespaol-1nb.com
-			* xhamster.com
-		-->
-		<each_element ref="script" tagname="script" require_attrs="innerHTML">
-			<each_re ref="video" string="${script.innerHTML}" re="(addParam|addVariable)\s*\(\s*[&quot;'](file|content_video|video)[&quot;']\s*,\s*[&quot;'](.*?)[&quot;']\s*\)">
-				<optional_re ref="thumbnail" string="${script.innerHTML}"> (addParam|addVariable)\s*\(\s*[&quot;'](image|thumbnail)[&quot;']\s*,\s*[&quot;'](.*?)[&quot;']\s*\) </optional_re>
-				<rule>
-					<!-- same server == default -->
-					<ifnot_url host="xhamster.com" />
-					<media url="${video.3}" thumbnail="${thumbnail.3}" />
-				</rule>
-				<rule>
-					<if_url host="xhamster.com" />
-					<if_re ref="srv"> addVariable\('srv','([^']+)'\) </if_re>
-					<media url="http://dl${srv.1}.xhamster.com/flv2/${video.3}" thumbnail="${thumbnail.3}" />
-				</rule>
-			</each_re>
-		</each_element>
 	</rule>
 	<rule id="mtv.de">
 		<!-- <if_url host="mtv.de" inpath="videos" /> -->
