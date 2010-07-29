@@ -130,6 +130,7 @@ UnPlug2Download.prototype = {
 			UnPlug2.log("Duplicate callback: ok " + this)
 			return
 		}
+		this.clear_timeout()
 		this._done = true;
 		this.text = this._xmlhttp.responseText;
 		this.xmldoc = this._xmlhttp.responseXML;
@@ -141,6 +142,7 @@ UnPlug2Download.prototype = {
 			UnPlug2.log("Duplicate callback: fail " + this)
 			return
 		}
+		this.clear_timeout()
 		this._done = true;
 		this._extern_callback_fail(this);
 	},
@@ -159,7 +161,7 @@ UnPlug2Download.prototype = {
 		this.cancel();
 	},
 	
-	clear_timout : function () {
+	clear_timeout : function () {
 		if (this._timeout) {
 			window.clearTimeout(this._timeout);
 			this._timeout = null;
