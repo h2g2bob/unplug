@@ -35,14 +35,17 @@
  */
 UnPlug2Download = function (reference, url, post_data, callback_ok, callback_fail, timeout) {
 	this.url = url;
+	this._post_data = post_data;
 	this.reference = reference;
 	this._extern_callback_ok = callback_ok;
 	this._extern_callback_fail = callback_fail;
 	this._done = false;
 	this._percent = 0;
 	this._xmlhttp = new XMLHttpRequest();
+	this._timeout_delay = timeout;
 	this.text = null;
 	this.xmldoc = null;
+	this._started = false;
 	
 	// this in these callbacks are xhttprequests.
 	// which is dumb
@@ -58,24 +61,44 @@ UnPlug2Download = function (reference, url, post_data, callback_ok, callback_fai
 	// abort isn't in 3.0.5
 	// this._xmlhttp.addEventListener("abort", this._internal_callback_fail, false); 
 	
-	this._timeout = window.setTimeout(function () { realthis._timeout_callback(); }, timeout);
-	
-	if (post_data) {
-		this._xmlhttp.open('POST', url, true);  
-		this._xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-		this._xmlhttp.send(post_data);
-	} else {
-		this._xmlhttp.open('GET', url, true);  
-		this._xmlhttp.send(null); 
-	}
-	
 	return this;
 }
 UnPlug2Download.prototype = {
 	/**
+	 * Returns true if the download has started
+	 */
+	is_started : function () {
+		return this._started || this._done;
+	},
+	
+	/**
+	 * Starts the download
+	 */
+	start : function () {
+		if (this._started) {
+			return;
+		}
+		this._started = true;
+		if (this._done) {
+			return; // this is set on cancel.
+		}
+		var realthis = this;
+		this._timeout = window.setTimeout(function () { realthis._timeout_callback(); }, this._timeout_delay);
+		
+		if (this._post_data) {
+			this._xmlhttp.open('POST', this.url, true);  
+			this._xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			this._xmlhttp.send(this._post_data);
+		} else {
+			this._xmlhttp.open('GET', this.url, true);  
+			this._xmlhttp.send(null); 
+		}
+	},
+	
+	/**
 	 * Returns true if the download has completed (or failed)
 	 */
-	complete : function () {
+	is_complete : function () {
 		return this._done;
 	},
 	
@@ -484,7 +507,6 @@ UnPlug2Search = {
 	
 	/**
 	 * Ask for a file to be downloaded
-	 * This doesn't actually queue right now, but just goes and downloads it
 	 * url must be an nsIURI object
 	 */
 	_queue_download : function (url, post_data, rules_to_apply, variables, timeout) {
@@ -497,7 +519,12 @@ UnPlug2Search = {
 			return
 		}
 		
-		UnPlug2Search._downloads[dl_id] = { rules_to_apply: rules_to_apply, variables : variables, download: null, nsiuri: url };
+		UnPlug2Search._downloads[dl_id] = {
+			rules_to_apply: rules_to_apply,
+			variables : variables,
+			download: null,
+			nsiuri: url,
+			priority : 50 };
 		// start download after setting everything else up
 		try {
 			UnPlug2Search._downloads[dl_id].download = new UnPlug2Download(
@@ -507,11 +534,62 @@ UnPlug2Search = {
 				UnPlug2Search._download_callback_ok,
 				UnPlug2Search._download_callback_fail,
 				timeout);
-			UnPlug2.log("Download began " + UnPlug2Search._downloads[dl_id].download);
+			UnPlug2.log("Download queued " + UnPlug2Search._downloads[dl_id].download);
 		} catch (e) {
-			UnPlug2.log("Download failed for " + UnPlug2Search._downloads[dl_id].download + " because " + e);
+			UnPlug2.log("Download failed to be queued for " + UnPlug2Search._downloads[dl_id].download + " because " + e);
 			// .download not assigned
-			UnPlug2Search._downloads[dl_id] = null;
+			UnPlug2Search._downloads[dl_id].download = null;
+		}
+		UnPlug2Search._do_download_poll = true;
+	},
+	
+	poll : function () {
+		if (UnPlug2Search._stopped) {
+			return;
+		}
+		
+		if (UnPlug2Search._do_download_poll) {
+			UnPlug2Search._do_download_poll = false;
+			UnPlug2Search._download_poll();
+		}
+	},
+	
+	/**
+	 * Should be called regularly to start queued downloads
+	 */
+	_download_poll : function () {
+		var concurrent_downloads = 5; // XXX CONFIGURABLE
+		for (var i = 0; i < UnPlug2Search._downloads.length; i++) {
+			if (UnPlug2Search._downloads[i]
+				&& UnPlug2Search._downloads[i].download
+				&& UnPlug2Search._downloads[i].download.is_started() == true
+				&& UnPlug2Search._downloads[i].download.is_complete() == false) {
+					--concurrent_downloads;
+			}
+		}
+		if (concurrent_downloads <= 0) {
+			return;
+		}
+		var startable_downloads = [];
+		for (var i = 0; i < UnPlug2Search._downloads.length; i++) {
+			if (UnPlug2Search._downloads[i]
+				&& UnPlug2Search._downloads[i].download
+				&& UnPlug2Search._downloads[i].download.is_started() == false) {
+					startable_downloads[startable_downloads.length] = i;
+			}
+		}
+		startable_downloads.sort(function (a, b) {
+			return UnPlug2Search._downloads[a].priority - UnPlug2Search._downloads[b].priority;
+		});
+		for (var i = 0; i < startable_downloads.length && i < concurrent_downloads; ++i) {
+			var dl_id = startable_downloads[i];
+			try {
+				UnPlug2Search._downloads[dl_id].download.start();
+				UnPlug2.log("Starting download id = " + dl_id);
+			} catch (e) {
+				UnPlug2.log("Starting Download failed for " + dl_id + " / " + UnPlug2Search._downloads[dl_id].download + " because " + e);
+				UnPlug2Search._downloads[dl_id].download = null;
+			}
 		}
 	},
 	
@@ -525,6 +603,7 @@ UnPlug2Search = {
 		}
 		UnPlug2Search._apply_rules_to_document(dlinfo.nsiuri, dl.text, dlxml, dlinfo.rules_to_apply, dlinfo.variables);
 		UnPlug2Search._downloads[dl.reference] = null;
+		UnPlug2Search._do_download_poll = true;
 	},
 	
 	_download_callback_fail : function (dl) {
@@ -535,6 +614,7 @@ UnPlug2Search = {
 			// can't do alert() here either .. sheesh!
 		}
 		UnPlug2Search._downloads[dl.reference] = null;
+		UnPlug2Search._do_download_poll = true;
 	},
 	
 	/**
@@ -553,6 +633,7 @@ UnPlug2Search = {
 	 * Stop downloading and stop search process
 	 */
 	abort : function () {
+		UnPlug2Search._stopped = true;
 		UnPlug2Search.cancel_downloads();
 	},
 	
@@ -948,6 +1029,8 @@ UnPlug2Search = {
 		// "this" is a lie!!
 		UnPlug2Search.callback = function ( res ) { UnPlug2.log("Cannot use callback for result " + res); };
 		UnPlug2Search._downloads = [];
+		UnPlug2Search._do_download_poll = false;
+		window.setInterval(UnPlug2Search.poll, 100);
 	},
 	
 	/**
