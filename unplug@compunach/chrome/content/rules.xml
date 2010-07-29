@@ -38,6 +38,17 @@
  */
 -->
 <unplug>
+	<hook for="download-priority">
+		<priority level="high">youtube.com</priority>
+		<priority level="low">addthis.com</priority>
+		<priority level="low">xtendmedia.com</priority>
+		<priority level="very-low">doubleclick.net</priority>
+		<priority level="very-low">googlesyndication.com</priority>
+		<priority level="very-low">yieldmanager.com</priority>
+		<priority level="very-low">admeld.com</priority>
+		<priority level="very-low">invitemedia.com</priority>
+		<priority level="very-low">quantserve.com</priority>
+	</hook>
 	<rule id="generic_flv_string">
 		<!-- possible alternative? <each_re ref="flvre" re="(https?://[a-z0-9_/\.\-]+\.flv(?:\?[a-z0-9_/\.%=&amp;\-]*)?)" flags="i"> -->
 		<each_re ref="flvre" re="[&quot;']((?:http|/)[^&quot;']+\.flv(?:\?[^&quot;']+)?)[&quot;']">

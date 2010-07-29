@@ -521,12 +521,35 @@ UnPlug2Search = {
 			return
 		}
 		
+		// set priority from download-priority hook
+		priority = 50;
+		for each (node in UnPlug2Search.get_hooks("download-priority")) {
+			for each (child in node.getElementsByTagName("priority")) {
+				if (url.host.indexOf(child.textContent) < 0) {
+					continue;
+				}
+				switch (child.getAttribute("level")) {
+					case "very-high": priority -= 20; break;
+					case "high": priority -= 10; break;
+					case "normal": break;
+					case "low": priority += 10; break;
+					case "very-low": priority += 20; break;
+					case "never":
+						UnPlug2.log("Not downloading " + url.spec + " because forbidden in download-priority hook");
+						return;
+					default:
+						UnPlug2.log("Invalid priority for download-priority hook " + child.getAttribute("level"));
+						break;
+				}
+			}
+		}
+		
 		UnPlug2Search._downloads[dl_id] = {
 			rules_to_apply: rules_to_apply,
 			variables : variables,
 			download: null,
 			nsiuri: url,
-			priority : 50 };
+			priority : priority };
 		// start download after setting everything else up
 		try {
 			UnPlug2Search._downloads[dl_id].download = new UnPlug2Download(
@@ -536,7 +559,7 @@ UnPlug2Search = {
 				UnPlug2Search._download_callback_ok,
 				UnPlug2Search._download_callback_fail,
 				timeout);
-			UnPlug2.log("Download queued " + UnPlug2Search._downloads[dl_id].download);
+			UnPlug2.log("Download queued " + UnPlug2Search._downloads[dl_id].download + " priority " + UnPlug2Search._downloads[dl_id].priority);
 		} catch (e) {
 			UnPlug2.log("Download failed to be queued for " + UnPlug2Search._downloads[dl_id].download + " because " + e);
 			// .download not assigned
@@ -637,6 +660,26 @@ UnPlug2Search = {
 	abort : function () {
 		UnPlug2Search._stopped = true;
 		UnPlug2Search.cancel_downloads();
+	},
+	
+	/**
+	 * Get a "hooks" item from rules.xml for adjusting eg download priority
+	 * Returns an array
+	 */
+	get_hooks : function (hookname) {
+		if (UnPlug2Search._hooks === undefined) {
+			UnPlug2Search._hooks = {};
+			var hooknodes = UnPlug2Search.get_rules_xml().getElementsByTagName("hook");
+			for (var i = 0; i < hooknodes.length; ++i) {
+				var hooknode = hooknodes[i];
+				var hookname = hooknode.getAttribute("for");
+				if (UnPlug2Search._hooks[hookname] === undefined) {
+					UnPlug2Search._hooks[hookname] = [];
+				}
+				UnPlug2Search._hooks[hookname].push(hooknode);
+			}
+		}
+		return UnPlug2Search._hooks[hookname] || [];
 	},
 	
 	/**
@@ -840,8 +883,12 @@ UnPlug2Search = {
 		 */
 		var node;
 		for each (node in rules_xml.childNodes) {
-			if (!node.tagName)
+			if (!node.tagName) {
 				continue;
+			}
+			if (node.tagName == "hook") {
+				continue;
+			}
 			var nodetagname = node.tagName.toLowerCase();
 			if (nodetagname.substring(0, 3) != "if_" && nodetagname.substring(0, 6) != "ifnot_" && nodetagname.substring(0, 9) != "optional_" && nodetagname.substring(0, 5) != "each_") {
 				try {
