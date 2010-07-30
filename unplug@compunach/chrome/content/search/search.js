@@ -433,15 +433,16 @@ UnPlug2Variables.prototype = {
 			 * ${youku:....}
 			 */
 			case "youku":
-				if (parts.length != 5) {
+				if (parts.length != 6) {
 					throw "wrong number of args for youku";
 				}
+				var mediatype = parts[5];
 				var key1 = this._subst_apply_functions([parts[4]]);
 				var key2 = this._subst_apply_functions([parts[3]]);
 				var seed = this._subst_apply_functions([parts[2]]);
 				var streamid = this._subst_apply_functions([parts[1]]);
 				var pieceid = this._subst_apply_functions([parts[0]]);
-				return this.youku_url(key1, key2, seed, streamid, pieceid);
+				return this.youku_url(mediatype, key1, key2, seed, streamid, pieceid);
 			default:
 				throw "Undefined function for variables: " + funcname;
 		}
@@ -507,7 +508,7 @@ UnPlug2Variables.prototype = {
 		return result.join("");
 	}),
 
-	youku_url : (function (key1, key2, randomseed, streamid, piece_num) {
+	youku_url : (function (mediatype, key1, key2, randomseed, streamid, piece_num) {
 		var r = (function () { return "0123456789"[Math.floor(Math.random() * 10)] });
 		
 		// get the codebook like in cg_hun()
@@ -540,7 +541,9 @@ UnPlug2Variables.prototype = {
 		}
 		url.push("_");
 		url.push(piece_num);
-		url.push("/st/flv/fileid/");
+		url.push("/st/");
+		url.push(mediatype);
+		url.push("/fileid/");
 		url.push(fileid.substring(0, 8));
 		url.push(piece_num);
 		url.push(fileid.substring(8, fileid.length));
