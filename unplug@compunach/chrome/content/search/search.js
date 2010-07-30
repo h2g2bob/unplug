@@ -324,16 +324,23 @@ UnPlug2Variables.prototype = {
 						throw "Unknown escape in jsdecode " + esc;
 					});
 			/**
-			 * ${random:float}
+			 * ${randomfloat}
 			 */
-			case "random":
+			case "randomfloat":
+				if (parts.length != 0)
+					throw "Cannot parse ${randomfloat}";
+				return Math.random();
+			/**
+			 * ${randomint:numchars}
+			 */
+			case "randomint":
 				if (parts.length != 1)
-					throw "Cannot parse ${random:...}";
-				switch (parts[0]) {
-					case "float":
-						return Math.random();
+					throw "Cannot parse ${randomint:...}";
+				var r = "";
+				for (var i = 0; i < parseInt(parts[0]); ++i) {
+					r += "0123456789"[Math.floor(Math.random() * 10)];
 				}
-				throw "Unknown ${random:...} " + parts[0];
+				return r
 			/**
 			 * ${optional:varname}
 			 */
@@ -422,6 +429,19 @@ UnPlug2Variables.prototype = {
 				var key1 = this._subst_apply_functions([parts[1]]);
 				var key2 = this._subst_apply_functions([parts[0]]);
 				return this.megavideo_hash(un, key1, key2);
+			/**
+			 * ${youku:....}
+			 */
+			case "youku":
+				if (parts.length != 5) {
+					throw "wrong number of args for youku";
+				}
+				var key1 = this._subst_apply_functions([parts[4]]);
+				var key2 = this._subst_apply_functions([parts[3]]);
+				var seed = this._subst_apply_functions([parts[2]]);
+				var streamid = this._subst_apply_functions([parts[1]]);
+				var pieceid = this._subst_apply_functions([parts[0]]);
+				return this.youku_url(key1, key2, seed, streamid, pieceid);
 			default:
 				throw "Undefined function for variables: " + funcname;
 		}
@@ -487,6 +507,50 @@ UnPlug2Variables.prototype = {
 		return result.join("");
 	}),
 
+	youku_url : (function (key1, key2, randomseed, streamid, piece_num) {
+		var r = (function () { return "0123456789"[Math.floor(Math.random() * 10)] });
+		
+		// get the codebook like in cg_hun()
+		var codebook = ""
+		var t = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/\\:._-1234567890"
+		randomseed = parseInt(randomseed)
+		while (t.length > 0) {
+			randomseed = ((randomseed * 211) + 30031) % 65536;
+			var idx = Math.floor(randomseed * t.length / 65536);
+			var c = t.charAt(idx);
+			if (!c) { throw "Youku: infinite loop of doom at " + idx.toSource() + " of " + t.toSource() + " => " + c.toSource() ; }
+			codebook += c;
+			t = t.replace(c, "");
+		}
+		
+		// decode the uuid like in cg_fun()
+		var fileid = "";
+		var fileid_stars = streamid.split("*");
+		fileid_stars.pop();
+		for (var i = 0; i < fileid_stars.length; ++i) {
+			fileid += codebook[parseInt(fileid_stars[i])];
+		}
+		
+		// make the url
+		var url = [];
+		url.push("http://f.youku.com/player/getFlvPath/sid/");
+		url.push(Math.floor((new Date()).getTime()))
+		for (var i = 0; i < 11; ++i) {
+			url.push(r());
+		}
+		url.push("_");
+		url.push(piece_num);
+		url.push("/st/flv/fileid/");
+		url.push(fileid.substring(0, 8));
+		url.push(piece_num);
+		url.push(fileid.substring(8, fileid.length));
+		url.push("?K=");
+		url.push((parseInt(key1, 16) ^ 0xa55aa5a5).toString(16).toLowerCase()); // xor
+		url.push(key2);
+		url.push("&myp=0&ts=" + r() + r() + r());
+		return url.join("");
+	}),
+	
 	endofobject : 1 }
 
 UnPlug2Search = {

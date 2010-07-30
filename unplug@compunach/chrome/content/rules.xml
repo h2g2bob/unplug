@@ -461,6 +461,23 @@
 				</rule>
 			</download>
 		</rule>
+		<rule id="youku.com.2010">
+			<if_url ref="url" inhost="youku.com" />
+			<if_re ref="videoid" re="var videoId\s*=\s*'([^']+)';" />
+			<if_re ref="videoid2" re="var videoId2\s*=\s*'([^']+)';" />
+			<download url="http://v.youku.com/player/getPlayList/VideoIDS/${videoid2.1}/timezone/+01/version/5/source/video?password=&amp;ran=${randomint:4}&amp;n=3">
+				<optional_re ref="thumbnail" re="&quot;logo&quot;:&quot;(http[^&quot;]+)&quot;" />
+				<if_re ref="seed" re="&quot;seed&quot;:(\d+)," />
+				<if_re ref="key1" re="&quot;key1&quot;:&quot;([^&quot;]+)&quot;," />
+				<if_re ref="key2" re="&quot;key2&quot;:&quot;([^&quot;]+)&quot;," />
+				<rule>
+					<if_re ref="flvstreamid" re="&quot;streamfileids&quot;:\{&quot;flv&quot;:&quot;([^&quot;]+)&quot;\}" />
+					<each_re ref="piece" re="\{&quot;no&quot;:&quot;(\d+)&quot;,">
+						<media url="${youku:key1.1:key2.1:seed.1:flvstreamid.1:piece.1}" thumbnail="${jsdecode:thumbnail.1}" description="Part ${piece.1}" type="flv" />
+					</each_re>
+				</rule>
+			</download>
+		</rule>
 	</download><!-- flashblock workaround -->
 	<rule id="generic_param">
 		<each_element tagname="param" ref="p" require_attrs="name,value">
@@ -531,7 +548,7 @@
 		<if_url host="spankwire.com" ref="loc" />
 		<rule>
 			<if_re string="${loc.path}" ref="id"> /video(\d+)/ </if_re>
-			<download url="http://www.spankwire.com/Player/VideoXML.aspx?id=${id.1}&amp;pid=0&amp;r=${random:float}">
+			<download url="http://www.spankwire.com/Player/VideoXML.aspx?id=${id.1}&amp;pid=0&amp;r=${randomfloat}">
 				<each_element ref="xmlurl" tagname="url" require_attrs="innerHTML">
 					<media url="${xmlurl.innerHTML}" />
 				</each_element>
@@ -776,22 +793,6 @@
 			<download url="http://dbatley.com/echo.php?foo=yay">
 				<media url="http://dbatley.com/test_only" type="txt" />
 			</download>
-		</rule>
-		<rule id="youku.com">
-			
-			<!-- transcribed from http://gist.github.com/4745 -->
-			<if_url ref="url" inhost="youku.com" />
-			<rule>
-				<if_re ref="videoid" re="var videoId=&quot;(.*?)&quot;;" />
-				<if_re ref="fid" string="${url.path}" re="/cd00(.*?)\.html" />
-				<download url="http://v.youku.com/v/playlistsummary/vid/${videoid.1}/url/${fid.1}?__rt=1&amp;__ro=video_show_summary" >
-					<if_re ref="fname" re="&lt;a title=&quot;.*?&quot; href=&quot;javascript:sendVideoLink\('.*?','(.*?)'\);&quot; charset=&quot;.*&quot;&gt;.*&lt;/a&gt;" />
-					<rule>
-						<if_re ref="fname_parts" re='^(.*?)0200010700(.*?)$' string="${fname.1}" />
-						<media url="http://60.217.252.21/${fname_parts.1}020001070[0-6]${fname_parts.2}.flv" type="flv" />
-					</rule>
-				</download>
-			</rule>
 		</rule>
 	</rule>
 </unplug>
