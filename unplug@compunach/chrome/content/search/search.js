@@ -511,6 +511,8 @@ UnPlug2Variables.prototype = {
 	youku_url : (function (mediatype, key1, key2, randomseed, streamid, piece_num) {
 		var r = (function () { return "0123456789"[Math.floor(Math.random() * 10)] });
 		
+		piece_num = ((parseInt(piece_num) < 10) ? "0" : "") + piece_num;
+		
 		// get the codebook like in cg_hun()
 		var codebook = ""
 		var t = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/\\:._-1234567890"
@@ -536,7 +538,7 @@ UnPlug2Variables.prototype = {
 		var url = [];
 		url.push("http://f.youku.com/player/getFlvPath/sid/");
 		url.push(Math.floor((new Date()).getTime()))
-		for (var i = 0; i < 11; ++i) {
+		for (var i = 0; i < 8; ++i) {
 			url.push(r());
 		}
 		url.push("_");
@@ -544,12 +546,10 @@ UnPlug2Variables.prototype = {
 		url.push("/st/");
 		url.push(mediatype);
 		url.push("/fileid/");
-		url.push(fileid.substring(0, 8));
-		url.push(piece_num);
-		url.push(fileid.substring(8, fileid.length));
+		url.push(fileid);
 		url.push("?K=");
-		url.push((parseInt(key1, 16) ^ 0xa55aa5a5).toString(16).toLowerCase()); // xor
 		url.push(key2);
+		url.push((parseInt(key1, 16) ^ 0xa55aa5a5).toString(16).toLowerCase()); // xor
 		url.push("&myp=0&ts=" + r() + r() + r());
 		return url.join("");
 	}),

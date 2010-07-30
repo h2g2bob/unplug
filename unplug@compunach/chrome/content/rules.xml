@@ -473,14 +473,14 @@
 				<rule>
 					<if_re ref="flvstreamid" re="&quot;flv&quot;:&quot;([\d\*]+\*)&quot;" />
 					<if_re ref="flvarray" re="&quot;flv&quot;:\[(\{&quot;no&quot;:[^\]]+)\]" />
-					<each_re ref="piece" re="\{&quot;no&quot;:&quot;(\d+)&quot;," string="${flvarray.1}">
+					<each_re ref="piece" re="\{&quot;no&quot;:&quot;?(\d+)&quot;?," string="${flvarray.1}">
 						<media url="${youku:flv:key1.1:key2.1:seed.1:flvstreamid.1:piece.1}" thumbnail="${jsdecode:thumbnail.1}" description="Part ${piece.1} (flv)" type="flv" />
 					</each_re>
 				</rule>
 				<rule>
 					<if_re ref="mp4streamid" re="&quot;mp4&quot;:&quot;([\d\*]+\*)&quot;" />
 					<if_re ref="mp4array" re="&quot;mp4&quot;:\[(\{&quot;no&quot;:[^\]]+)\]" />
-					<each_re ref="piece" re="\{&quot;no&quot;:&quot;(\d+)&quot;," string="${mp4array.1}">
+					<each_re ref="piece" re="\{&quot;no&quot;:&quot;?(\d+)&quot;?," string="${mp4array.1}">
 						<media url="${youku:mp4:key1.1:key2.1:seed.1:mp4streamid.1:piece.1}" thumbnail="${jsdecode:thumbnail.1}" description="Part ${piece.1} (mp4)" type="mp4" />
 					</each_re>
 				</rule>
