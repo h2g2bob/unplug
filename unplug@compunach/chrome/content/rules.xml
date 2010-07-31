@@ -205,7 +205,7 @@
 							description="${translate:high_quality} - ${optional:title.1}" type="flv" />
 					</rule>
 					<rule>
-						<if_not_re string="${fmt_url.1}" re="^(4|5|18|22|34|35)$" />
+						<ifnot_re string="${fmt_url.1}" re="^(4|5|18|22|34|35)$" />
 						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
 							description="Unknown quality code ${fmt_url.1} - ${optional:title.1}" type="flv" />
 					</rule>
