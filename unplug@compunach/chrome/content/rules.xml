@@ -485,6 +485,11 @@
 				</rule>
 			</download>
 		</rule>
+		<rule id="generic-flv-urlencoded">
+			<!-- eg: redtube.com -->
+			<if_re ref="loc" re="[&amp;\?&quot;](?:[a-z0-9_-]+=)?(http%3A%2F%2F[a-z0-9%_\.-]+\.flv(?:%3F[a-z0-9%_\.-]*)?)[&amp;&quot;']" flags="i" />
+			<media url="${urldecode:loc.1}" type="flv" />
+		</rule>
 	</download><!-- flashblock workaround -->
 	<rule id="generic_param">
 		<each_element tagname="param" ref="p" require_attrs="name,value">
