@@ -299,16 +299,6 @@
 					</if_re>
 					<media url="${urldecode:googlevidurl.1}" thumbnail="${urldecode:googlevidurl.2}" />
 				</rule>
-				<rule id="embed.youtube.com">
-					<if_re ref="embedyoutube" string="${embedelem.src}">
-						youtube\.com\/v\/([^&amp;]+)
-					</if_re>
-					<download url="http://www.youtube.com/get_video_info?&amp;video_id=${embedyoutube.1}&amp;el=embedded&amp;ps=default">
-						<if_re ref="token"> token=([^&amp;]+)&amp; </if_re>
-						<if_re ref="title" optional="yes"> title=([^&amp;]+)&amp; </if_re>
-						<media description="${urldecode:title.1}" url="http://www.youtube.com/get_video?video_id=${embedyoutube.1}&amp;t=${token.1}" type="flv" thumbnail="http://i4.ytimg.com/vi/${embedyoutube.1}/default.jpg"/>
-					</download>
-				</rule>
 				<rule id="embed.vimeo.com" >
 					<if_re ref="vimeoscript" string="${embedelem.src}">
 						vimeo\.com/moogaloop\.swf\?clip_id=(\d+)&amp;
@@ -372,16 +362,6 @@
 				<rule id="pram.default">
 					<if_re string="${param.name}" flags="i"> (movie|src|href) </if_re>
 					<media url="${param.value}" description="${translate:embedplayer}"/>
-				</rule>
-				<rule id="param.youtube.com">
-					<if_re ref="embedyoutube" string="${param.value}">
-						youtube\.com\/v\/([^&amp;]+)
-					</if_re>
-					<download url="http://www.youtube.com/get_video_info?&amp;video_id=${embedyoutube.1}&amp;el=embedded&amp;ps=default">
-						<if_re ref="token"> token=([^&amp;]+)&amp; </if_re>
-						<if_re ref="title" optional="yes"> title=([^&amp;]+)&amp; </if_re>
-						<media description="${urldecode:title.1}" url="http://www.youtube.com/get_video?video_id=${embedyoutube.1}&amp;t=${token.1}" />
-					</download>
 				</rule>
 			</each_element>
 		</rule>
