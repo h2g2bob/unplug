@@ -171,49 +171,68 @@
 			 * ${embedelem.innerHTML} won't work
 	-->
 	<download id="flashblock_workaround" url="${.url}">
-		<rule id="youtube.com" target="youtube.com">
-			<if_url host="youtube.com" />
-			<if_re ref="fmt_stream_map" re="&amp;fmt_stream_map=([^&amp;]+)" />
-			<optional_re ref="title" re="&lt;title&gt;\s*YouTube\s+\-\s+(.*)\s*&lt;/title&gt;" />
-			<optional_re ref="video_id" re="&lt;input type=&quot;hidden&quot; name=&quot;video_id&quot; value=&quot;([^&quot;]+)&quot; /&gt;" />
-			<each_re ref="fmt_part" string="${urldecode:fmt_stream_map.1}" re="([^,]+)">
-				<if_re ref="fmt_url" re="^(\d+)\|(http[^\|]+)(?:\|.*)?$" string="${fmt_part.1}" />
-				<rule>
-					<if_re string="${fmt_url.1}" re="^(22)$" />
-					<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-						description="${translate:hd_quality} - ${optional:title.1}" type="mp4" />
-				</rule>
-				<rule>
-					<if_re string="${fmt_url.1}" re="^(5)$" />
-					<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-						description="${translate:low_quality} - ${optional:title.1}" type="flv" />
-				</rule>
-				<rule>
-					<if_re string="${fmt_url.1}" re="^(34|4)$" />
-					<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-						description="${translate:mid_quality} - ${optional:title.1}" type="flv" />
-				</rule>
-				<rule>
-					<if_re string="${fmt_url.1}" re="^(18)$" />
-					<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-						description="${translate:mid_quality} (mp4) - ${optional:title.1}" type="mp4" />
-				</rule>
-				<rule>
-					<if_re string="${fmt_url.1}" re="^(35)$" />
-					<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-						description="${translate:high_quality} - ${optional:title.1}" type="flv" />
-				</rule>
-				<rule>
-					<if_not_re string="${fmt_url.1}" re="^(4|5|18|22|34|35)$" />
-					<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-						description="Unknown quality code ${fmt_url.1} - ${optional:title.1}" type="flv" />
-				</rule>
-			</each_re>
+		<rule id="youtube.com">
+			<if_url ref="url" host="youtube.com" />
+			<rule id="youtube-single" target="youtube-single">
+				<if_re ref="fmt_stream_map" re="&amp;fmt_stream_map=([^&amp;]+)" />
+				<optional_re ref="title" re="&lt;title&gt;\s*YouTube\s+\-\s+(.*)\s*&lt;/title&gt;" />
+				<optional_re ref="video_id" re="&lt;input type=&quot;hidden&quot; name=&quot;video_id&quot; value=&quot;([^&quot;]+)&quot; /&gt;" />
+				<each_re ref="fmt_part" string="${urldecode:fmt_stream_map.1}" re="([^,]+)">
+					<if_re ref="fmt_url" re="^(\d+)\|(http[^\|]+)(?:\|.*)?$" string="${fmt_part.1}" />
+					<rule>
+						<if_re string="${fmt_url.1}" re="^(22)$" />
+						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+							description="${translate:hd_quality} - ${optional:title.1}" type="mp4" />
+					</rule>
+					<rule>
+						<if_re string="${fmt_url.1}" re="^(5)$" />
+						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+							description="${translate:low_quality} - ${optional:title.1}" type="flv" />
+					</rule>
+					<rule>
+						<if_re string="${fmt_url.1}" re="^(34|4)$" />
+						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+							description="${translate:mid_quality} - ${optional:title.1}" type="flv" />
+					</rule>
+					<rule>
+						<if_re string="${fmt_url.1}" re="^(18)$" />
+						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+							description="${translate:mid_quality} (mp4) - ${optional:title.1}" type="mp4" />
+					</rule>
+					<rule>
+						<if_re string="${fmt_url.1}" re="^(35)$" />
+						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+							description="${translate:high_quality} - ${optional:title.1}" type="flv" />
+					</rule>
+					<rule>
+						<if_not_re string="${fmt_url.1}" re="^(4|5|18|22|34|35)$" />
+						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+							description="Unknown quality code ${fmt_url.1} - ${optional:title.1}" type="flv" />
+					</rule>
+				</each_re>
+			</rule>
+			<rule id="youtube-channel">
+				<!-- click the "see all uploads" link -->
+				<if_re string="${url.path}" ref="username" re="^/user/([^#\?]+)" />
+				<download url="http://www.youtube.com/profile_ajax?action_ajax=1&amp;user=${urlencode:username.1}&amp;new=1&amp;box_method=load_playlist&amp;box_name=user_playlist_navigator&amp;playlistName=uploads&amp;sort=default" post="session_token=&amp;messages=%5B%7B%22type%22%3A%22box_method%22%2C%22request%22%3A%7B%22name%22%3A%22user_playlist_navigator%22%2C%22x_position%22%3A1%2C%22y_position%22%3A-2%2C%22palette%22%3A%22default%22%2C%22method%22%3A%22load_playlist%22%2C%22params%22%3A%7B%22playlist_name%22%3A%22uploads%22%2C%22view%22%3A%22play%22%2C%22playlist_sort%22%3A%22default%22%7D%7D%7D%5D">
+					<each_re re="&lt;div id=\\&quot;playnav\-play\-uploads\-page\-(\d+)\\&quot;" ref="pagenum">
+						<!-- lets limit this to top few pages so we don't get an insane (or unlimited!) number of results (although we hit our download limit eventually...) -->
+						<if_re string="_${pagenum.1}_" re="_[0-3]_" />
+						<download url="http://www.youtube.com/profile_ajax?action_ajax=1&amp;user=${urlencode:username.1}&amp;new=1&amp;box_method=load_playlist_page&amp;box_name=user_playlist_navigator" post="session_token=&amp;messages=%5B%7B%22type%22%3A%22box_method%22%2C%22request%22%3A%7B%22name%22%3A%22user_playlist_navigator%22%2C%22x_position%22%3A1%2C%22y_position%22%3A-2%2C%22palette%22%3A%22default%22%2C%22method%22%3A%22load_playlist_page%22%2C%22params%22%3A%7B%22playlist_name%22%3A%22uploads%22%2C%22encrypted_playlist_id%22%3A%22uploads%22%2C%22query%22%3A%22%22%2C%22encrypted_shmoovie_id%22%3A%22uploads%22%2C%22page_num%22%3A${pagenum.1}%2C%22view%22%3A%22play%22%2C%22playlist_sort%22%3A%22default%22%7D%7D%7D%5D">
+							<each_re ref="link" re="&lt;a href=\\&quot;\\/(watch\?v=[^&quot;]+)\\&quot; class=\\&quot;playnav-item-title">
+								<download url="http://www.youtube.com/${jsdecode:link.1}">
+									<rule goto="youtube-single" />
+								</download>
+							</each_re>
+						</download>
+					</each_re>
+				</download>
+			</rule>
 		</rule>
 		<rule id="embed-youtube-2010">
 			<each_re ref="video_id" re="http://(?:www\.)?youtube\.com/v/([a-zA-Z0-9_\-]+)">
 				<download url="http://www.youtube.com/watch?v=${video_id.1}">
-					<rule goto="youtube.com" />
+					<rule goto="youtube-single" />
 				</download>
 			</each_re>
 		</rule>
