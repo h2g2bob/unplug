@@ -694,7 +694,7 @@ UnPlug2Search = {
 			dlxml = null;
 		}
 		UnPlug2Search._apply_rules_to_document(dlinfo.nsiuri, dl.text, dlxml, dlinfo.rules_to_apply, dlinfo.variables);
-		UnPlug2Search._downloads[dl.reference] = null;
+		UnPlug2Search._downloads[dl.reference].download = null;
 		UnPlug2Search._do_download_poll = true;
 	},
 	
@@ -705,7 +705,7 @@ UnPlug2Search = {
 		} catch(e) {
 			// can't do alert() here either .. sheesh!
 		}
-		UnPlug2Search._downloads[dl.reference] = null;
+		UnPlug2Search._downloads[dl.reference].download = null;
 		UnPlug2Search._do_download_poll = true;
 	},
 	
@@ -1155,7 +1155,7 @@ UnPlug2Search = {
 	 */
 	has_finished : function () {
 		for (var i = 0; i < UnPlug2Search._downloads.length; i++) {
-			if (UnPlug2Search._downloads[i])
+			if (UnPlug2Search._downloads[i] && UnPlug2Search._downloads[i].download)
 				return false;
 		}
 		// TODO - more checks about doing stuff while not downloading stuff
@@ -1166,11 +1166,28 @@ UnPlug2Search = {
 	 * Returns information about the current status
 	 */
 	statusinfo : function () {
-		var info = { downloads : 0, finished : false };
+		var info = { downloads : 0, finished : false, percent : 0 };
+		var attempted_downloads = 0;
+		var active_downloads = 0;
+		var completed_pct = 0;
 		for (var i = 0; i < UnPlug2Search._downloads.length; i++) {
-			if (UnPlug2Search._downloads[i])
-				info.downloads ++
+			var di = UnPlug2Search._downloads[i];
+			if (di) {
+				++attempted_downloads;
+				if (di.download) {
+					completed_pct += di.download.percent_complete();
+					if (di.download.is_complete() == false) {
+						++active_downloads;
+					}
+				} else {
+					// we cleared the download because it was done
+					completed_pct += 100;
+				}
+			}
 		}
+		info.downloads = active_downloads;
+		// info.percent = 100 * (attempted_downloads - active_downloads) / (attempted_downloads || 1);
+		info.percent = completed_pct / (attempted_downloads || 1);
 		switch (info.downloads) {
 			case 0:
 				info.finished = true;

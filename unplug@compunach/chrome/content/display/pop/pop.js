@@ -75,11 +75,11 @@ UnPlug2SearchPage = {
 		try {
 			var statusinfo = UnPlug2Search.statusinfo();
 			document.getElementById("dynamic_download").value = statusinfo.text;
+			var searchbar = document.getElementById("search_progress");
 			if (statusinfo.finished) {
-				with (document.getElementById("search_progress")) {
-					mode = "determined";
-					value = "100";
-				}
+				searchbar.mode = "determined";
+				searchbar.value = "100";
+				
 				var all_results = document.getElementsByTagName("unplug_result");
 				document.getElementById("stop_button").disabled = true;
 				if (all_results.length == 0) {
@@ -91,8 +91,11 @@ UnPlug2SearchPage = {
 					document.getElementById("dynamic_results").value = UnPlug2.str("search_n_results").replace("#", all_results.length);
 				}
 			} else {
-				with (document.getElementById("search_progress")) {
-					mode = "undetermined";
+				if (statusinfo.percent) {
+					searchbar.mode = "determined";
+					searchbar.value = statusinfo.percent;
+				} else {
+					searchbar.mode = "undetermined";
 				}
 				window.setTimeout(UnPlug2SearchPage.poll, 500);
 			}
