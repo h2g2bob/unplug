@@ -351,6 +351,34 @@ UnPlug2Variables.prototype = {
 					return "";
 				}
 			/**
+			 * ${required:varname}
+			 */
+			case "required":
+				var r = this._subst_apply_functions(parts);
+				if (r) {
+					return r;
+				} else {
+					throw "Variable gave empty string: " + parts.toSource()
+				}
+			/**
+			 * ${either:var1:var2:....}
+			 */
+			case "either":
+				parts = parts.reverse()
+				while (parts) {
+					var p = parts.pop()
+					var z = "";
+					try {
+						z = this._subst_apply_functions([p]);
+					} catch (e) {
+						continue;
+					}
+					if (z) {
+						return z;
+					}
+				}
+				return "";
+			/**
 			 * ${translate:name_in_locale_file}
 			 */
 			case "translate":
@@ -417,7 +445,10 @@ UnPlug2Variables.prototype = {
 				urlstring = "&" + urlstring + "&";
 				var r = RegExp("&" + qname + "=([^&]+)");
 				var m = r.exec(urlstring);
-				return m ? unescape(m[1]) : "";
+				if (!m) {
+					throw "qparam:" + qname + " is not in " + urlstring;
+				}
+				return unescape(m[1]);
 			/**
 			 * ${megavideo:un:key1:key2}
 			 */
