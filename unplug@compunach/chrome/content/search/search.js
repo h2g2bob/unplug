@@ -1029,6 +1029,30 @@ UnPlug2Search = {
 								UnPlug2Search.default_timeout)
 							break;
 						case "media":
+							/*
+							TODO -- new things to implement!
+							<media
+							url="http://...../"        # required
+							
+							# display options:
+							description="low quality"  # default "" (used for display only)
+							thumbnail="http://..../"   # default null
+							
+							# file naming options
+							title="A kitten"           # default -- guess from url or "no title"
+							type="flv"                 # default -- guess from url or "flv"
+							certainty="low"            # default "mid" (used to decide which name is "right" when merging duplicates)
+							
+							# grouping same media with different quality settings
+							mediaid="foo"              # default url (used to group media which are the same but are different quality settings
+							quality="low"              # default "mid" (used to order results)
+							
+							# grouping items which are in a playlist
+							playlist="bar"
+							
+							/>
+							*/
+							
 							// get url
 							var relative_url = updated_variables.subst(node.getAttribute("url"));
 							if (!relative_url)

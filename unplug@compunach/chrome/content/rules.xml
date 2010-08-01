@@ -50,10 +50,11 @@
 		<priority level="very-low">quantserve.com</priority>
 		<priority level="low">cpro.baidu.com</priority>
 	</hook>
+	<optional_elem ref="origtitle" require_attrs="innerHTML" />
 	<rule id="generic_flv_string">
 		<!-- possible alternative? <each_re ref="flvre" re="(https?://[a-z0-9_/\.\-]+\.flv(?:\?[a-z0-9_/\.%=&amp;\-]*)?)" flags="i"> -->
 		<each_re ref="flvre" re="[&quot;']((?:http|/)[^&quot;']+\.flv(?:\?[^&quot;']+)?)[&quot;']">
-			<media url="${flvre.1}" certainty="low" />
+			<media url="${flvre.1}" certainty="low" title="${origtitle.innerHTML}" type="flv" />
 		</each_re>
 	</rule>
 	<rule id="clipfish.de">
@@ -98,37 +99,39 @@
 		</rule>
 	</rule>	
 	<rule id="tudou.com">
-		<if_url host="tudou.com" />
-		<if_re ref="iid" tagname="script"> iid\s*=\s*(\d+) </if_re>
-		<!-- nocatch is a random number, i think. xml gives a list of flv files from different servers. -->
-		<download url="http://v2.tudou.com/v2/cdn?id=${iid.1}&amp;noCatch=0000&amp;safekey=IAlsoNeverKnow">
-			<each_element ref="f" tagname="f" require_attrs="innerHTML">
-				<media url="${f.innerHTML}" type="flv" />
-			</each_element>
-		</download>
-	</rule>
-	<rule id="playlist..tudou.com">
 		<if_url ref="url" host="tudou.com" />
-		<!-- nocatch is a random number, i think. xml gives a list of flv files from different servers. -->
-		<download url="http://v2.tudou.com/v2/cdn?id=${qparam:iid:url.url}&amp;noCatch=0000&amp;safekey=IAlsoNeverKnow">
-			<each_element ref="f" tagname="f" require_attrs="innerHTML">
-				<media url="${f.innerHTML}" type="flv" />
-			</each_element>
-		</download>
-	</rule>
-	<rule id="hd.tudou.com">
-		<if_url host="tudou.com" />
-		<if_re ref="iid" tagname="script"> iid\s*:\s*&quot;(\d+)&quot; </if_re>
-		<optional_re ref="title" tagname="script"> title\s*:\s*&quot;(.*?)&quot; </optional_re>
-		<!-- nocatch is a random number, i think. xml gives a list of flv files from different servers. -->
-		<download url="http://v2.tudou.com/v2/kili?id=${iid.1}&amp;safekey=YouNeverKnowThat&amp;noCatch=0000">
-			<each_element ref="f" tagname="f" require_attrs="innerHTML">
-				<media url="${f.innerHTML}" type="flv" description="${translate:hd_quality} ${optional:title.1}" />
-			</each_element>
-		</download>
+		<optional_re ref="vc_title" re="&lt;span id=&quot;vcate_title&quot;&gt;(.*)&lt;/span&gt;" />
+		<optional_re ref="thumb" re="&lt;div class=&quot;summary&quot;&gt;&lt;span class=&quot;s_pic&quot;&gt;(http://[^&lt;&gt;]+jpg)&lt;/span&gt;" />
+		<rule id="tudou-single">
+			<if_re ref="iid" tagname="script"> iid\s*=\s*(\d+) </if_re>
+			<!-- nocatch is a random number, i think. xml gives a list of the same flv file on different mirrors. -->
+			<download url="http://v2.tudou.com/v2/cdn?id=${iid.1}&amp;noCatch=0000&amp;safekey=IAlsoNeverKnow">
+				<each_element ref="f" tagname="f" require_attrs="innerHTML">
+					<media url="${f.innerHTML}" type="flv" mediaid="toudu-${iid.1}" quality="mid" title="${either:vc_title.1:origtitle.innerHTML}" thumbnail="${thumb.1}" />
+				</each_element>
+			</download>
+		</rule>
+		<rule id="tudou.com-playlist">
+			<download url="http://v2.tudou.com/v2/cdn?id=${qparam:iid:url.url}&amp;noCatch=0000&amp;safekey=IAlsoNeverKnow">
+				<each_element ref="f" tagname="f" require_attrs="innerHTML">
+					<media url="${f.innerHTML}" type="flv" mediaid="toudu-${qparam:iid:url.url}" quality="mid" title="${either:vc_title.1:origtitle.innerHTML}" thumbnail="${thumb.1}" />
+				</each_element>
+			</download>
+		</rule>
+		<rule id="hd.tudou.com">
+			<if_url host="hd.tudou.com" />
+			<if_re ref="iid" tagname="script"> iid\s*:\s*&quot;(\d+)&quot; </if_re>
+			<optional_re ref="title" tagname="script"> title\s*:\s*&quot;(.*?)&quot; </optional_re>
+			<download url="http://v2.tudou.com/v2/kili?id=${iid.1}&amp;safekey=YouNeverKnowThat&amp;noCatch=0000">
+				<each_element ref="f" tagname="f" require_attrs="innerHTML">
+					<media url="${f.innerHTML}" type="flv" description="${translate:hd_quality} ${optional:title.1}" title="${title.1}" quality="very-high" mediaid="${iid.1}" thumbnail="${thumb.1}" />
+				</each_element>
+			</download>
+		</rule>
 	</rule>
 	<rule id="movies.apple.com">
-		<!-- TODO - when we have binary downloads, we can treat the orignial .mov file as a playlist element -->
+		<!-- TODO movies.apple.com site dead? -->
+		<!-- when we have binary downloads, we can treat the orignial .mov file as a playlist element -->
 		<if_url host="apple.com" />
 		<each_re ref="movredirect" re="(http://[^&quot;']*?apple\.com/[^&quot;']+?_)(\d+p\.mov)">
 			<media url="${movredirect.1}h${movredirect.2}" type="mov" description="${translate:hd_quality}" />
@@ -499,6 +502,11 @@
 			<!-- eg: redtube.com -->
 			<if_re ref="loc" re="[&amp;\?&quot;](?:[a-z0-9_-]+=)?(http%3A%2F%2F[a-z0-9%_\.-]+\.flv(?:%3F[a-z0-9%_\.-]*)?)[&amp;&quot;']" flags="i" />
 			<media url="${urldecode:loc.1}" type="flv" />
+		</rule>
+		<rule id="supernovatube.com">
+			<if_url host="supernovatube.com" />
+			<if_re ref="param" tagname="script"> so\.addVariable\("file",\s*"(http://[^"]+)"\) </if_re>
+			<media url="${param.1}" type="flv" />
 		</rule>
 	</download><!-- flashblock workaround -->
 	<rule id="generic_param">
