@@ -48,6 +48,7 @@
 		<priority level="very-low">admeld.com</priority>
 		<priority level="very-low">invitemedia.com</priority>
 		<priority level="very-low">quantserve.com</priority>
+		<priority level="low">cpro.baidu.com</priority>
 	</hook>
 	<rule id="generic_flv_string">
 		<!-- possible alternative? <each_re ref="flvre" re="(https?://[a-z0-9_/\.\-]+\.flv(?:\?[a-z0-9_/\.%=&amp;\-]*)?)" flags="i"> -->
@@ -61,28 +62,27 @@
 			<if_re ref="videoid" string="${url.path}"> /video/(\d+)/ </if_re>
 			<download url="http://www.clipfish.de/video_n.php?p=0|DE&amp;vid=${videoid.1}">
 				<if_re ref="flvurl"> url=(.*?)&amp; </if_re>
-				<media url="${flvurl.1}" />
+				<media url="${flvurl.1}" title="${origtitle.innerHTML}" type="flv" />
 			</download>
 		</rule>
 	</rule>
-	<rule>
+	<rule id="joy69.com">
 		<if_url host="joy69.com" ref="url" />
 		<rule>
 			<if_re ref="videoid" string="${url.path}"> id=(\d+) </if_re>
 			<download url="http://www.joy69.com/getmedia/?id=${videoid.1}&amp;limit=15">
 				<!-- this actually has links to several different files with the tags below repeated in different <item> tags. Plus its poorly formatted xml -->
-				<if_re ref="content"> (http://[^"]+\.flv[^"]*)" </if_re>
-				<if_re ref="poster"> &lt;poster url="([^"]+jpg)" </if_re>
-				<media url="${content.1}" thumbnail="${poster.1}" />
+				<!-- content like: <media:content url="[filename]?start=[seek],http://media.joy69.com/.....flv" duration="185" lang="en"> -->
+				<if_re ref="content" re="(http://[^&quot;]+\.flv[^&quot;]*)&quot;" />
+				<optional_elem ref="poster" tagname="media:thumbnail" require_attrs="innerHTML" />
+				<optional_elem ref="media_title" tagname="media:title" require_attrs="innerHTML" />
+				<media url="${content.1}" thumbnail="${poster.innerHTML}" title="${either:media_title.innerHTML:origtitle.innerHTML}" type="flv" />
 			</download>
 		</rule>
 	</rule>
-	<rule id="supernovatube.com">
-		<if_url host="supernovatube.com" />
-		<if_re ref="param" tagname="script"> so\.addVariable\("file",\s*"(http://[^"]+)"\) </if_re>
-		<media url="${param.1}" type="flv" />
-	</rule>
 	<rule id="veoh.com">
+		<!-- TODO veoh support is broken -->
+		<if_false />
 		<if_url host="veoh.com" />
 		<if_re ref="videoid" tagname="textarea"> "videoId":"([^"]+)" </if_re>
 		<rule id="veoh" target="veoh">
@@ -138,7 +138,15 @@
 		</each_re>
 	</rule>
 	<rule id="wat.tv">
-		<if_re ref="videoid" re="videoId\s*:\s*&quot;(\d+)&quot;" tagname="script" />
+		<if_false />
+		<!-- TODO does not work -->
+		<!--
+		url to grab some json data:
+		http://www.wat.tv/interface/contentv3/5039961
+		
+		minimal url for getting download url
+		http://www.wat.tv/get/web/5039961?token=0b6c33af021d74d8e8c122cbfaf61ecf/4c54c602&domain=www.wat.tv&getURL=1
+		-->
 		<download url="http://www.wat.tv/interface/contentv2/${videoid.1}">
 			<if_re ref="videourl" re="&quot;url&quot;:&quot;(http[^&quot;]*wat\.tv[^&quot;]*get[^&quot;]*flv)&quot;" />
 			<media url="${jsdecode:videourl.1}" />
@@ -151,8 +159,9 @@
 		<if_re ref="k1" re="flashvars\.k1 = &quot;(\d+)&quot;" />
 		<if_re ref="k2" re="flashvars\.k2 = &quot;(\d+)&quot;" />
 		<if_re ref="s" re="flashvars\.s = &quot;(\d+)&quot;" />
-		<media type="flv" description="${title.1}" url="http://www${s.1}.megavideo.com/files/${megavideo:un.1:k1.1:k2.1}/" />
+		<media type="flv" description="${title.1}" url="http://www${s.1}.megavideo.com/files/${megavideo:un.1:k1.1:k2.1}/" title="${either:title.1:origtitle.1}" />
 	</rule>
+<!-- TODO checked to here -->
 	<rule id="wikipedia_file_link">
 		<if_url host="wikipedia.org" />
 		<each_element tagname="button" require_attrs="onclick" ref="btn">
@@ -169,6 +178,7 @@
 		 * Run <each_element> on it
 			 * Each_element runs slowly in this situation because it's a regular expression
 			 * ${embedelem.innerHTML} won't work
+		This also work around scripts
 	-->
 	<download id="flashblock_workaround" url="${.url}">
 		<rule id="youtube.com">
