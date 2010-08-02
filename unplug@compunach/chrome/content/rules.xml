@@ -164,14 +164,6 @@
 		<if_re ref="s" re="flashvars\.s = &quot;(\d+)&quot;" />
 		<media type="flv" description="${title.1}" url="http://www${s.1}.megavideo.com/files/${megavideo:un.1:k1.1:k2.1}/" title="${either:title.1:origtitle.1}" />
 	</rule>
-<!-- TODO checked to here -->
-	<rule id="wikipedia_file_link">
-		<if_url host="wikipedia.org" />
-		<each_element tagname="button" require_attrs="onclick" ref="btn">
-			<if_re ref="fileloc" string="${btn.onclick}"> "videoUrl"\s*:\s*"(http://[^"]+)", </if_re>
-			<media url="${fileloc.1}" />
-		</each_element>
-	</rule>
 	<!--
 		The current flashblock workaround is to:
 		 * re-download page
@@ -195,26 +187,31 @@
 					<rule>
 						<if_re string="${fmt_url.1}" re="^(22)$" />
 						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+							quality="very-high" title="${either:title.1:origtitle.1}" mediaid="${video_id.1}"
 							description="${translate:hd_quality} - ${optional:title.1}" type="mp4" />
 					</rule>
 					<rule>
 						<if_re string="${fmt_url.1}" re="^(5)$" />
 						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+							quality="low" title="${either:title.1:origtitle.1}" mediaid="${video_id.1}"
 							description="${translate:low_quality} - ${optional:title.1}" type="flv" />
 					</rule>
 					<rule>
 						<if_re string="${fmt_url.1}" re="^(34|4)$" />
 						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+							quality="mid" title="${either:title.1:origtitle.1}" mediaid="${video_id.1}"
 							description="${translate:mid_quality} - ${optional:title.1}" type="flv" />
 					</rule>
 					<rule>
 						<if_re string="${fmt_url.1}" re="^(18)$" />
 						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+							quality="mid" title="${either:title.1:origtitle.1}" mediaid="${video_id.1}"
 							description="${translate:mid_quality} (mp4) - ${optional:title.1}" type="mp4" />
 					</rule>
 					<rule>
 						<if_re string="${fmt_url.1}" re="^(35)$" />
 						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+							quality="mid" title="${either:title.1:origtitle.1}" mediaid="${video_id.1}"
 							description="${translate:high_quality} - ${optional:title.1}" type="flv" />
 					</rule>
 					<rule>
@@ -260,6 +257,7 @@
 				</each_re>
 			</rule>
 		</rule>
+<!-- TODO: checked to here -->
 		<rule id="generic_embedded">
 			<each_element ref="embedelem" tagname="embed" require_attrs="src" attrs="flashvars">
 				<rule id="all_embed">
@@ -710,11 +708,20 @@
 	<!--
 	Lower priority
 	-->
-	<rule id="generic_link" priority="low">
+	<!-- TODO
+	this rule really slows down the search - can cause page to freeze for a moment.
+	the each_element has slow="yes" which limits this to pages with a DOM (ie the start page only).
+	it's also marked as defer, in case that is supported
+	-->
+	<rule id="generic_link" defer="yes">
 		<each_element ref="alink" tagname="a" require_attrs="href" attrs="innerHTML" slow="yes">
 			<rule id="generic_media_link">
 				<if_ext is_media="yes" filename="${alink.href}" />
-				<media url="${alink.href}" description="${alink.innerHTML}" />
+				<media url="${alink.href}" description="${alink.innerHTML}" certainty="mid" />
+			</rule>
+			<rule id="wikipedia.org-link">
+				<if_re ref="wplink" string="${alink.href}" re="^/(wiki)/(Media|Image|File|Fichier|Datei|ファイル|Archivo|Файл|Ficheiro|Plik):(.*)\.(ogg|mp3|ogv|oga)$" />
+				<media url="/${wplink.1}/Special:FilePath/${wplink.3}.${wplink.4}" title="${wplink.3}" type="${wplink.4}" description="Download ${wplink.3}" />
 			</rule>
 			<rule id="a.multiply.com">
 				<!-- replace this with flash player one. -->
