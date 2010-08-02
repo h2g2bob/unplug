@@ -1077,6 +1077,7 @@ UnPlug2Search = {
 							var result = UnPlug2Search._make_response_object_result(
 								abs_url,
 								download_method,
+								updated_variables.subst_optional(node.getAttribute("title")),
 								node.getAttribute("type"),
 								updated_variables.subst_optional(node.getAttribute("description")),
 								updated_variables.subst_optional(node.getAttribute("thumbnail")),
@@ -1098,6 +1099,7 @@ UnPlug2Search = {
 	/**
 	 * Return an unplug result object, for passing to the callback
 	 * The format is JSON-compatible
+	 * (no no native objects, etc)
 	 * 
 	 * Download method must be a javascrit object. It's used by download components (eg "copy url", "save with firefox", "save with dta", etc) to decide how and if they work. Examples below:
 	 * { "link" : url }
@@ -1109,14 +1111,16 @@ UnPlug2Search = {
 	 * 
 	 * Download can be used to track duplicate results
 	 */
-	_make_response_object_result : function (nsiuri, download_method, file_ext, description, thumbnailurl, trace) {
-		var name = UnPlug2Search.get_name(nsiuri.spec);
+	_make_response_object_result : function (nsiuri, download_method, name, file_ext, description, thumbnailurl, trace) {
+		if (!name) {
+			name = UnPlug2Search.get_name(nsiuri.spec);
+		}
 		var result_object = {
 			"type"     : "result",
 			"details"  : {
-				"name"        : name || "(no name!)",
+				"name"        : name,
 				"url"         : nsiuri.spec, // this is used for advice only (not used for downloading)
-				"swf"         : (nsiuri.path.indexOf(".swf") >= 0) ? true : false,
+				"swf"         : (nsiuri.path.indexOf(".swf") >= 0) ? true : false, // TODO improve this!
 				"trace"       : trace || "TRACE!?" },
 			"download" : download_method };
 		

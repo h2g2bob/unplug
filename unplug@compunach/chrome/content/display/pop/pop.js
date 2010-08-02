@@ -384,7 +384,7 @@ UnPlug2SearchPage = {
 		"saveas" : {
 			avail : function (res) { return (res.download.url ? true : false); },
 			exec  : function (res, data) {
-				var file = UnPlug2SearchPage._save_as_box(res.details.description || res.details.name, res.details.file_ext);
+				var file = UnPlug2SearchPage._save_as_box(res.details.name, res.details.file_ext);
 				if (!file)
 					return;
 				
