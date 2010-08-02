@@ -984,9 +984,6 @@ UnPlug2Search = {
 			if (!node.tagName) {
 				continue;
 			}
-			if (node.tagName == "hook") {
-				continue;
-			}
 			var nodetagname = node.tagName.toLowerCase();
 			if (nodetagname.substring(0, 3) != "if_" && nodetagname.substring(0, 6) != "ifnot_" && nodetagname.substring(0, 9) != "optional_" && nodetagname.substring(0, 5) != "each_") {
 				try {
@@ -1033,6 +1030,9 @@ UnPlug2Search = {
 									updated_variables);
 							}
 							break;
+						case "hook":
+							// do nothing
+							break
 						case "download":
 						case "playlist": // synonym, eg for .3mu/.asx files which we can parse
 							var relative_url = updated_variables.subst(node.getAttribute("url"));
@@ -1062,7 +1062,7 @@ UnPlug2Search = {
 							# file naming options
 							title="A kitten"           # default -- guess from url or "no title"
 							type="flv"                 # default -- guess from url or "flv"
-							certainty="low"            # default "mid" (used to decide which name is "right" when merging duplicates)
+							certainty="low"            # default "high" (used to decide which name is "right" when merging duplicates)
 							
 							# grouping same media with different quality settings
 							mediaid="foo"              # default url (used to group media which are the same but are different quality settings
