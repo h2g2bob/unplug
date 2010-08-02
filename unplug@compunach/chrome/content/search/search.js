@@ -1005,12 +1005,33 @@ UnPlug2Search = {
 								if (!referenced_node)
 									throw "Cannot find node to goto " + node.getAttribute("goto");
 							}
-							UnPlug2Search._apply_rules_to_document(
-								url,
-								text,
-								doc,
-								referenced_node,
-								updated_variables)
+							if (node.hasAttribute("defer")) {
+								/*
+								the code below does a good job of keeping the arguments the same
+								ie: referenced_node does not change to the last one in the file inside the timeout
+								but it is a rather insane
+								*/
+								UnPlug2Search._defered_rules_count += 1;
+								window.setTimeout((function (args) {
+									return (function () {
+									UnPlug2Search._defered_rules_count -= 1;
+									UnPlug2Search._apply_rules_to_document.apply(UnPlug2Search, args);
+									})
+									})([
+										url,
+										text,
+										doc,
+										referenced_node,
+										updated_variables ])
+									, 500)
+							} else {
+								UnPlug2Search._apply_rules_to_document(
+									url,
+									text,
+									doc,
+									referenced_node,
+									updated_variables);
+							}
 							break;
 						case "download":
 						case "playlist": // synonym, eg for .3mu/.asx files which we can parse
@@ -1201,6 +1222,7 @@ UnPlug2Search = {
 		UnPlug2Search.callback = function ( res ) { UnPlug2.log("Cannot use callback for result " + res); };
 		UnPlug2Search._downloads = [];
 		UnPlug2Search._do_download_poll = false;
+		UnPlug2Search._defered_rules_count = 0;
 		window.setInterval(UnPlug2Search.poll, 100);
 	},
 	
@@ -1209,6 +1231,9 @@ UnPlug2Search = {
 	 * TODO - depricate this in favor of statusinfo()
 	 */
 	has_finished : function () {
+		if (UnPlug2Search._defered_rules_count) {
+			return false;
+		}
 		for (var i = 0; i < UnPlug2Search._downloads.length; i++) {
 			if (UnPlug2Search._downloads[i] && UnPlug2Search._downloads[i].download)
 				return false;
@@ -1254,6 +1279,9 @@ UnPlug2Search = {
 			default:
 				info.text = UnPlug2.str("search_n_active_downloads").replace("#", info.downloads);
 				break;
+		}
+		if (UnPlug2Search._defered_rules_count) {
+			info.finished = false;
 		}
 		return info;
 	},
