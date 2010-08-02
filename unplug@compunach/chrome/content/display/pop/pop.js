@@ -91,11 +91,11 @@ UnPlug2SearchPage = {
 					document.getElementById("dynamic_results").value = UnPlug2.str("search_n_results").replace("#", all_results.length);
 				}
 			} else {
-				if (statusinfo.percent) {
+				if (statusinfo.percent == 0 || statusinfo.percent == 100) {
+					searchbar.mode = "undetermined";
+				} else {
 					searchbar.mode = "determined";
 					searchbar.value = statusinfo.percent;
-				} else {
-					searchbar.mode = "undetermined";
 				}
 				window.setTimeout(UnPlug2SearchPage.poll, 500);
 			}
