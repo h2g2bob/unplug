@@ -1077,10 +1077,8 @@ UnPlug2Search = {
 							var result = UnPlug2Search._make_response_object_result(
 								abs_url,
 								download_method,
-								updated_variables.subst_optional(node.getAttribute("title")),
-								node.getAttribute("type"),
-								updated_variables.subst_optional(node.getAttribute("description")),
-								updated_variables.subst_optional(node.getAttribute("thumbnail")),
+								updated_variables,
+								node,
 								updated_variables.trace());
 							
 							// callback
@@ -1111,36 +1109,41 @@ UnPlug2Search = {
 	 * 
 	 * Download can be used to track duplicate results
 	 */
-	_make_response_object_result : function (nsiuri, download_method, name, file_ext, description, thumbnailurl, trace) {
-		if (!name) {
-			name = UnPlug2Search.get_name(nsiuri.spec);
-		}
+	_make_response_object_result : function (nsiuri, download_method, variables, node, trace) {
+		var levels = { "very-low" : -20, "low" : -10, "mid" : 0, "high" : +10, "very-high" : +20 };
+		var guesses = UnPlug2Search.guess_from_uri(nsiuri);
+		var default_quality = 0;
+		var default_certainty = +10; // high!
+		
+		var title = variables.subst_optional(node.getAttribute("title"));
+		var file_ext = variables.subst_optional(node.getAttribute("type"));
+		var description = variables.subst_optional(node.getAttribute("description"));
+		var thumbnailurl = variables.subst_optional(node.getAttribute("thumbnail"));
+		var certainty = levels[variables.subst_optional(node.getAttribute("certainty"))];
+		var quality = levels[variables.subst_optional(node.getAttribute("quality"))];
+		
 		var result_object = {
 			"type"     : "result",
 			"details"  : {
-				"name"        : name,
-				"url"         : nsiuri.spec, // this is used for advice only (not used for downloading)
-				"swf"         : (nsiuri.path.indexOf(".swf") >= 0) ? true : false, // TODO improve this!
-				"trace"       : trace || "TRACE!?" },
+				"name"        : title || guesses.base_name,
+				"mediaid"     : variables.subst_optional(node.getAttribute("mediaid")) || null,
+				"playlistid"  : variables.subst_optional(node.getAttribute("playlistid")) || null,
+				"certainty"   : certainty === undefined ? default_certainty : certainty,
+				"quality"     : quality === undefined ? default_quality : quality,
+				
+				// IMPORTANT this is used for advice only (not used for downloading) !!
+				"url"         : nsiuri.spec,
+				"protocol"    : nsiuri.scheme,
+				"host"        : nsiuri.hostPort,
+				
+				// more details we may know
+				"swf"         : (file_ext == "swf"), // TODO roll this into file_ext?
+				"file_ext"    : file_ext || guesses.file_ext || "flv",
+				"description" : description || null,
+				"thumbnail"   : thumbnailurl || null,
+				"trace"       : trace },
 			"download" : download_method };
 		
-		// details section ( { "label" : undefined } has odd results, so assign here )
-		if (description)
-			result_object.details.description = description;
-		if (file_ext)
-			result_object.details.file_ext = file_ext;
-		if (thumbnailurl)
-			result_object.details.thumbnail = thumbnailurl;
-		try {
-			result_object.details.protocol = nsiuri.scheme
-		} catch (e) {
-			// probably will never fail
-		}
-		try {
-			result_object.details.host = nsiuri.host
-		} catch (e) {
-			// fails for rtmp links (difference between nsIURI and nsIURL?)
-		}
 		return result_object;
 	},
 	
@@ -1169,22 +1172,37 @@ UnPlug2Search = {
 	/**
 	 * Gets a filename from the url
 	 */
-	get_name : function (full_url) {
-		if (full_url.indexOf("#") > 0)
-			full_url = full_url.substring(0, full_url.indexOf("#"));
-		// index of last slash (except slashes in query part)
-		var last_slash = full_url.lastIndexOf("/");
-		if (full_url.indexOf("?") > 0)
-			last_slash = full_url.substring(0, full_url.indexOf("?")).lastIndexOf("/");
-		// take everything after last slash, like foo.flv?foo=bar&woo=y
-		full_url = full_url.substring(last_slash+1);
-		// take first 30 chars of nnn?qqqq or take all of nnnnnn
-		if (full_url.indexOf("?") > 0) {
-			full_url = full_url.substring(0, Math.max(30, full_url.indexOf("?")));
+	guess_from_uri : function (uri) {
+		/* nsIRUI have scheme, host, port, and path (note: can be "")
+		 * nsIURL also have a fileName (made of fileBaseName and fileExtension) which can be "" if uri ends in "/". In this case we want to look at the directory which won't have #ref or ?query or ;param.
+		 */
+		var data = {
+			file_ext : "",
+			base_name : "" };
+		if (uri instanceof Components.interfaces.nsIURL) {
+			// these are in nsIURL but not in nsIURI
+			// easy! but these can be empty strings
+			data.file_ext = uri.fileExtension;
+			data.base_name = uri.fileBaseName;
 		}
-		if (!full_url)
-			return "(no name)"
-		return full_url;
+		if (!data.file_ext || !data.base_name) {
+			var u = uri.spec;
+			// trim endings, like #foo ;foo ?foo
+			u = RegExp("^([^\\?;#]*)([\\?;#]|$)").exec(uri.spec)[1];
+			// take the last meaningful segment after the final slash
+			var r = RegExp("(^|/)([^/]+)/*$").exec(u);
+			if (r) {
+				u = r[2];
+				r = RegExp("^(.*)\\.([a-zA-Z0-9]{1,5})$").exec(u);
+				if (r) {
+					data.base_name = r[1];
+					data.file_ext = r[2];
+				} else {
+					data.base_name = u;
+				}
+			}
+		}
+		return data;
 	},
 	
 	/**
