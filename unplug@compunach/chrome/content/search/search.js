@@ -1206,16 +1206,6 @@ UnPlug2Search = {
 	},
 	
 	/**
-	 * TODO depricated
-	 */
-	_subst_node : function (node, attrib, variables) {
-		throw "_subst_node is depricated!";
-	},
-	_subst : function (text, variables) {
-		throw "_subst is depricated!";
-	},
-	
-	/**
 	 * Call when it's all over
 	 */
 	_reset : function () {
