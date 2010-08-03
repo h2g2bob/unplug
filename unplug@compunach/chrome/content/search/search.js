@@ -1213,7 +1213,9 @@ UnPlug2Search = {
 		UnPlug2Search.callback = function ( res ) { UnPlug2.log("Cannot use callback for result " + res); };
 		UnPlug2Search._downloads = [];
 		UnPlug2Search._do_download_poll = false;
-		window.setInterval(UnPlug2Search.poll, 100);
+		if (!UnPlug2Search._poll_timer) {
+			UnPlug2Search._poll_timer = window.setInterval(UnPlug2Search.poll, 100);
+		}
 	},
 	
 	/**
