@@ -1137,7 +1137,7 @@ UnPlug2Search = {
 				"host"        : nsiuri.hostPort,
 				
 				// more details we may know
-				"swf"         : (file_ext == "swf"), // TODO roll this into file_ext?
+				"swf"         : ((file_ext || guesses.file_ext) == "swf"), // TODO roll this into file_ext?
 				"file_ext"    : file_ext || guesses.file_ext || "flv",
 				"description" : description || null,
 				"thumbnail"   : thumbnailurl || null,
