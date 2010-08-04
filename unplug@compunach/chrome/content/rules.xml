@@ -257,15 +257,26 @@
 				</each_re>
 			</rule>
 		</rule>
-<!-- TODO: checked to here -->
 		<rule id="generic_embedded">
 			<each_element ref="embedelem" tagname="embed" require_attrs="src" attrs="flashvars">
-				<rule id="all_embed">
-					<media url="${embedelem.src}" />
-				</rule>
-				<rule id="embed_with_media_ext">
-					<if_ext is_media="yes" filename="${embedelem.src}" />
-					<media url="${embedelem.src}" />
+				<rule>
+					<!-- guesses applicable anywhere -->
+					<rule id="all_embed">
+						<!-- normally swf files, can be any embed -->
+						<media url="${embedelem.src}" certainty="low" title="${origtitle.1}" description="${translate:embedplayer}" />
+					</rule>
+					<rule id="embed_with_media_ext">
+						<if_ext is_media="yes" filename="${embedelem.src}" />
+						<media url="${embedelem.src}" certainty="mid" title="${origtitle.1}" />
+					</rule>
+					<rule id="generic_flashvars">
+						<each_re ref="queryparam" string="${embed.flashvars}" re="([^&amp;]+)=([^&amp;]+)">
+							<rule>
+								<if_re string="${queryparam.2}" re="\.flv(?:\?|#|;|$" />
+								<media url="${queryparam.2}" type="flv" certainty="mid" title="${origtitle.1}" />
+							</rule>
+						</each_re>
+					</rule>
 				</rule>
 				<rule id="embed.veoh.com">
 					<if_re string="${embedelem.src}"> veoh\.com.*\.swf </if_re>
@@ -274,17 +285,9 @@
 						<rule goto="veoh" />
 					</rule>
 				</rule>
-				<rule id="smotri.com">
-					<if_re re="//pics.smotri.com/" string="${embedelem.src}" />
-					<if_re ref="vid_id" re="file=([^&amp;]+)&amp;" string="${embedelem.flashvars}" />
-					<download url="http://smotri.com/video/view/url/bot/?video_url=1&amp;ticket=${vid_id.1}">
-						<if_re ref="vid_url" re="&quot;_vidURL&quot;\s*:\s*&quot;([^&quot;]+)&quot;" />
-						<media url="${jsdecode:vid_url.1}" type="flv" />
-					</download>
-				</rule>
 				<rule id="magnatune.com.embed">
-					<if_re ref="playlisturl" string="${embedelem.src}"> embed\.magnatune\.com.*playlist_url=([^&amp;]+) </if_re>
-					<download url="${playlisturl.1}">
+					<if_re ref="playlisturl" string="${embedelem.src}"> magnatune\.com.*[&amp;\?]playlist_url=([^&amp;]+) </if_re>
+					<playlist url="${playlisturl.1}">
 						<rule id="xspf">
 							<each_re ref="track" re="&lt;track&gt;([\s\S]*?)&lt;/track&gt;" flags="m">
 								<if_re ref="loc" string="${track.1}"> &lt;location&gt;(.*?)&lt;/location&gt; </if_re>
@@ -293,9 +296,10 @@
 								<media url="${loc.1}" description="${ann.1}" thumbnail="${image.1}" />
 							</each_re>
 						</rule>
-					</download>
+					</playlist>
 				</rule>
 				<rule id="metacafe">
+					<!-- TODO unchecked -->
 					<if_url ref="url" host="metacafe.com" />
 					<media
 						url="${qparam:mediaURL:embedelem.flashvars}?__gda__=${urlencode:qparam:gdaKey:embedelem.flashvars}"
@@ -304,6 +308,7 @@
 						/>
 				</rule>
 				<rule id="embed.video.google.com">
+					<!-- TODO unchecked -->
 					<!-- possibly not working as we don't serialize page any more -->
 					<if_re ref="googlevidurl" string="${embedelem.src}">
 						/googleplayer\.swf\?videoUrl=([^&amp;]+)&amp;thumbnailUrl=([^&amp;]*)
@@ -311,6 +316,7 @@
 					<media url="${urldecode:googlevidurl.1}" thumbnail="${urldecode:googlevidurl.2}" />
 				</rule>
 				<rule id="embed.vimeo.com" >
+					<!-- TODO unchecked -->
 					<if_re ref="vimeoscript" string="${embedelem.src}">
 						vimeo\.com/moogaloop\.swf\?clip_id=(\d+)&amp;
 					</if_re>
@@ -322,35 +328,17 @@
 						<rule goto="megavideo.com" />
 					</download>
 				</rule>
-				<!--
-				<rule id="metacafe">
-					http://www.metacafe.com/fplayer/2384460/crazy_old_man.swf
-					<if_re ref="embedsrc" string="${embedelem.src}">
-						^http://www.metacafe.com/fplayer/([^/]+)
-					</if_re>
-				</rule>
-				-->
 				<rule id="adultmult.ru">
+					<!-- TODO unchecked -->
 					<if_url host="adultmult.ru" />
 					<media url="${qparam:file:embedelem.flashvars}" thumbnail="${qparam:image:embedelem.flashvars}" type="flv" />
 				</rule>
 				<rule id="embed.xvidoes">
+					<!-- TODO unchecked -->
 					<if_re re="xvideos\.com" string="${embedelem.src}" />
 					<media url="${qparam:flv_url:htmldecode:embedelem.flashvars}" thumbnail="${qparam:url_bigthumb:htmldecode:embedelem.flashvars}" type="flv" />
 				</rule>
-				<rule id="generic_flashvars">
-					<!-- TODO - have some special tag to parse this sort of thing? -->
-					<each_re ref="queryparam" string="${embed.flashvars}" re="([^&amp;]+)=([^&amp;]+)">
-						<rule>
-							<if_re string="${queryparam.2}"> \.flv(?:\?|$) </if_re>
-							<media url="${queryparam.2}" type="flv" />
-						</rule>
-					</each_re>
-				</rule>
-				<rule id="embedsrc" priority="low">
-					<!-- normally swf files, can be any embed -->
-					<media src="${embedelem.src}" description="${translate:embedplayer}"/>
-				</rule>
+<!-- TODO: checked to here -->
 				<rule id="videmo">
 					<!-- for embedded players and the site iself -->
 					<if_re ref="vid" re="embed\.vidoemo\.com\/video\d+\/([A-Za-z0-9_-]+)$" string="${embedelem.src}" />
@@ -583,7 +571,9 @@
 			</download>
 		</rule>
 	</rule>
-	<rule>
+	<rule id="metacafe.com">
+		<!-- TODO broken -->
+		<if_false />
 		<if_url host="metacafe.com" />
 		<if_re string="${.url}" ref="reurl" >
 			/watch/([^/]+)
