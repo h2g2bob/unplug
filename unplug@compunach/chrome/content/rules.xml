@@ -272,7 +272,7 @@
 					<rule id="generic_flashvars">
 						<each_re ref="queryparam" string="${embed.flashvars}" re="([^&amp;]+)=([^&amp;]+)">
 							<rule>
-								<if_re string="${queryparam.2}" re="\.flv(?:\?|#|;|$" />
+								<if_re string="${queryparam.2}" re="\.flv(?:\?|#|;|$)" />
 								<media url="${queryparam.2}" type="flv" certainty="mid" title="${origtitle.1}" />
 							</rule>
 						</each_re>
@@ -359,8 +359,8 @@
 			</each_element>
 			<each_element ref="param" tagname="param" require_attrs="name,value">
 				<rule id="pram.default">
-					<if_re string="${param.name}" flags="i"> (movie|src|href) </if_re>
-					<media url="${param.value}" description="${translate:embedplayer}"/>
+					<if_re string="${param.name}" flags="i" re="(movie|src|href)" />
+					<media url="${param.value}" certainty="low" title="${origtitle.1}" description="${translate:embedplayer}" />
 				</rule>
 			</each_element>
 		</rule>
@@ -473,6 +473,7 @@
 					<if_re ref="flvarray" re="&quot;flv&quot;:\[(\{&quot;no&quot;:[^\]]+)\]" />
 					<each_re ref="piece" re="\{&quot;no&quot;:&quot;?(\d+)&quot;?," string="${flvarray.1}">
 						<media url="${youku:flv:key1.1:key2.1:seed.1:flvstreamid.1:piece.1}" thumbnail="${jsdecode:thumbnail.1}" description="Part ${piece.1} (flv)" type="flv" />
+						<!-- TODO really need to double check this. Possibly all the pieces give the same output!? -->
 					</each_re>
 				</rule>
 				<rule>
