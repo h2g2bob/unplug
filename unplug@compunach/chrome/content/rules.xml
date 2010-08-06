@@ -162,7 +162,7 @@
 		<if_re ref="k1" re="flashvars\.k1 = &quot;(\d+)&quot;" />
 		<if_re ref="k2" re="flashvars\.k2 = &quot;(\d+)&quot;" />
 		<if_re ref="s" re="flashvars\.s = &quot;(\d+)&quot;" />
-		<media type="flv" description="${title.1}" url="http://www${s.1}.megavideo.com/files/${megavideo:un.1:k1.1:k2.1}/" title="${either:title.1:origtitle.1}" />
+		<media type="flv" description="${title.1}" url="http://www${s.1}.megavideo.com/files/${megavideo:un.1:k1.1:k2.1}/" title="${either:title.1:origtitle.innerHTML}" />
 	</rule>
 	<!--
 		The current flashblock workaround is to:
@@ -187,31 +187,31 @@
 					<rule>
 						<if_re string="${fmt_url.1}" re="^(22)$" />
 						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-							quality="very-high" title="${either:title.1:origtitle.1}" mediaid="${video_id.1}"
+							quality="very-high" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
 							description="${translate:hd_quality} - ${optional:title.1}" type="mp4" />
 					</rule>
 					<rule>
 						<if_re string="${fmt_url.1}" re="^(5)$" />
 						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-							quality="low" title="${either:title.1:origtitle.1}" mediaid="${video_id.1}"
+							quality="low" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
 							description="${translate:low_quality} - ${optional:title.1}" type="flv" />
 					</rule>
 					<rule>
 						<if_re string="${fmt_url.1}" re="^(34|4)$" />
 						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-							quality="mid" title="${either:title.1:origtitle.1}" mediaid="${video_id.1}"
+							quality="mid" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
 							description="${translate:mid_quality} - ${optional:title.1}" type="flv" />
 					</rule>
 					<rule>
 						<if_re string="${fmt_url.1}" re="^(18)$" />
 						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-							quality="mid" title="${either:title.1:origtitle.1}" mediaid="${video_id.1}"
+							quality="mid" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
 							description="${translate:mid_quality} (mp4) - ${optional:title.1}" type="mp4" />
 					</rule>
 					<rule>
 						<if_re string="${fmt_url.1}" re="^(35)$" />
 						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-							quality="mid" title="${either:title.1:origtitle.1}" mediaid="${video_id.1}"
+							quality="mid" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
 							description="${translate:high_quality} - ${optional:title.1}" type="flv" />
 					</rule>
 					<rule>
@@ -263,17 +263,17 @@
 					<!-- guesses applicable anywhere -->
 					<rule id="all_embed">
 						<!-- normally swf files, can be any embed -->
-						<media url="${embedelem.src}" certainty="low" title="${origtitle.1}" description="${translate:embedplayer}" />
+						<media url="${embedelem.src}" certainty="low" title="${origtitle.innerHTML}" description="${translate:embedplayer}" />
 					</rule>
 					<rule id="embed_with_media_ext">
 						<if_ext is_media="yes" filename="${embedelem.src}" />
-						<media url="${embedelem.src}" certainty="mid" title="${origtitle.1}" />
+						<media url="${embedelem.src}" certainty="mid" title="${origtitle.innerHTML}" />
 					</rule>
 					<rule id="generic_flashvars">
 						<each_re ref="queryparam" string="${embed.flashvars}" re="([^&amp;]+)=([^&amp;]+)">
 							<rule>
 								<if_re string="${queryparam.2}" re="\.flv(?:\?|#|;|$)" />
-								<media url="${queryparam.2}" type="flv" certainty="mid" title="${origtitle.1}" />
+								<media url="${queryparam.2}" type="flv" certainty="mid" title="${origtitle.innerHTML}" />
 							</rule>
 						</each_re>
 					</rule>
@@ -360,7 +360,7 @@
 			<each_element ref="param" tagname="param" require_attrs="name,value">
 				<rule id="pram.default">
 					<if_re string="${param.name}" flags="i" re="(movie|src|href)" />
-					<media url="${param.value}" certainty="low" title="${origtitle.1}" description="${translate:embedplayer}" />
+					<media url="${param.value}" certainty="low" title="${origtitle.innerHTML}" description="${translate:embedplayer}" />
 				</rule>
 			</each_element>
 		</rule>
