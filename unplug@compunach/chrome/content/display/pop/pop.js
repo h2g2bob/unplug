@@ -157,6 +157,7 @@ UnPlug2SearchPage = {
 			try {
 				// we need to add a new object
 				var uid = UnPlug2SearchPage.results.length;
+				UnPlug2SearchPage.download_to_uid[download_tosource] = uid;
 				UnPlug2SearchPage.results[uid] = result;
 				result.uid = uid;
 				
