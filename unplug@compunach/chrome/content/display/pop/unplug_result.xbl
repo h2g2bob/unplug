@@ -35,6 +35,9 @@
 	-->	
 	<binding id="unplug_result">
 		<implementation>
+<!-- TODO - do i need to pass UnPlug2SearchPage.widgetresponse in as a variable somewhere?
+so i can use it in callback without it needing to be in global scope.
+-->
 			<constructor>
 				callback = (function (evt, responsename, responsedata) {
 					var reference;
@@ -48,36 +51,33 @@
 					evt.stopPropagation();
 				});
 			</constructor>
-			<method name="initResult">
-				<parameter name="result"/>
-				<parameter name="preferred_downloaders"/>
+			<method name="set_download">
+				<parameter name="preferences" />
+				<parameter name="data" />
 				<body>
 					/*
 					 * Set up the item
 					 * TODO - remove capabilities from here (use widgetavailable instead)
 					 */
 					var that = this;
-					var getelem = (function(elem_id) {
+					var get = (function(elem_id) {
 						return document.getAnonymousElementByAttribute(that, "id", elem_id);
 					});
-					var setattr = (function(elem_id, attr_name, attr_value) {
-						getelem(elem_id).setAttribute(attr_name, attr_value);
-					});
 					var isavailable = (function(widgetname) {
-						return UnPlug2SearchPage.widgetavailable(result, widgetname);
+						return UnPlug2SearchPage.widgetavailable(result, widgetname); // TODO ????
 					});
 					var hideifnotavail = (function(elem_id, widgetname) {
 						if (isavailable(widgetname)) {
-							getelem(elem_id).style.display = "block";
+							get(elem_id).style.display = "block";
 						} else {
-							getelem(elem_id).style.display = "none";
+							get(elem_id).style.display = "none";
 						}
 					});
 					var disableifnotavail = (function(elem_id, widgetname) {
 						if (isavailable(widgetname)) {
-							setattr(elem_id, "disabled", false);
+							get(elem_id).setAttribute("disabled", false);
 						} else {
-							setattr(elem_id, "disabled", true);
+							get(elem_id).setAttribute("disabled", true);
 						}	
 					});
 					var set_default_downloader = (function () {
@@ -88,41 +88,41 @@
 							switch (preferred_downloaders[i]) {
 								case "fallback":
 									if (true) {
-										setattr("dl", "oncommand", "callback(event, 'fallback', null)");
-										setattr("dl", "tooltiptext", "&dl.nodefault.tooltip;");
-										getelem("dl").className = "fallback";
+										get("dl").setAttribute("oncommand", "callback(event, 'fallback', null)");
+										get("dl").setAttribute("tooltiptext", "&dl.nodefault.tooltip;");
+										get("dl").className = "fallback";
 										return;
 									}
 									break;
 								case "saveas":
 									if (isavailable("saveas")) {
-										setattr("dl", "oncommand", "callback(event, 'saveas', null)");
-										setattr("dl", "tooltiptext", "&dl.saveas.tooltip;");
-										getelem("dl").className = "saveas";
+										get("dl").setAttribute("oncommand", "callback(event, 'saveas', null)");
+										get("dl").setAttribute("tooltiptext", "&dl.saveas.tooltip;");
+										get("dl").className = "saveas";
 										return;
 									}
 									break;
 								case "downthemall":
 									if (isavailable("downthemall")) {
-										setattr("dl", "oncommand", "callback(event, 'downthemall', null)");
-										setattr("dl", "tooltiptext", "&dl.dta.tooltip;");
-										getelem("dl").className = "dta";
+										get("dl").setAttribute("oncommand", "callback(event, 'downthemall', null)");
+										get("dl").setAttribute("tooltiptext", "&dl.dta.tooltip;");
+										get("dl").className = "dta";
 										return;
 									}
 									break;
 								case "flashgot":
 									if (isavailable("flashgot")) {
-										setattr("dl", "oncommand", "callback(event, 'flashgot', null)");
-										setattr("dl", "tooltiptext", "&dl.flashgot.tooltip;");
-										getelem("dl").className = "flashgot";
+										get("dl").setAttribute("oncommand", "callback(event, 'flashgot', null)");
+										get("dl").setAttribute("tooltiptext", "&dl.flashgot.tooltip;");
+										get("dl").className = "flashgot";
 										return;
 									}
 									break;
 								case "openover":
 									if (isavailable("openover")) {
-										setattr("dl", "oncommand", "callback(event, 'openover', null)");
-										setattr("dl", "tooltiptext", "&open.over.tooltip;");
-										getelem("dl").className = "openover";
+										get("dl").setAttribute("oncommand", "callback(event, 'openover', null)");
+										get("dl").setAttribute("tooltiptext", "&open.over.tooltip;");
+										get("dl").className = "openover";
 										return;
 									}
 									break;
@@ -130,20 +130,6 @@
 						}
 					});
 					
-					// debug
-					setattr("contentbox", "tooltiptext", result.download.toSource() + "\n" + result.details.trace);
-					
-					// basic information
-					setattr("name", "value", result.details.name || "name missing!");
-					setattr("host", "value", result.details.host || "host missing!");
-					setattr("protocol", "value", result.details.protocol || "proocol missing!");
-					setattr("description", "value", result.details.description || "");
-					
-					// thumbnail
-					if (result.details.thumbnail) {
-						setattr("thumbnail", "src", result.details.thumbnail);
-						setattr("thumbnail", "tooltiptext", result.details.thumbnail);
-					}
 					
 					// copy url
 					disableifnotavail("copyurl",     "copyurl");
@@ -160,43 +146,42 @@
 					
 					// det default downloader on dl button
 					set_default_downloader();
+
 				</body>
 			</method>
-			<method name="addDuplicate">
-				<parameter name="result"/>
+			<method name="set_description">
+				<parameter name="preferences" />
+				<parameter name="data" />
 				<body>
-					/*
-					 * Duplicates are downloaded in the same way, but may have different
-					 * details associated with them.
-					 */
 					var that = this;
-					var getelem = function(elem_id) {
+					var get = (function(elem_id) {
 						return document.getAnonymousElementByAttribute(that, "id", elem_id);
-					}
-					var getattr = function(elem_id, attr_name) {
-						return getelem(elem_id).getAttribute(attr_name);
-					}
-					var setattr = function(elem_id, attr_name, attr_value) {
-						getelem(elem_id).setAttribute(attr_name, attr_value);
-					}
+					});
 					
 					// debug
-					setattr("contentbox", "tooltiptext", getattr("contentbox", "tooltiptext") + "\n" + result.details.trace);
+					get("contentbox").setAttribute("tooltiptext", data.toSource() + "\n" + data.trace);
 					
 					// basic information
-					if (result.details.description) {
-						setattr("description", "value", result.details.description);
-					}
+					get("name").setAttribute("value", data.name || "name missing!");
+					get("host").setAttribute("value", data.host || "host missing!");
+					get("protocol").setAttribute("value", data.protocol || "proocol missing!");
+					get("description").setAttribute("value", data.description || "");
+					
+					// css class
+					that.className = [
+						"certainty-" + (data.certainty &lt; 0 : "low" : "high"),
+						"file-ext-" + (data.file_ext || "unknown") ].join(" ")
 					
 					// thumbnail
-					if (result.details.thumbnail) {
-						setattr("thumbnail", "src", result.details.thumbnail);
-						setattr("thumbnail", "tooltiptext", result.details.thumbnail);
+					if (data.thumbnail) {
+						get("thumbnail").getAttribute("src", data.thumbnail);
 					}
 				</body>
 			</method>
 			
 			<!-- when callbacks are made, this value is supplied -->
+			<!-- it's set to the uid of the result in UnPlug2SearchPage -->
+			<!-- TODO we can remove this if we use some better callback mechanism -->
 			<field name="reference" />
 		</implementation>
 		<content>

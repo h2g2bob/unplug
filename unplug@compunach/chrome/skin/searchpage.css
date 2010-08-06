@@ -1,4 +1,8 @@
-image#thumbnail {
+.unplug-result {
+	border: 1px black solid;
+}
+
+.unplug-result image.ur-thumbnail {
 	width: 4.8em;
 	height: 2.8em;
 	border: 1px black solid;
@@ -6,72 +10,66 @@ image#thumbnail {
 	background: #000000;
 }
 
-#name {
+.unplug-result label.ur-name {
 	font-weight: bold;
 }
 
-#host {
+.unplug-result label.ur-host {
 	font-size: smaller;
 	color: #008000;
 }
 
-#protocol {
+.unplug-result label.ur-protocol {
 }
 
-#description {
+.unplug-result label.ur-description {
 }
 
-unplug_result.swf {
-	color: #666666;
+.unplug-result.file-ext-swf {
+	opacity: 0.5;
 }
 
-toolbarbutton.config,
-menuitem.config {
+.unplug-result .menuitem-iconic.config {
 	list-style-image: url("chrome://unplug/skin/tango-16/preferences-system.png");
 }
 
-toolbarbutton.saveas,
-menuitem.saveas {
+.unplug-result .menuitem-iconic.saveas {
 	list-style-image: url("chrome://unplug/skin/tango-16/document-save-as.png");
 }
 
-toolbarbutton.dta,
-menuitem.dta {
+.unplug-result .menuitem-iconic.dta {
 	list-style-image: url("chrome://dta/skin/common/dta.png");
 }
 
-toolbarbutton.flashgot,
-menuitem.flashgot {
+.unplug-result .menuitem-iconic.flashgot {
 	list-style-image: url("chrome://flashgot/skin/fg1.png");
 }
 
-toolbarbutton.fallback,
-menuitem.fallback {
+.unplug-result .menuitem-iconic.fallback {
 	list-style-image: url("chrome://unplug/skin/tango-16/dialog-error.png");
 }
 
 
-toolbarbutton.copyurl,
-menuitem.copyurl {
+.unplug-result .menuitem-iconic.copyurl {
 	list-style-image: url("chrome://unplug/skin/tango-16/edit-copy.png");
 }
 
-toolbarbutton.opentab,
-menuitem.opentab {
+.unplug-result toolbarbutton.menuitem-iconic.opentab,
+.unplug-result menuitem.menuitem-iconic.opentab {
 	list-style-image: url("chrome://unplug/skin/tango-16/tab-new.png");
 }
 
-toolbarbutton.opennew,
-menuitem.opennew {
+.unplug-result toolbarbutton.menuitem-iconic.opennew,
+.unplug-result menuitem.menuitem-iconic.opennew {
 	list-style-image: url("chrome://unplug/skin/tango-16/window-new.png");
 }
 
-toolbarbutton.openover,
-menuitem.openover {
+.unplug-result toolbarbutton.menuitem-iconic.openover,
+.unplug-result menuitem.menuitem-iconic.openover {
 	list-style-image: url("chrome://unplug/skin/tango-16/window.png");
 }
 
-toolbarbutton > toolbarbutton > label {
+.unplug-result toolbarbutton > toolbarbutton > label {
 	/* this aligns the label on the drop-down buttons correctly (ie: not just on the top) */
 	max-height : 1em;
 }

@@ -45,11 +45,27 @@ UnPlug2SearchPage = {
 		this._clipboard = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
 			.getService(Components.interfaces.nsIClipboardHelper);  
 		
+		// preferered downloaders from config
+		switch (UnPlug2.get_pref("downloader")) {
+			case "saveas":
+				this.preferred_downloaders = ["saveas"];
+				break;
+			case "openover":
+				this.preferred_downloaders = ["openover"];
+				break;
+			default:
+				this.preferred_downloaders = ["dta", "flashgot", "saveas"];
+				break;
+		}
+		
 		// set this to true to stop everything
 		this._stopped = false;
 		
 		// results array to be populated when a callback occurs
-		this.results = [];
+		this.download_to_uid = {}; // { result.download.toSource() : 1 }
+		this.results = []; // { 1 : result }  ... or rather [ ..., result, ... ]
+		this.media_id_lookup = {}; // { "youtube-324121" : 1 }
+		this.playlist_id_lookup = {}; // { "youtube-uploader-1213" : 1 }
 	},
 	
 	/**
@@ -101,6 +117,8 @@ UnPlug2SearchPage = {
 			}
 		} catch (e) {
 			UnPlug2.log(e);
+			var e = document.getElementById("dynamic_results");
+			e.value = "Have errors";
 		}
 	},
 	
@@ -120,72 +138,142 @@ UnPlug2SearchPage = {
 	 * Called for each result found. This may be asynchromous (ie, after additional files are downloaded).
 	 */
 	_search_callback : function (result) {
-		UnPlug2.log("FOUND: " + result.toSource());
 		if (result.type != "result") {
 			UnPlug2.log("Callback function got a " + result.type + " (not a result)!");
 			return;
 		}
 		
-		for (var i = 0; i < UnPlug2SearchPage.results.length; i++) {
-			// JavaScript being retarded here:
-			//     {"X" : "Y"} == {"X" : "Y"} -> false
-			// So convert to source strings and compare to give the correct damned answer!
-			if (UnPlug2SearchPage.results[i].download.toSource() === result.download.toSource()) {
-				var old_result_widget = document.getElementById("result_" + i);
-				old_result_widget.addDuplicate(result);
+		/*
+		 * detect if it's an exact duplicate
+		 * In JavaScript, asking if {"X" : "Y"} == {"X" : "Y"} -> false
+		 *  So convert to source strings and compare to give the correct answer!
+		*/
+		var download_tosource = result.download.toSource();
+		var uid = UnPlug2SearchPage.download_to_uid[download_tosource]; // TODO -- also need to check this key is not a "native object" like "length", "toString", etc!
+		
+		UnPlug2.log("FOUND: " + result.toSource() + " as " + (uid || "new result"));
+		
+		if (uid === undefined) {
+			try {
+				// we need to add a new object
+				var uid = UnPlug2SearchPage.results.length;
+				UnPlug2SearchPage.results[uid] = result;
+				result.uid = uid;
 				
-				if (!UnPlug2SearchPage.results[i].details.file_ext) {
-					UnPlug2SearchPage.results[i].details.file_ext = result.details.file_ext;
+				var reselem = UnPlug2SearchPage.result_e_create();
+				reselem.setAttribute("id", "result_" + uid);
+				reselem.setAttribute("tooltiptext", "uid=" + uid + "\n\ndownload=" + result.download.toSource() + "\n\noriginal = " + result.details.toSource());
+				
+				// sets download callbacks, etc
+				UnPlug2SearchPage.result_e_set_download(reselem, result);
+				
+				// this sets labels, icons, descripions, css, etc
+				// but wont ever move the element
+				UnPlug2SearchPage.result_e_set_description(reselem, result);
+
+				// show element
+				document.getElementById("results").appendChild(reselem);
+				
+				// make draggable if simple url only
+				if (result.download.url) { // TODO -- make this trigger on resultelem.draggable (or just move into download)
+					reselem.addEventListener("draggesture", function (e) {
+						nsDragAndDrop.startDrag(e, UnPlug2SearchPage.drag_and_drop_observer(result.download.url));
+						}, false);
 				}
-				return;
+				
+			} catch(e) {
+				UnPlug2.log("ERROR displaying result " + e);
+			}
+		} else {
+			var reselem = document.getElementById("result_" + uid);
+			var old_result = UnPlug2SearchPage.results[uid];
+			if (old_result.certainty > result.certainty) {
+				reselem.setAttribute("tooltiptext", reselem.getAttribute("tooltiptext") + "\n\nupdated = " + result.details.toSource());
+				
+				// we need to update this.results and the widget displayed on the page with our better data
+				UnPlug2SearchPage.result_e_set_description(reselem, result);
+				
+				// TODO -- need to implement the media_id and download_id stuff
+				// so it can attach/detach from the parent element as needed
+			} else {
+				reselem.setAttribute("tooltiptext", reselem.getAttribute("tooltiptext") + "\n\nignored = " + result.details.toSource());
+			}
+		}
+	},
+	
+	result_e_create : function () {
+		var orig = document.getElementById("unplug_result_template");
+		var dupe = orig.cloneNode(true);
+		dupe.collapsed = false;
+		return dupe;
+	},
+	
+	result_e_set_download : function (reselem, result) {
+		// variables for use in the callbaks (closures)
+		var uid = result.uid;
+		var download = result.download;
+		var that = UnPlug2SearchPage;
+		
+		var getwidget = (function (wname) {
+			var l = reselem.getElementsByTagName("menuitem")
+			for (var i = 0; i < l.length; ++i) {
+				if (l[i].className && l[i].className.split(" ").indexOf(wname) >= 0) {
+					return l[i];
+				}
+			}
+			var l = reselem.getElementsByTagName("toolbarbutton")
+			for (var i = 0; i < l.length; ++i) {
+				if (l[i].className && l[i].className.split(" ").indexOf(wname) >= 0) {
+					return l[i];
+				}
+			}
+			return null;
+		});
+		
+		var buttons = ["copyurl", "saveas", "dta", "flashgot", "opentab", "opennew", "openover", "config"]
+		for (var i = 0; i < buttons.length; ++i) {
+			var wname = buttons[i];
+			var w = getwidget(wname);
+			if (that.widgets[wname].avail(result)) {
+				// use closure to get correct scoping
+				var function_function = (function (that, uid, wname) {
+					return (function (evt) {
+						that.widgetresponse(uid, wname, wname == "config" ? "downloader" : null);
+					});
+				});
+				w.addEventListener("command", function_function(that, uid, wname), true);
+				w.setAttribute("disabled", false);
+			} else {
+				w.setAttribute("disabled", true);
 			}
 		}
 		
-		// add this result
-		var new_result_index = UnPlug2SearchPage.results.length;
-		UnPlug2SearchPage.results[new_result_index] = result;
+		// TODO -- which to make default (not drop-down)
 		
-		try {
-			var reselem = document.createElement("unplug_result");
-			
-			// add an id so we can edit this item later
-			reselem.setAttribute("id", "result_" + new_result_index);
-			reselem.setAttribute("reference", new_result_index);
-			
-			// change css classes in some circumstances
-			// TODO -- improve css styling code
-			if (result.details.swf) {
-				reselem.className = "swf";
-			}
-			
-			// make draggable if simple url only
-			if (result.download.url) {
-				reselem.addEventListener("draggesture", function (e) {
-					nsDragAndDrop.startDrag(e, UnPlug2SearchPage.drag_and_drop_observer(result.download.url));
-					}, false);
-			}
-			
-			var preferred_downloaders;
-			switch (UnPlug2.get_pref("downloader")) {
-				case "saveas":
-					preferred_downloaders = ["saveas"];
-					break;
-				case "openover":
-					preferred_downloaders = ["openover"];
-					break;
-				default:
-					preferred_downloaders = ["downthemall", "flashgot", "saveas"];
-					break;
-			}
-			
-			// hide before and show after calling init
-			reselem.collapsed = true;
-			document.getElementById("results").appendChild(reselem);
-			reselem.initResult(result, preferred_downloaders);
-			reselem.collapsed = false;
-		} catch(e) {
-			UnPlug2.log("ERROR displaying result " + e);
-		}
+		// TODO -- fix drag+drop to drag whole element
+	},
+	
+	result_e_set_description : function (reselem, result) {
+		// variables for use in the callbaks (closures)
+		var uid = result.uid;
+		var details = result.details;
+		var that = UnPlug2SearchPage;
+		
+		var host_label = reselem.getElementsByTagName("label")[0];
+		host_label.setAttribute("value", details.host);
+		var name_label = reselem.getElementsByTagName("label")[1];
+		name_label.setAttribute("value", details.name);
+		var protocol_label = reselem.getElementsByTagName("label")[2];
+		protocol_label.setAttribute("value", details.protocol);
+		var desc_label = reselem.getElementsByTagName("label")[3];
+		desc_label.setAttribute("value", details.description);
+		var thumbnail = reselem.getElementsByTagName("image")[0];
+		thumbnail.setAttribute("src", details.thumbnail);
+		
+		reselem.className = [
+			"file-ext-" + (details.file_ext || "unknown"),
+			"certainty-" + (details.certainty < 0 ? "low" : "high"),
+			reselem.className].join(" ")
 	},
 	
 	toString : function () {
@@ -413,7 +501,7 @@ UnPlug2SearchPage = {
 				UnPlug2SearchPage._win.location = res.download.url;
 			}
 		},
-		"downthemall" : {
+		"dta" : {
 			avail : function (res) {
 				if (!UnPlug2.get_root_pref("extensions.{DDC359D1-844A-42a7-9AA1-88A850A938A8}.description")) {
 					return false;
