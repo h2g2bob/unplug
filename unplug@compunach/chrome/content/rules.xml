@@ -696,6 +696,16 @@
 		<if_re ref="playerurl" tagname="script"> (googleplayer\.swf\?[^&quot;']+)[&quot;'] </if_re>
 		<media url="${qparam:videoUrl:jsdecode:playerurl.1}" thumbnail="${qparam:thumbnailUrl:jsdecode:playerurl.1}" />
 	</rule>
+	<rule id="vbox7.com">
+		<if_url ref="url" host="vbox7.com" />
+		<rule>
+			<if_re ref="vidid" re="vbox7\.com/play:([a-fA-F0-9]+)" string="${url.url}" />
+			<download url="http://www.vbox7.com/play/magare.do" post="onLoad=%5Btype%20Function%5D&amp;vid=${vidid.1}">
+				<if_re ref="vid" re="&amp;videoFile=(http[^&amp;]+)&amp;" />
+				<media url="${vid.1}" title="${origtitle.innerHTML}" thumbnail="http://i.vbox7.com/p/${vidid.1}1.jpg" type="flv" />
+			</download>
+		</rule>
+	</rule>
 	<!--
 	Lower priority
 	-->
