@@ -50,7 +50,13 @@
 		<priority level="very-low">quantserve.com</priority>
 		<priority level="low">cpro.baidu.com</priority>
 	</hook>
-	<optional_elem ref="origtitle" require_attrs="innerHTML" />
+	<!--
+		First, grab the original page title, so we know what to save it as
+	-->
+	<optional_element ref="origtitle" tagname="title" require_attrs="innerHTML" />
+	<!--
+		Now the actual rules
+	-->
 	<rule id="generic_flv_string">
 		<!-- possible alternative? <each_re ref="flvre" re="(https?://[a-z0-9_/\.\-]+\.flv(?:\?[a-z0-9_/\.%=&amp;\-]*)?)" flags="i"> -->
 		<each_re ref="flvre" re="[&quot;']((?:http|/)[^&quot;']+\.flv(?:\?[^&quot;']+)?)[&quot;']">
@@ -75,8 +81,8 @@
 				<!-- this actually has links to several different files with the tags below repeated in different <item> tags. Plus its poorly formatted xml -->
 				<!-- content like: <media:content url="[filename]?start=[seek],http://media.joy69.com/.....flv" duration="185" lang="en"> -->
 				<if_re ref="content" re="(http://[^&quot;]+\.flv[^&quot;]*)&quot;" />
-				<optional_elem ref="poster" tagname="media:thumbnail" require_attrs="innerHTML" />
-				<optional_elem ref="media_title" tagname="media:title" require_attrs="innerHTML" />
+				<optional_element ref="poster" tagname="media:thumbnail" require_attrs="innerHTML" />
+				<optional_element ref="media_title" tagname="media:title" require_attrs="innerHTML" />
 				<media url="${content.1}" thumbnail="${poster.innerHTML}" title="${either:media_title.innerHTML:origtitle.innerHTML}" type="flv" />
 			</download>
 		</rule>
@@ -263,7 +269,8 @@
 					<!-- guesses applicable anywhere -->
 					<rule id="all_embed">
 						<!-- normally swf files, can be any embed -->
-						<media url="${embedelem.src}" certainty="low" title="${origtitle.innerHTML}" description="${translate:embedplayer}" />
+						<!-- lets not use page title (origtitle.innerHTML) because we're not too certain of this one -->
+						<media url="${embedelem.src}" certainty="low" description="${translate:embedplayer}" />
 					</rule>
 					<rule id="embed_with_media_ext">
 						<if_ext is_media="yes" filename="${embedelem.src}" />
