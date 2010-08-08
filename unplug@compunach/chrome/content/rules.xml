@@ -273,8 +273,9 @@
 						<media url="${embedelem.src}" certainty="low" description="${translate:embedplayer}" />
 					</rule>
 					<rule id="embed_with_media_ext">
+						<!-- this is an embedded media file, PROBABLY with a sane filename already, so we won't set title to origtitle.innerHTML -->
 						<if_ext is_media="yes" filename="${embedelem.src}" />
-						<media url="${embedelem.src}" certainty="mid" title="${origtitle.innerHTML}" />
+						<media url="${embedelem.src}" certainty="mid" />
 					</rule>
 					<rule id="generic_flashvars">
 						<each_re ref="queryparam" string="${embed.flashvars}" re="([^&amp;]+)=([^&amp;]+)">
@@ -283,13 +284,6 @@
 								<media url="${queryparam.2}" type="flv" certainty="mid" title="${origtitle.innerHTML}" />
 							</rule>
 						</each_re>
-					</rule>
-				</rule>
-				<rule id="embed.veoh.com">
-					<if_re string="${embedelem.src}"> veoh\.com.*\.swf </if_re>
-					<rule>
-						<if_re string="${htmldecode:embedelem.src}" ref="videoid"> (?:\?|&amp;)permalinkId=([^&amp;]+) </if_re>
-						<rule goto="veoh" />
 					</rule>
 				</rule>
 				<rule id="magnatune.com.embed">
@@ -314,19 +308,15 @@
 						thumbnail="${qparam:staticURL:embedelem.flashvars}/thumb/${qparam:itemID:embedelem.flashvars}.jpg"
 						/>
 				</rule>
-				<rule id="embed.video.google.com">
-					<!-- TODO unchecked -->
-					<!-- possibly not working as we don't serialize page any more -->
-					<if_re ref="googlevidurl" string="${embedelem.src}">
-						/googleplayer\.swf\?videoUrl=([^&amp;]+)&amp;thumbnailUrl=([^&amp;]*)
-					</if_re>
-					<media url="${urldecode:googlevidurl.1}" thumbnail="${urldecode:googlevidurl.2}" />
+				<rule id="embed.video.google.com-2010">
+					<if_re ref="docid" string="${embedelem.src}" re="video\.google\.com.*docid=(\d+)(&amp;|$)" />
+					<download url="http://video.google.com/videoplay?docid=${docid.1}">
+						<optional_element ref="origtitle" tagname="title" require_attrs="innerHTML" />
+						<rule goto="noembed.video.google.com" />
+					</download>
 				</rule>
 				<rule id="embed.vimeo.com" >
-					<!-- TODO unchecked -->
-					<if_re ref="vimeoscript" string="${embedelem.src}">
-						vimeo\.com/moogaloop\.swf\?clip_id=(\d+)&amp;
-					</if_re>
+					<if_re ref="vimeoscript" string="${embedelem.src}" re="vimeo\.com/moogaloop\.swf\?clip_id=(\d+)&amp;" />
 					<rule goto="vimeodownload" />
 				</rule>
 				<rule id="embed.megavideo.com">
@@ -339,6 +329,10 @@
 					<!-- TODO unchecked -->
 					<if_url host="adultmult.ru" />
 					<media url="${qparam:file:embedelem.flashvars}" thumbnail="${qparam:image:embedelem.flashvars}" type="flv" />
+				</rule>
+				<rule id="rutube.ru-embed-2010">
+					<if_re ref="v" string="${embedelem.src}" re="^http://video\.rutube\.ru/([0-9a-fA-F]+)" />
+					<rule goto="rutube-from-id" />
 				</rule>
 				<rule id="embed.xvidoes">
 					<!-- TODO unchecked -->
@@ -668,11 +662,18 @@
 			<media url="${hexres.1}" type="flv" />
 		</rule>
 	</rule>
-	<rule id="rutube.ru">
-		<if_url host="rutube.ru"/>
-		<each_re ref="playurl" re="'(http[^']+player\.swf\?[^']+)'" tagname="script">
-			<media url="${urldecode:qparam:file:htmldecode:playurl.1}" thumbnail="${urldecode:qparam:image:htmldecode:playurl.1}" />
-		</each_re>
+	<rule id="rutube.ru-2010">
+		<if_url host="rutube.ru" ref="url" />
+		<rule>
+			<if_re ref="v" re="^(.*)$" string="${qparam:v:url.url}" />
+			<optional_elem tagname="h1" require_attrs="innerHTML" />
+			<rule id="rutube-from-id" target="rutube-from-id">
+				<download url="http://bl.rutube.ru/${v.1}.xml?schema=rtmp">
+					<if_re ref="final" re="&lt;finalAddress&gt;&lt;!\[CDATA\[(http.*?)\]\]&gt;&lt;/finalAddress&gt;" />
+					<media url="${final.1}" thumbnail="http://img.rutube.ru/thumbs/${substring:0:2:v.1}/${substring:2:4:v.1}/${v.1}-1.jpg" title="${either:h1.innerHTML:origtitle.innerHTML}" type="flv" />
+				</download>
+			</rule>
+		</rule>
 	</rule>
 	<rule id="revver.com">
 		<if_url ref="url" host="revver.com" path="/video" />
