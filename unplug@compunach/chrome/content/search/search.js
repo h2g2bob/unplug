@@ -391,19 +391,25 @@ UnPlug2Variables.prototype = {
 			 * can be -ve numbers (like python)
 			 */
 			case "substring":
-				var fullstring = this._subst_apply_functions(parts);
-				var n1 = Number(parts[parts.length-1]);
-				if (n1 < 0)
+				var n1 = Number(parts.pop())
+				if (n1 < 0) {
 					n1 += fullstring.length;
-				var n2 = Number(parts[parts.length-2]);
-				parts.pop(); // pop n1
-				if (n2 === NaN) {
-					if (n2 < 0)
-						n2 += fullstring.length;
-					return String(fullstring).substring(n1);
 				}
-				parts.pop(); // pop n2 too
-				return String(fullstring).substring(n1);
+				var n2 = Number(parts[parts.length-1]);
+				if (isNaN(n2)) {
+					// ${substring:start:var}
+					n2 = null;
+				} else {
+					// ${substring:start:end:var}
+					parts.pop() // pop n2
+				}
+				var fullstring = String(this._subst_apply_functions(parts));
+				if (!n2) {
+					n2 = fullstring.length;
+				} else if (n2 < 0) {
+					n2 += fullstring.length;
+				}
+				return fullstring.substring(n1, n2);
 			case "reversed":
 				var value = this._subst_apply_functions(parts);
 				return value.split("").reverse().join("")
