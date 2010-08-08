@@ -122,17 +122,6 @@ UnPlug2SearchPage = {
 		}
 	},
 	
-	// drag+drop observer
-	drag_and_drop_observer : function (url) {
-		return {
-			onDragStart: function (e, transferData, action) {
-				transferData.data = new TransferData();
-				transferData.data.addDataForFlavour("text/unicode", url);
-				/* transferData.data.addDataForFlavour("text/html", url); */
-			}
-		};
-	},
-	
 	/**
 	 * Callback for UnPlug2Rules.search
 	 * Called for each result found. This may be asynchromous (ie, after additional files are downloaded).
@@ -174,13 +163,6 @@ UnPlug2SearchPage = {
 
 				// show element
 				document.getElementById("results").appendChild(reselem);
-				
-				// make draggable if simple url only
-				if (result.download.url) { // TODO -- make this trigger on resultelem.draggable (or just move into download)
-					reselem.addEventListener("draggesture", function (e) {
-						nsDragAndDrop.startDrag(e, UnPlug2SearchPage.drag_and_drop_observer(result.download.url));
-						}, false);
-				}
 				
 			} catch(e) {
 				UnPlug2.log("ERROR displaying result " + e);
@@ -251,7 +233,20 @@ UnPlug2SearchPage = {
 		
 		// TODO -- which to make default (not drop-down)
 		
-		// TODO -- fix drag+drop to drag whole element
+		// DRAG AND DROP
+		
+		if (result.download.url) { // make draggable if simple url only
+			var image = reselem.getElementsByTagName("image")[0]; // ur-thumbnail
+			reselem.setAttribute("draggable", true);
+			reselem.addEventListener("dragstart", (function (url, image) {
+				return (function (event) {
+					event.dataTransfer.setData('text/uri-list', url);
+					event.dataTransfer.setData('text/plain', url);
+					event.dataTransfer.effectAllowed = "link";
+					event.dataTransfer.setDragImage(image, 25, 25);
+				});
+			})(result.download.url, image), true);
+		}
 	},
 	
 	result_e_set_description : function (reselem, result) {
