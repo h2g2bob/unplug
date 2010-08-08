@@ -1152,28 +1152,6 @@ UnPlug2Search = {
 		
 		return result_object;
 	},
-	
-	/**
-	 * Turn a relative url into a full url
-	 */
-	_abs_url : function (url, base_url) {
-		UnPlug2.log("_abs_url is depricaed!");
-		// TODO - should use nsIURI-type URIs everywhere
-		UnPlug2.log("URL: " + url + " from base " + base_url);
-		if (base_url) {
-			var base_nsiuri = UnPlug2Search.make_uri(base_url);
-			return UnPlug2Search.make_uri(url, base_nsiuri).spec;
-		}			
-		return url;
-	},
-	
-	make_uri : function (uri, base_uri) {
-		UnPlug2.log("make_uri is depricated");
-		// TODO - DEPRICATED
-		var io_service = Components.classes["@mozilla.org/network/io-service;1"]
-			.getService(Components.interfaces.nsIIOService);
-		return io_service.newURI(uri, null, base_uri || null);
-	},
 
 	/**
 	 * Gets a filename from the url
