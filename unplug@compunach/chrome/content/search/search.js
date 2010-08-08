@@ -1140,7 +1140,7 @@ UnPlug2Search = {
 				// IMPORTANT this is used for advice only (not used for downloading) !!
 				"url"         : nsiuri.spec,
 				"protocol"    : nsiuri.scheme,
-				"host"        : nsiuri.hostPort,
+				"host"        : guesses.host,
 				
 				// more details we may know
 				"swf"         : ((file_ext || guesses.file_ext) == "swf"), // TODO roll this into file_ext?
@@ -1183,8 +1183,19 @@ UnPlug2Search = {
 		 * nsIURL also have a fileName (made of fileBaseName and fileExtension) which can be "" if uri ends in "/". In this case we want to look at the directory which won't have #ref or ?query or ;param.
 		 */
 		var data = {
+			host : "",
 			file_ext : "",
 			base_name : "" };
+		
+		// the host SHOULD be available in the nsIURI,
+		// but this raises an exception for unusual protocols!
+		// there's no guarentee that "host" is meaningful, eg: data links
+		try {
+			data.host = nsiuri.hostPort
+		} catch(e) {
+			// pass
+		}
+		
 		if (uri instanceof Components.interfaces.nsIURL) {
 			// these are in nsIURL but not in nsIURI
 			// easy! but these can be empty strings
