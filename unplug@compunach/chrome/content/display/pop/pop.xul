@@ -115,6 +115,7 @@
 				type="menu-button"
 				tabindex="1"
 				onkeydown="if (event.keyCode == 32) { this.open = true; }"
+				class="big-download-button fallback"
 				>
 				<menupopup>
 					<menuitem
@@ -122,24 +123,28 @@
 						label="&dl.saveas.label;"
 						tooltiptext="&dl.saveas.tooltip;"
 						class="menuitem-iconic saveas"
+						disabled="true"
 						/>
 					<menuitem
 						accesskey="&dl.dta.accesskey;"
 						label="&dl.dta.label;"
 						tooltiptext="&dl.dta.tooltip;"
 						class="menuitem-iconic dta"
+						disabled="true"
 						/>
 					<menuitem
 						accesskey="&dl.flashgot.accesskey;"
 						label="&dl.flashgot.label;"
 						tooltiptext="&dl.flashgot.tooltip;"
 						class="menuitem-iconic flashgot"
+						disabled="true"
 						/>
 					<menuitem
 						accesskey="&dl.special.accesskey;"
 						label="&dl.special.label;"
 						tooltiptext="&dl.special.tooltip;"
 						class="menuitem-iconic special"
+						disabled="true"
 						/>
 					<menuseparator />
 					<menuitem
@@ -147,18 +152,21 @@
 						label="&open.tab.label;"
 						tooltiptext="&open.tab.tooltip;"
 						class="menuitem-iconic opentab"
+						disabled="true"
 						/>
 					<menuitem
 						accesskey="&open.new.accesskey;"
 						label="&open.new.label;"
 						tooltiptext="&open.new.tooltip;"
 						class="menuitem-iconic opennew"
+						disabled="true"
 						/>
 					<menuitem
 						accesskey="&open.over.accesskey;"
 						label="&open.over.label;"
 						tooltiptext="&open.over.tooltip;"
 						class="menuitem-iconic openover"
+						disabled="true"
 						/>
 					<menuseparator />
 					<menuitem
@@ -166,6 +174,7 @@
 						label="&config.label;"
 						tooltiptext="&config.tooltip;"
 						class="menuitem-iconic config"
+						disabled="true"
 						/>
 				</menupopup>
 			</toolbarbutton>

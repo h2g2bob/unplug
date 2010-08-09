@@ -213,28 +213,46 @@ UnPlug2SearchPage = {
 			return null;
 		});
 		
-		var buttons = ["copyurl", "saveas", "dta", "flashgot", "opentab", "opennew", "openover", "config"]
+		var buttons = ["copyurl", "saveas", "dta", "flashgot", "special", "opentab", "opennew", "openover", "config"]
+		// what's available
+		var available_buttons = [];
 		for (var i = 0; i < buttons.length; ++i) {
 			var wname = buttons[i];
-			var w = getwidget(wname);
 			if (that.widgets[wname].avail(result)) {
-				// use closure to get correct scoping
-				var function_function = (function (that, uid, wname) {
-					return (function (evt) {
-						that.widgetresponse(uid, wname, wname == "config" ? "downloader" : null);
-					});
+				available_buttons.push(wname);
+			}
+		}
+		// what's best of those available (for main button action)
+		var best_downloader = null;
+		for (var i = 0; i < that.preferred_downloaders.length; ++i) {
+			var wname = that.preferred_downloaders[i];
+			if (available_buttons.indexOf(wname) >= 0) {
+				best_downloader = wname;
+				break;
+			}
+		}
+		// hook up events and enable
+		for (var i = 0; i < available_buttons.length; ++i) {
+			var wname = available_buttons[i];
+			var w = getwidget(wname);
+			// use closure to get correct scoping
+			var function_function = (function (that, uid, wname) {
+				return (function (evt) {
+					that.widgetresponse(uid, wname, wname == "config" ? "downloader" : null);
+					evt.stopPropagation();
 				});
-				w.addEventListener("command", function_function(that, uid, wname), true);
-				w.setAttribute("disabled", false);
-			} else {
-				w.setAttribute("disabled", true);
+			});
+			w.addEventListener("command", function_function(that, uid, wname), true);
+			w.setAttribute("disabled", false);
+			if (best_downloader == wname) {
+				// also hook up main button
+				var main = getwidget("big-download-button");
+				main.addEventListener("command", function_function(that, uid, wname), true);
+				main.className = "big-download-button menuitem-iconic " + wname;
 			}
 		}
 		
-		// TODO -- which to make default (not drop-down)
-		
-		// DRAG AND DROP
-		
+		// setup drag and drop
 		if (result.download.url) { // make draggable if simple url only
 			var image = reselem.getElementsByTagName("image")[0]; // ur-thumbnail
 			reselem.setAttribute("draggable", true);
@@ -459,6 +477,10 @@ UnPlug2SearchPage = {
 	 * For callbacks from unplug_result button presses
 	 */
 	widgets : {
+		"special" : {
+			avail : function (res) { return false; },
+			exec : function (res, data) { return }
+		},
 		"copyurl" : {
 			avail : function (res) { return (res.download.url ? true : false); },
 			exec  : function (res, data) {
