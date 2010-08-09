@@ -170,42 +170,6 @@
 		<if_re ref="s" re="flashvars\.s = &quot;(\d+)&quot;" />
 		<media type="flv" description="${title.1}" url="http://www${s.1}.megavideo.com/files/${megavideo:un.1:k1.1:k2.1}/" title="${either:title.1:origtitle.innerHTML}" />
 	</rule>
-	<rule id="generic_param">
-		<each_element tagname="param" ref="p" require_attrs="name,value">
-			<if_re string="${p.name}" flags="i"> (?:filename|url) </if_re>
-			<media url="${p.value}" />
-		</each_element>
-	</rule>
-	<rule id="comedycentral.com">
-		<!-- TODO unchecked -->
-		<if_url host="comedycentral.com" />
-		<if_re ref="mgid" re="/media/(mgid:cms:video:comedycentral.com:\d+)&quot;" />
-		<rule>
-			<download id="ccmgid" url="http://www.comedycentral.com/comedycentral/video/data/mrss.jhtml?useMediaGen=clip&amp;uri=${urlencode:mgid.1}&amp;poe=">
-				<optional_element ref="thumbnail" tagname="media:thumbnail" require_attrs="url" />
-				<each_element ref="videoxml" tagname="media:content" require_attrs="url">
-					<download id="ccxml" url="${videoxml.url}">
-						<each_re ref="src" re="&lt;src&gt;\s*([a-z]+)://(.*?)\s*&lt;/src&gt;">
-							<rule id="ccall">
-								<if_config name="show_all" value="true" />
-								<!--
-								rtmp link we can't download yet
-								-->
-								<media url="${src.1}://${src.2}" thumbnail="${thumbnail.url}" />
-							</rule>
-						</each_re>
-					</download>
-				</each_element>
-			</download>
-		</rule>
-	</rule>
-	<rule id="crunchyroll.com">
-		<!-- TODO unchecked -->
-		<if_url host="crunchyroll.com" />
-		<if_re ref="videoid"> video_id%3D%27(\d+)%27 </if_re>
-		<if_re ref="mediaid"> media_id%3D%27(\d+)%27 </if_re>
-		<media url="http://www.crunchyroll.com/getitem?videoid=${videoid.1}&amp;mediaid=${mediaid.1}" />
-	</rule>
 	<rule id="videosz.com">
 		<!-- TODO unchecked -->
 		<rule id="videosz_movie">
@@ -410,7 +374,7 @@
 		This also work around scripts
 	-->
 	<download id="flashblock_workaround" url="${.url}">
-		<rule id="generic_embedded">
+		<rule id="each_embed">
 			<each_element ref="embedelem" tagname="embed" require_attrs="src" attrs="flashvars">
 				<rule>
 					<!-- guesses applicable anywhere -->
@@ -486,7 +450,6 @@
 					<if_re re="xvideos\.com" string="${embedelem.src}" />
 					<media url="${qparam:flv_url:htmldecode:embedelem.flashvars}" thumbnail="${qparam:url_bigthumb:htmldecode:embedelem.flashvars}" type="flv" />
 				</rule>
-<!-- TODO: checked to here -->
 				<rule id="videmo">
 					<!-- TODO unchecked -->
 					<!-- for embedded players and the site iself -->
@@ -512,6 +475,47 @@
 					<!-- TODO unchecked -->
 					<if_re string="${param.name}" flags="i" re="(movie|src|href)" />
 					<media url="${param.value}" certainty="low" title="${origtitle.innerHTML}" description="${translate:embedplayer}" />
+				</rule>
+			</each_element>
+		</rule>
+		<rule id="each_param">
+			<each_element tagname="param" ref="p" require_attrs="name,value">
+				<rule id="generic_param">
+					<if_re string="${p.name}" flags="i" re="(?:filename|url|movie)" />
+					<rule id="all_param">
+						<media url="${p.value}" certainty="low" />
+					</rule>
+					<rule id="media_param">
+						<if_ext is_media="yes" filename="${p.value}" />
+						<media url="${p.value}" certainty="mid" />
+					</rule>
+					<rule id="dailyshow">
+						<!-- name=movie -->
+						<if_re ref="mgid" re="^http://media\.mtvnservices\.com/(mgid:.*)$" string="${p.value}" />
+						<download url="http://media.mtvnservices.com/player/config.jhtml?uri=${urlencode:mgid.1}" geolocate="US">
+							<each_re ref="item" re="&lt;item&gt;([\s\S]*?)&lt;/item&gt;">
+								<optional_re ref="title" string="${item.1}" re="&lt;title&gt;\s*(.*?)\s*&lt;/title&gt;" />
+								<if_element ref="xmlurl" require_attrs="url" tagname="media:content" string="${item.1}" />
+								<download url="${xmlurl.url}">
+									<each_re ref="rend" re="&lt;rendition[^&lt;&gt;]*?bitrate=&quot;(\d+)&quot;[\s\S]*?&lt;src&gt;\s*(rtmpe?|http)://(.*?)\s*&lt;/src&gt;">
+										<!-- this gives an rtmpe link -->
+										<rule>
+											<if_re re="^(1720)$" string="${rend.1}" />
+											<media url="${rend.2}://${rend.3}" description="${optional:title.1} (${rend.1} bits/sec)" title="${either:title.1:origtitle.innerHTML}" type="flv" quality="high" />
+										</rule>
+										<rule>
+											<if_re re="^(450)$" string="${rend.1}" />
+											<media url="${rend.2}://${rend.3}" description="${optional:title.1} (${rend.1} bits/sec)" title="${either:title.1:origtitle.innerHTML}" type="flv" quality="low" />
+										</rule>
+										<rule>
+											<ifnot_re re="^(1720|450)$" string="${rend.1}" />
+											<media url="${rend.2}://${rend.3}" description="${optional:title.1} (${rend.1} bits/sec)" title="${either:title.1:origtitle.innerHTML}" type="flv" />
+										</rule>
+									</each_re>
+								</download>
+							</each_re>
+						</download>
+					</rule>
 				</rule>
 			</each_element>
 		</rule>
