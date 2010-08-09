@@ -57,6 +57,11 @@ UnPlug2SearchPage = {
 				this.preferred_downloaders = ["dta", "flashgot", "saveas"];
 				break;
 		}
+		// fallbacks (if the default fails)
+		this.preferred_downloaders.push("special");
+		this.preferred_downloaders.push("saveas");
+		this.preferred_downloaders.push("openover");
+		this.preferred_downloaders.push("fallback");
 		
 		// set this to true to stop everything
 		this._stopped = false;
@@ -242,12 +247,12 @@ UnPlug2SearchPage = {
 					evt.stopPropagation();
 				});
 			});
-			w.addEventListener("command", function_function(that, uid, wname), true);
+			w.addEventListener("command", function_function(that, uid, wname), false);
 			w.setAttribute("disabled", false);
 			if (best_downloader == wname) {
 				// also hook up main button
 				var main = getwidget("big-download-button");
-				main.addEventListener("command", function_function(that, uid, wname), true);
+				main.addEventListener("command", function_function(that, uid, wname), false);
 				main.className = "big-download-button menuitem-iconic " + wname;
 			}
 		}
@@ -478,8 +483,13 @@ UnPlug2SearchPage = {
 	 */
 	widgets : {
 		"special" : {
-			avail : function (res) { return false; },
-			exec : function (res, data) { return }
+			avail : function (res) { return res.download.url && (
+				res.download.url.indexOf("rtmp://") == 0
+				|| res.download.url.indexOf("rtmpe://") == 0);
+			},
+			exec : function (res, data) {
+				alert("Sorry, this feature is not available yet");
+			}
 		},
 		"copyurl" : {
 			avail : function (res) { return (res.download.url ? true : false); },
@@ -488,7 +498,10 @@ UnPlug2SearchPage = {
 			}
 		},
 		"saveas" : {
-			avail : function (res) { return (res.download.url ? true : false); },
+			avail : function (res) { return res.download.url && (
+				res.download.url.indexOf("http://") == 0
+				|| res.download.url.indexOf("https://") == 0);
+			},
 			exec  : function (res, data) {
 				var file = UnPlug2SearchPage._save_as_box(res.details.name, res.details.file_ext);
 				if (!file)
@@ -524,10 +537,13 @@ UnPlug2SearchPage = {
 				if (!UnPlug2.get_root_pref("extensions.{DDC359D1-844A-42a7-9AA1-88A850A938A8}.description")) {
 					return false;
 				}
-				if (res.download.url) {
-					return true;
+				if (!res.download.url) {
+					return false;
 				}
-				return false;
+				if (res.download.url.indexOf("http://") != 0 && res.download.url.indexOf("https://") != 0) {
+					return false;
+				}
+				return true;
 			},
 			exec  : function (res, data) {
 				var url = res.download.url;
@@ -551,7 +567,9 @@ UnPlug2SearchPage = {
 			avail : function (res) {
 				if (UnPlug2SearchPage._flashgot) {
 					// flashgot installed
-					return (res.download.url ? true : false);
+					return (res.download.url && (
+						res.download.url.indexOf("http://") == 0
+						|| res.download.url.indexOf("https://") == 0))
 				} else {
 					// flashgot not installed
 					return false;
@@ -565,7 +583,7 @@ UnPlug2SearchPage = {
 		"fallback" : {
 			avail : function (res) { return true; },
 			exec  : function (res, data) {
-				alert("No default downloader is available");
+				alert("Cannot download this kind of file.");
 			}
 		},
 		"config" : {

@@ -115,7 +115,7 @@
 				type="menu-button"
 				tabindex="1"
 				onkeydown="if (event.keyCode == 32) { this.open = true; }"
-				class="big-download-button fallback"
+				class="big-download-button"
 				>
 				<menupopup>
 					<menuitem
