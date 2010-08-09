@@ -50,6 +50,9 @@
 	list-style-image: url("chrome://unplug/skin/tango-16/dialog-error.png");
 }
 
+.unplug-result .menuitem-iconic.special {
+	list-style-image: url("chrome://unplug/skin/star-in-circle-16.png");
+}
 
 .unplug-result .menuitem-iconic.copyurl {
 	list-style-image: url("chrome://unplug/skin/tango-16/edit-copy.png");

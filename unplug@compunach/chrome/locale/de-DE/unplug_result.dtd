@@ -56,6 +56,11 @@
 <!ENTITY dl.flashgot.label    "FlashGot">
 <!ENTITY dl.flashgot.accesskey "F">
 <!ENTITY dl.flashgot.tooltip  "Download mit dem FlashGot Addon.">
+
+<!-- translate -->
+<!ENTITY dl.special.label     "Run a downloader">
+<!ENTITY dl.special.accesskey "R">
+<!ENTITY dl.special.tooltip   "Get or run a tool to download this file.">
 <!ENTITY dl.nodefault.tooltip "No default downloader.">
 
 

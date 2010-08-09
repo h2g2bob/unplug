@@ -135,6 +135,12 @@
 						tooltiptext="&dl.flashgot.tooltip;"
 						class="menuitem-iconic flashgot"
 						/>
+					<menuitem
+						accesskey="&dl.special.accesskey;"
+						label="&dl.special.label;"
+						tooltiptext="&dl.special.tooltip;"
+						class="menuitem-iconic special"
+						/>
 					<menuseparator />
 					<menuitem
 						accesskey="&open.tab.accesskey;"
