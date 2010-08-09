@@ -441,11 +441,12 @@ UnPlug2Rules = {
 			"elemid",
 			"require_attrs",
 			"attrs",
+			"string",
 			"slow"],
 		apply_ref : true,
 		execute   : function (data, url, text, doc) {
 			var search_with_dom = true;
-			if (!doc)
+			if (data.string || !doc)
 				search_with_dom = false;
 			// TODO - this next line should be configurable for flashblock/no flashblock and for about:config settings too!
 			// TODO - and this is only really useful where we can get original source from cache
@@ -461,7 +462,7 @@ UnPlug2Rules = {
 				var rtn = [];
 				var reg = RegExp("<" + data.tagname + "([^>]*)>", "gi");
 				while (true) {
-					var regresult = reg.exec(text);
+					var regresult = reg.exec(data.string || text);
 					if (!regresult)
 						break;
 					var tag = regresult[1];
