@@ -84,13 +84,11 @@
 		<toolbar flex="1">
 			<image class="ur-thumbnail" />
 			<vbox flex="1" style="overflow: hidden;">
+				<label class="ur-name" />
+				<label class="ur-description" />
 				<hbox>
+					<label class="ur-protocol" />
 					<label class="ur-host" />
-					<label class="ur-name" />
-				</hbox>
-				<hbox>
-					<label class="ur-protocol" /><!-- protocol -->
-					<label class="ur-description" /><!-- description -->
 				</hbox>
 			</vbox>
 			<!--

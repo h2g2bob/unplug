@@ -13,6 +13,7 @@
 	font-weight: bold;
 }
 
+.unplug-result label.ur-protocol,
 .unplug-result label.ur-host {
 	font-size: smaller;
 	color: #008000;
@@ -108,8 +109,13 @@ vbox.container#mediaid_none {
 
 .unplug-result.mediaid-collapse label.ur-name {
 	opacity: 0.8;
+	display: none;
 }
 .unplug-result.mediaid-collapse image.ur-thumbnail {
 	visibility: hidden;
+}
+.unplug-result.mediaid-collapse label.ur-protocol,
+.unplug-result.mediaid-collapse label.ur-host {
+	/* display: none; */
 }
 

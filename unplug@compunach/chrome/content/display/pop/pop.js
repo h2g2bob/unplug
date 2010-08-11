@@ -280,14 +280,14 @@ UnPlug2SearchPage = {
 		var details = result.details;
 		var that = UnPlug2SearchPage;
 		
-		var host_label = reselem.getElementsByTagName("label")[0];
-		host_label.setAttribute("value", details.host);
-		var name_label = reselem.getElementsByTagName("label")[1];
+		var name_label = reselem.getElementsByTagName("label")[0];
 		name_label.setAttribute("value", details.name);
+		var desc_label = reselem.getElementsByTagName("label")[1];
+		desc_label.setAttribute("value", details.description);
 		var protocol_label = reselem.getElementsByTagName("label")[2];
 		protocol_label.setAttribute("value", details.protocol);
-		var desc_label = reselem.getElementsByTagName("label")[3];
-		desc_label.setAttribute("value", details.description);
+		var host_label = reselem.getElementsByTagName("label")[3];
+		host_label.setAttribute("value", details.host);
 		var thumbnail = reselem.getElementsByTagName("image")[0];
 		thumbnail.setAttribute("src", details.thumbnail);
 		
