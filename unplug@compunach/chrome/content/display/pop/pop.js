@@ -69,8 +69,8 @@ UnPlug2SearchPage = {
 		// results array to be populated when a callback occurs
 		this.download_to_uid = {}; // { result.download.toSource() : 1 }
 		this.results = []; // { 1 : result }  ... or rather [ ..., result, ... ]
-		this.media_id_lookup = {}; // { "youtube-324121" : 1 }
-		this.playlist_id_lookup = {}; // { "youtube-uploader-1213" : 1 }
+		this.media_id_lookup = {}; // { "youtube-324121" : [1, ...] }
+		this.playlist_id_lookup = {}; // { "youtube-uploader-1213" : [1, ...] }
 	},
 	
 	/**
@@ -165,9 +165,9 @@ UnPlug2SearchPage = {
 				// this sets labels, icons, descripions, css, etc
 				// but wont ever move the element
 				UnPlug2SearchPage.result_e_set_description(reselem, result);
-
-				// show element
-				document.getElementById("results").appendChild(reselem);
+				
+				// container for the group, eg the mediaid and/or playlistid
+				UnPlug2SearchPage.set_container(uid, reselem, result.details);
 				
 			} catch(e) {
 				UnPlug2.log("ERROR displaying result " + e);
@@ -176,13 +176,15 @@ UnPlug2SearchPage = {
 			var reselem = document.getElementById("result_" + uid);
 			var old_result = UnPlug2SearchPage.results[uid];
 			if (old_result.certainty > result.certainty) {
-				reselem.setAttribute("tooltiptext", reselem.getAttribute("tooltiptext") + "\n\nupdated = " + result.details.toSource());
+				// Update
+				UnPlug2SearchPage.results[uid].details = result.description;
 				
 				// we need to update this.results and the widget displayed on the page with our better data
+				reselem.setAttribute("tooltiptext", reselem.getAttribute("tooltiptext") + "\n\nupdated = " + result.details.toSource());
 				UnPlug2SearchPage.result_e_set_description(reselem, result);
 				
-				// TODO -- need to implement the media_id and download_id stuff
-				// so it can attach/detach from the parent element as needed
+				// it can attach/detach from the parent element as needed
+				UnPlug2SearchPage.update_container(uid, reselem, old_result.details, result.description);
 			} else {
 				reselem.setAttribute("tooltiptext", reselem.getAttribute("tooltiptext") + "\n\nignored = " + result.details.toSource());
 			}
@@ -293,6 +295,57 @@ UnPlug2SearchPage = {
 			"file-ext-" + (details.file_ext || "unknown"),
 			"certainty-" + (details.certainty < 0 ? "low" : "high"),
 			reselem.className].join(" ")
+	},
+	
+	set_container : function (uid, reselem, details) {
+		if (!details.mediaid) {
+			document.getElementById("results").appendChild(reselem);
+			return;
+		}
+		
+		var minfo = this.media_id_lookup[details.mediaid];
+		// escape used here because could have all sorts of special characters in mediaid
+		var eid = "mediaid_" + escape(details.mediaid || "none");
+		var container = document.getElementById(eid);
+		if (! container) {
+			container = document.createElement("vbox");
+			container.className = "container";
+			container.id = eid;
+			document.getElementById("results").appendChild(container);
+		}
+		if (minfo === undefined) {
+			this.media_id_lookup[details.mediaid] = {
+				certainty : details.certainty,
+				quality : details.quality,
+				best : uid };
+			reselem.className += " mediaid-best";
+			container.appendChild(reselem);
+		} else {
+			if (minfo.certainty < details.certainty || (minfo.certainty == details.certainty && minfo.quality < details.quality)) {
+				var old_best = document.getElementById("result_" + minfo["best"]);
+				old_best.className = old_best.className.replace("mediaid-best", "mediaid-collapse");
+				// this media info is the main one
+				this.media_id_lookup[details.mediaid] = {
+					certainty : details.certainty,
+					quality : details.quality,
+					best : uid };
+				reselem.className += " mediaid-best";
+				container.insertBefore(reselem, container.firstChild);
+			} else {
+				reselem.className += " mediaid-collapse";
+				container.appendChild(reselem);
+			}
+		}
+		container.appendChild(reselem);
+	},
+	
+	update_container : function (uid, reselem, old_details, new_details) {
+		if ((old_details.mediaid || "none") != (new_descripton.mediaid || "none")) {
+			// remove from current container
+			reselem.parentNode.removeChild(reselem);
+			// and add to the new one
+			UnPlug2SearchPage.set_container(uid, reselem, new_details);
+		}
 	},
 	
 	toString : function () {

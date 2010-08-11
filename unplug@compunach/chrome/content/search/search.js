@@ -1190,7 +1190,7 @@ UnPlug2Search = {
 		// but this raises an exception for unusual protocols!
 		// there's no guarentee that "host" is meaningful, eg: data links
 		try {
-			data.host = nsiuri.hostPort
+			data.host = uri.hostPort;
 		} catch(e) {
 			// pass
 		}
