@@ -49,6 +49,7 @@
 		<priority level="very-low">invitemedia.com</priority>
 		<priority level="very-low">quantserve.com</priority>
 		<priority level="low">cpro.baidu.com</priority>
+		<priority level="very-low">contentabc.com</priority>
 	</hook>
 	<!--
 		First, grab the original page title, so we know what to save it as
@@ -243,7 +244,7 @@
 		</each_element>
 	</rule>
 	<rule id="spiegel.de">
-		<!-- TODO unchecked -->
+		<!-- TODO broken -->
 		<if_url host="spiegel.de" path="/video/" ref="url" />
 		<rule>
 			<if_re string="${url.path}" ref="videoid"> /video/video\-(\d+)\.html </if_re>
@@ -277,13 +278,12 @@
 		</rule>
 	</rule>
 	<rule id="keezmovies.com">
-		<!-- TODO unchecked -->
 		<if_url ref="url" host="keezmovies.com"/>
 		<rule>
-			<if_re ref="vidid" string="${url.path}"> /(\d+) </if_re>
+			<if_re ref="vidid" string="${url.path}" re="\-(\d+)$" />
 			<download url="http://www.keezmovies.com/watch_player.php?id=${vidid.1}">
 				<each_element ref="flvurl" tagname="flv_url" require_attrs="innerHTML">
-					<media url="${flvurl.innerHTML}" />
+					<media url="${flvurl.innerHTML}" type="flv" title="${origtitle.innerHTML}" thumbnail="http://km-pics.phncdn.com/thumbs/${substring:-9:-6:leftpad:0:10:vidid.1}/${substring:-6:-3:leftpad:0:10:vidid.1}/${substring:-3:end:leftpad:0:10:vidid.1}/small.jpg" />
 				</each_element>
 			</download>
 		</rule>
@@ -434,9 +434,10 @@
 					<rule goto="rutube-from-id" />
 				</rule>
 				<rule id="embed.xvidoes">
-					<!-- TODO unchecked -->
+					<!-- also normal site -->
 					<if_re re="xvideos\.com" string="${embedelem.src}" />
-					<media url="${qparam:flv_url:htmldecode:embedelem.flashvars}" thumbnail="${qparam:url_bigthumb:htmldecode:embedelem.flashvars}" type="flv" />
+					<optional_re ref="title" re="&lt;strong&gt;([^&lt;&gt;]+)&lt;/strong&gt;&lt;strong&gt; \- &lt;/strong&gt;\s*\d+ min" />
+					<media url="${qparam:flv_url:htmldecode:embedelem.flashvars}" thumbnail="${qparam:url_bigthumb:htmldecode:embedelem.flashvars}" type="flv" title="${either:title.1:origtitle.innerHTML}" />
 				</rule>
 				<rule id="videmo">
 					<!-- TODO unchecked -->
@@ -555,11 +556,12 @@
 			<rule id="youtube-channel">
 				<!-- click the "see all uploads" link -->
 				<if_re string="${url.path}" ref="username" re="^/user/([^#\?]+)" />
-				<download url="http://www.youtube.com/profile_ajax?action_ajax=1&amp;user=${urlencode:username.1}&amp;new=1&amp;box_method=load_playlist&amp;box_name=user_playlist_navigator&amp;playlistName=uploads&amp;sort=default" post="session_token=&amp;messages=%5B%7B%22type%22%3A%22box_method%22%2C%22request%22%3A%7B%22name%22%3A%22user_playlist_navigator%22%2C%22x_position%22%3A1%2C%22y_position%22%3A-2%2C%22palette%22%3A%22default%22%2C%22method%22%3A%22load_playlist%22%2C%22params%22%3A%7B%22playlist_name%22%3A%22uploads%22%2C%22view%22%3A%22play%22%2C%22playlist_sort%22%3A%22default%22%7D%7D%7D%5D">
+				<optional_re ref="session" re="window.ajax_session_info = 'session_token=(.*?)';" />
+				<download url="http://www.youtube.com/profile_ajax?action_ajax=1&amp;user=${urlencode:username.1}&amp;new=1&amp;box_method=load_playlist&amp;box_name=user_playlist_navigator&amp;playlistName=uploads&amp;sort=default" post="session_token=${optional:urlencode:session.1}&amp;messages=%5B%7B%22type%22%3A%22box_method%22%2C%22request%22%3A%7B%22name%22%3A%22user_playlist_navigator%22%2C%22x_position%22%3A1%2C%22y_position%22%3A-2%2C%22palette%22%3A%22default%22%2C%22method%22%3A%22load_playlist%22%2C%22params%22%3A%7B%22playlist_name%22%3A%22uploads%22%2C%22view%22%3A%22play%22%2C%22playlist_sort%22%3A%22default%22%7D%7D%7D%5D">
 					<each_re re="&lt;div id=\\&quot;playnav\-play\-uploads\-page\-(\d+)\\&quot;" ref="pagenum">
 						<!-- lets limit this to top few pages so we don't get an insane (or unlimited!) number of results (although we hit our download limit eventually...) -->
 						<if_re string="_${pagenum.1}_" re="_[0-3]_" />
-						<download url="http://www.youtube.com/profile_ajax?action_ajax=1&amp;user=${urlencode:username.1}&amp;new=1&amp;box_method=load_playlist_page&amp;box_name=user_playlist_navigator" post="session_token=&amp;messages=%5B%7B%22type%22%3A%22box_method%22%2C%22request%22%3A%7B%22name%22%3A%22user_playlist_navigator%22%2C%22x_position%22%3A1%2C%22y_position%22%3A-2%2C%22palette%22%3A%22default%22%2C%22method%22%3A%22load_playlist_page%22%2C%22params%22%3A%7B%22playlist_name%22%3A%22uploads%22%2C%22encrypted_playlist_id%22%3A%22uploads%22%2C%22query%22%3A%22%22%2C%22encrypted_shmoovie_id%22%3A%22uploads%22%2C%22page_num%22%3A${pagenum.1}%2C%22view%22%3A%22play%22%2C%22playlist_sort%22%3A%22default%22%7D%7D%7D%5D">
+						<download url="http://www.youtube.com/profile_ajax?action_ajax=1&amp;user=${urlencode:username.1}&amp;new=1&amp;box_method=load_playlist_page&amp;box_name=user_playlist_navigator" post="session_token=${session.1}&amp;messages=%5B%7B%22type%22%3A%22box_method%22%2C%22request%22%3A%7B%22name%22%3A%22user_playlist_navigator%22%2C%22x_position%22%3A1%2C%22y_position%22%3A-2%2C%22palette%22%3A%22default%22%2C%22method%22%3A%22load_playlist_page%22%2C%22params%22%3A%7B%22playlist_name%22%3A%22uploads%22%2C%22encrypted_playlist_id%22%3A%22uploads%22%2C%22query%22%3A%22%22%2C%22encrypted_shmoovie_id%22%3A%22uploads%22%2C%22page_num%22%3A${pagenum.1}%2C%22view%22%3A%22play%22%2C%22playlist_sort%22%3A%22default%22%7D%7D%7D%5D">
 							<each_re ref="link" re="&lt;a href=\\&quot;\\/(watch\?v=[^&quot;]+)\\&quot; class=\\&quot;playnav-item-title">
 								<download url="http://www.youtube.com/${jsdecode:link.1}">
 									<rule goto="youtube-single" />
