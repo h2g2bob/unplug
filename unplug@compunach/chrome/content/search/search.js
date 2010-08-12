@@ -391,11 +391,11 @@ UnPlug2Variables.prototype = {
 			 */
 			case "substring":
 				var n1 = Number(parts.pop())
-				if (n1 < 0) {
-					n1 += fullstring.length;
-				}
 				var n2 = Number(parts[parts.length-1]);
-				if (isNaN(n2)) {
+				if (parts[parts.length-1] == "end") {
+					n2 = null;
+					parts.pop();
+				} else if (isNaN(n2)) {
 					// ${substring:start:var}
 					n2 = null;
 				} else {
@@ -403,6 +403,9 @@ UnPlug2Variables.prototype = {
 					parts.pop() // pop n2
 				}
 				var fullstring = String(this._subst_apply_functions(parts));
+				if (n1 < 0) {
+					n1 += fullstring.length;
+				}
 				if (!n2) {
 					n2 = fullstring.length;
 				} else if (n2 < 0) {
@@ -425,6 +428,21 @@ UnPlug2Variables.prototype = {
 				if (!prefixboundary)
 					throw "Invalid boundary size in ${padprefix}";
 				while (value.length % prefixboundary)
+					value = prefixvalue + value;
+				return value;
+			/**
+			 * ${padprefix:pad_char:size:variable}
+			 * Adds pad_char to the left of variable until it is at least size long
+			 */
+			case "leftpad":
+				var prefixvalue = parts.pop()
+				var len = Number(parts.pop())
+				var value = this._subst_apply_functions(parts);
+				if (prefixvalue.length != 1)
+					throw "char must be length 1 in ${padleft}";
+				if (!len)
+					throw "Invalid size in ${padleft}";
+				while (value.length < len)
 					value = prefixvalue + value;
 				return value;
 			/**
