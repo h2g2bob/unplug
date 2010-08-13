@@ -1044,9 +1044,16 @@ UnPlug2Search = {
 							if (UnPlug2Search._downloadable_protocols.indexOf(abs_url.scheme) < 0) {
 								throw "Cannot download " + abs_url.spec + " because bad protocol";
 							}
+							var post = "";
+							if (node.hasAttribute("post")) {
+								post = updated_variables.subst_optional(node.getAttribute("post"))
+								if (!post) {
+									throw "Post data failed";
+								}
+							}
 							UnPlug2Search._queue_download(
 								abs_url,
-								updated_variables.subst_optional(node.getAttribute("post")),
+								post,
 								node,
 								updated_variables,
 								UnPlug2Search.default_timeout)
