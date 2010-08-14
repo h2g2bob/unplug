@@ -203,15 +203,6 @@
 			</download>
 		</rule>
 	</rule>
-	<rule id="metacafe.com">
-		<!-- TODO broken -->
-		<if_false />
-		<if_url host="metacafe.com" />
-		<if_re string="${.url}" ref="reurl" >
-			/watch/([^/]+)
-		</if_re>
-		<media url="http://www.metacafe.com/fplayer.php?itemID=${reurl.1}&amp;fs=n&amp;t=embedded" type="flv" />
-	</rule>
 	<rule id="vimeo.com">
 		<!-- TODO unchecked -->
 		<if_url host="vimeo.com" />
@@ -490,12 +481,18 @@
 						</download>
 					</rule>
 				</rule>
+				<rule id="metacafe-param-2010">
+					<if_url host="metacafe.com" />
+					<if_equal a="${p.name}" b="flashvars" />
+					<media url="${qparam:mediaURL:p.value}?__gda__=${qparam:gdaKey:p.value}" mediaid="metacafe-${qparam:itemID:p.value}" title="${urldecode:qparam:title:p.value}" type="flv" />
+				</rule>
 			</each_element>
-		</rule>
+		</rule><!-- each param -->
 		<!-- other rules which need re-download -->
 		<rule id="generic-flv-urlencoded">
 			<!-- eg: redtube.com -->
 			<if_re ref="loc" re="[&amp;\?&quot;](?:[a-z0-9_-]+=)?(http%3A%2F%2F[a-z0-9%_\.-]+\.flv(?:%3F[a-z0-9%_\.-]*)?)[&amp;&quot;']" flags="i" />
+			<ifnot_url host="metacafe.com" />
 			<media url="${urldecode:loc.1}" type="flv" title="${origtitle.innerHTML}" certainty="mid" />
 		</rule>
 		<rule id="youtube.com">
