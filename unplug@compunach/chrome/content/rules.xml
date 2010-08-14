@@ -430,15 +430,20 @@
 						<media url="${flvpath.1}" type="flv" />
 					</download>
 				</rule>
-				<rule id="embed.myspace">
-					<!-- TODO unchecked -->
+				<rule id="embed.myspace-2010-lads">
 					<if_re string="${embedelem.src}" re="lads\.myspace\.com/videos/c\.swf.*m=(\d+)&amp;" ref="m" />
-					<download url="http://mediaservices.myspace.com/services/rss.ashx?videoID=${m.1}&amp;type=video">
-						<optional_element ref="title" tagname="title" attrs="innerHTML" />
-						<optional_element ref="thumb" tagname="media:thumbnail" attrs="url" />
-						<if_element ref="content" tagname="media:content" require_attrs="url" />
-						<media url="${content.url}" thumbnail="${thumb.url}" type="flv" description="${title.innerHTML}" />
-					</download>
+					<rule goto="embed.myspace" />
+				</rule>
+				<rule id="embed.myspace-2010-mservice">
+					<if_re string="${embedelem.src}" re="mediaservices\.myspace\.com/services/media/embed.aspx/m=(\d+)," ref="m" />
+					<rule id="embed.myspace">
+						<download url="http://mediaservices.myspace.com/services/rss.ashx?videoID=${m.1}&amp;type=video">
+							<optional_element ref="title" tagname="myspace:videodescription" attrs="innerHTML" />
+							<optional_element ref="thumb" tagname="media:thumbnail" attrs="url" />
+							<if_element ref="content" tagname="media:content" require_attrs="url" />
+							<media url="${content.url}" thumbnail="${thumb.url}" type="flv" title="${title.innerHTML}" />
+						</download>
+					</rule>
 				</rule>
 			</each_element>
 		</rule>
