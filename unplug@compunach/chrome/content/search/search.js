@@ -600,7 +600,9 @@ UnPlug2Variables.prototype = {
 		url.push("/st/");
 		url.push(mediatype);
 		url.push("/fileid/");
-		url.push(fileid);
+		url.push(fileid.substring(0, 8));
+		url.push(piece_num);
+		url.push(fileid.substring(10, fileid.length));
 		url.push("?K=");
 		url.push(key2);
 		url.push((parseInt(key1, 16) ^ 0xa55aa5a5).toString(16).toLowerCase()); // xor

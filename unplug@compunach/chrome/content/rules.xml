@@ -389,7 +389,7 @@
 						</rule>
 					</playlist>
 				</rule>
-				<rule id="metacafe">
+				<rule id="embed.metacafe">
 					<!-- TODO unchecked -->
 					<if_url ref="url" host="metacafe.com" />
 					<media
@@ -415,7 +415,7 @@
 						<rule goto="megavideo.com" />
 					</download>
 				</rule>
-				<rule id="adultmult.ru">
+				<rule id="embed.adultmult.ru">
 					<!-- TODO unchecked -->
 					<if_url host="adultmult.ru" />
 					<media url="${qparam:file:embedelem.flashvars}" thumbnail="${qparam:image:embedelem.flashvars}" type="flv" />
@@ -430,7 +430,7 @@
 					<optional_re ref="title" re="&lt;strong&gt;([^&lt;&gt;]+)&lt;/strong&gt;&lt;strong&gt; \- &lt;/strong&gt;\s*\d+ min" />
 					<media url="${qparam:flv_url:htmldecode:embedelem.flashvars}" thumbnail="${qparam:url_bigthumb:htmldecode:embedelem.flashvars}" type="flv" title="${either:title.1:origtitle.innerHTML}" />
 				</rule>
-				<rule id="videmo">
+				<rule id="embed.videmo">
 					<!-- TODO unchecked -->
 					<!-- for embedded players and the site iself -->
 					<if_re ref="vid" re="embed\.vidoemo\.com\/video\d+\/([A-Za-z0-9_-]+)$" string="${embedelem.src}" />
@@ -439,7 +439,7 @@
 						<media url="${flvpath.1}" type="flv" />
 					</download>
 				</rule>
-				<rule id="myspace">
+				<rule id="embed.myspace">
 					<!-- TODO unchecked -->
 					<if_re string="${embedelem.src}" re="lads\.myspace\.com/videos/c\.swf.*m=(\d+)&amp;" ref="m" />
 					<download url="http://mediaservices.myspace.com/services/rss.ashx?videoID=${m.1}&amp;type=video">
@@ -494,10 +494,9 @@
 		</rule>
 		<!-- other rules which need re-download -->
 		<rule id="generic-flv-urlencoded">
-			<!-- TODO unchecked -->
 			<!-- eg: redtube.com -->
 			<if_re ref="loc" re="[&amp;\?&quot;](?:[a-z0-9_-]+=)?(http%3A%2F%2F[a-z0-9%_\.-]+\.flv(?:%3F[a-z0-9%_\.-]*)?)[&amp;&quot;']" flags="i" />
-			<media url="${urldecode:loc.1}" type="flv" />
+			<media url="${urldecode:loc.1}" type="flv" title="${origtitle.innerHTML}" certainty="mid" />
 		</rule>
 		<rule id="youtube.com">
 			<if_url ref="url" host="youtube.com" />
@@ -674,19 +673,20 @@
 			<!-- pornhub, extremetube, etc -->
 			<if_re ref="vidid" re="&lt;param name=&quot;FlashVars&quot; value=&quot;options=(http://[^/]+/embed_player\.php\?id=\d+)&quot;/&gt;" />
 			<!--<if_re ref="vidid" re="&lt;input type=&quot;hidden&quot; id=&quot;video_0&quot; value=&quot;(\d+)&quot;/>" />-->
+			<optional_element tagname="h1" require_attrs="innerHTML" ref="h1" />
 			<download url="${vidid.1}">
 				<if_element ref="flv_url" tagname="flv_url" require_attrs="innerHTML" />
 				<rule>
 					<optional_re string="${flv_url.innerHTML}" ref="thumbpart" re="/videos/(\d+/\d+/\d+)/\d+\.flv$" />
-					<media url="${flv_url.innerHTML}" type="flv" thumbnail="http://ph-pics.phncdn.com/thumbs/${thumbpart.1}/small.jpg" />
+					<media url="${flv_url.innerHTML}" type="flv" thumbnail="http://ph-pics.phncdn.com/thumbs/${thumbpart.1}/small.jpg" title="${either:h1.innerHTML:origtitle.innerHTML}" />
 				</rule>
 			</download>
 		</rule>
 		<rule id="youku.com.2010">
-			<!-- TODO unchecked -->
 			<if_url ref="url" inhost="youku.com" />
 			<if_re ref="videoid" re="var videoId\s*=\s*'([^']+)';" />
 			<if_re ref="videoid2" re="var videoId2\s*=\s*'([^']+)';" />
+			<optional_re ref="title" re="&lt;span class=&quot;name&quot;&gt;([^&lt;&gt;]+)&lt;/span&gt;\s*&lt;/h1&gt;" />
 			<download url="http://v.youku.com/player/getPlayList/VideoIDS/${videoid2.1}/timezone/+01/version/5/source/video?password=&amp;ran=${randomint:4}&amp;n=3">
 				<optional_re ref="thumbnail" re="&quot;logo&quot;:&quot;(http[^&quot;]+)&quot;" />
 				<if_re ref="seed" re="&quot;seed&quot;:(\d+)," />
@@ -696,15 +696,15 @@
 					<if_re ref="flvstreamid" re="&quot;flv&quot;:&quot;([\d\*]+\*)&quot;" />
 					<if_re ref="flvarray" re="&quot;flv&quot;:\[(\{&quot;no&quot;:[^\]]+)\]" />
 					<each_re ref="piece" re="\{&quot;no&quot;:&quot;?(\d+)&quot;?," string="${flvarray.1}">
-						<media url="${youku:flv:key1.1:key2.1:seed.1:flvstreamid.1:piece.1}" thumbnail="${jsdecode:thumbnail.1}" description="Part ${piece.1} (flv)" type="flv" />
-						<!-- TODO really need to double check this. Possibly all the pieces give the same output!? -->
+						<media url="${youku:flv:key1.1:key2.1:seed.1:flvstreamid.1:piece.1}" thumbnail="${jsdecode:thumbnail.1}" description="Part ${piece.1} (flv)" type="flv" title="${either:title.1:origtitle.innerHTML}-${piece.1}" />
 					</each_re>
 				</rule>
 				<rule>
 					<if_re ref="mp4streamid" re="&quot;mp4&quot;:&quot;([\d\*]+\*)&quot;" />
 					<if_re ref="mp4array" re="&quot;mp4&quot;:\[(\{&quot;no&quot;:[^\]]+)\]" />
 					<each_re ref="piece" re="\{&quot;no&quot;:&quot;?(\d+)&quot;?," string="${mp4array.1}">
-						<media url="${youku:mp4:key1.1:key2.1:seed.1:mp4streamid.1:piece.1}" thumbnail="${jsdecode:thumbnail.1}" description="Part ${piece.1} (mp4)" type="mp4" />
+						<media url="${youku:mp4:key1.1:key2.1:seed.1:mp4streamid.1:piece.1}" thumbnail="${jsdecode:thumbnail.1}" description="Part ${piece.1} (mp4)" type="mp4" title="${either:title.1:origtitle.innerHTML}-${piece.1}" />
+
 					</each_re>
 				</rule>
 			</download>
