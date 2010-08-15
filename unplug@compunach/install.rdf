@@ -15,9 +15,7 @@
                    em:creator="h2g2bob &lt;unplug@dbatley.com&gt;"
                    em:homepageURL="http://unplug.dbatley.com/"
                    em:iconURL="chrome://unplug/skin/unplug-32.png"
-                   em:optionsURL="chrome://unplug/content/config/config.xul"
-                   em:updateURL="http://unplug.dbatley.com/updates/latest.rdf"
-                   em:updateKey="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCmsLX6DKEyMcfSQoPJMUEUJAQzz9Ei5gWEVwRXQUwEJzTVyKEAQ8wDfrjoM+bKcPXU0xu2t0PK4W4TfXqeWpmoXQAk/GrZnXMC1YpL43H1mBffxXY/MOZ7RBdRIcbY8n+asU+h9EUrA/Nd9hUABWrK9JtEgjsRKeiXKi0chuKOCwIDAQAB">
+                   em:optionsURL="chrome://unplug/content/config/config.xul" >
     <em:targetApplication RDF:resource="rdf:#$2b9VD"/>
   </RDF:Description>
 </RDF:RDF>
