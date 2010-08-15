@@ -60,7 +60,7 @@ UnPlug2SearchPage = {
 		// fallbacks (if the default fails)
 		this.preferred_downloaders.push("special");
 		this.preferred_downloaders.push("saveas");
-		this.preferred_downloaders.push("openover");
+		// this.preferred_downloaders.push("openover");
 		this.preferred_downloaders.push("fallback");
 		
 		// set this to true to stop everything
@@ -220,7 +220,7 @@ UnPlug2SearchPage = {
 			return null;
 		});
 		
-		var buttons = ["copyurl", "saveas", "dta", "flashgot", "special", "opentab", "opennew", "openover", "config"]
+		var buttons = ["copyurl", "saveas", "dta", "flashgot", "special", "opentab", "opennew", "openover", "config", "fallback"]
 		// what's available
 		var available_buttons = [];
 		for (var i = 0; i < buttons.length; ++i) {
@@ -249,8 +249,10 @@ UnPlug2SearchPage = {
 					evt.stopPropagation();
 				});
 			});
-			w.addEventListener("command", function_function(that, uid, wname), false);
-			w.setAttribute("disabled", false);
+			if (w) {
+				w.addEventListener("command", function_function(that, uid, wname), false);
+				w.setAttribute("disabled", false);
+			}
 			if (best_downloader == wname) {
 				// also hook up main button
 				var main = getwidget("big-download-button");
@@ -636,7 +638,7 @@ UnPlug2SearchPage = {
 		"fallback" : {
 			avail : function (res) { return true; },
 			exec  : function (res, data) {
-				alert("Cannot download this kind of file.");
+				alert(UnPlug2.str("cannot_download_this_kind"));
 			}
 		},
 		"config" : {

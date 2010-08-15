@@ -17,6 +17,7 @@ search_no_results_yet=Keine Ergebnisse bis jetzt
 search_1_result=1 Ergebnis
 search_n_results=# Ergebnisse
 search_no_results=keine Ergebnisse
+cannot_download_this_kind=Cannot download this kind of file
 
 # for rules.xml
 high_quality=Hohe Qualit\u00E4t
