@@ -101,15 +101,15 @@ UnPlug2SearchPage = {
 				searchbar.mode = "determined";
 				searchbar.value = "100";
 				
-				var all_results = document.getElementsByTagName("unplug_result");
+				var num_results = UnPlug2SearchPage.results.length;
 				document.getElementById("stop_button").disabled = true;
-				if (all_results.length == 0) {
+				if (num_results == 0) {
 					document.getElementById("dynamic_results").value = UnPlug2.str("search_no_results");
 					document.getElementById("dynamic_results").className = "failed";
-				} else if (all_results.length == 1) {
+				} else if (num_results == 1) {
 					document.getElementById("dynamic_results").value = UnPlug2.str("search_1_result");
 				} else {
-					document.getElementById("dynamic_results").value = UnPlug2.str("search_n_results").replace("#", all_results.length);
+					document.getElementById("dynamic_results").value = UnPlug2.str("search_n_results").replace("#", num_results);
 				}
 			} else {
 				if (statusinfo.percent == 0 || statusinfo.percent == 100) {
