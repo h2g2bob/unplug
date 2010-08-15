@@ -58,18 +58,15 @@
 	list-style-image: url("chrome://unplug/skin/tango-16/edit-copy.png");
 }
 
-.unplug-result toolbarbutton.menuitem-iconic.opentab,
-.unplug-result menuitem.menuitem-iconic.opentab {
+.unplug-result .menuitem-iconic.opentab {
 	list-style-image: url("chrome://unplug/skin/tango-16/tab-new.png");
 }
 
-.unplug-result toolbarbutton.menuitem-iconic.opennew,
-.unplug-result menuitem.menuitem-iconic.opennew {
+.unplug-result .menuitem-iconic.opennew {
 	list-style-image: url("chrome://unplug/skin/tango-16/window-new.png");
 }
 
-.unplug-result toolbarbutton.menuitem-iconic.openover,
-.unplug-result menuitem.menuitem-iconic.openover {
+.unplug-result .menuitem-iconic.openover {
 	list-style-image: url("chrome://unplug/skin/tango-16/window.png");
 }
 
