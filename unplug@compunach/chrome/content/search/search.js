@@ -24,8 +24,6 @@
  *
  */
 
-// result object
-
 /**
  * A download. Don't forget to make this with "new", ie:
  * 	var foo = new UnPlug2Download(url, UnPlug2Search._download_callback_ok, UnPlug2Search._download_callback_fail, 5000);
@@ -1164,7 +1162,6 @@ UnPlug2Search = {
 				"quality"     : quality === undefined ? default_quality : quality,
 				
 				// IMPORTANT this is used for advice only (not used for downloading) !!
-				"url"         : nsiuri.spec,
 				"protocol"    : nsiuri.scheme,
 				"host"        : guesses.host,
 				
@@ -1195,7 +1192,7 @@ UnPlug2Search = {
 		// but this raises an exception for unusual protocols!
 		// there's no guarentee that "host" is meaningful, eg: data links
 		try {
-			data.host = nsiuri.hostPort
+			data.host = uri.hostPort;
 		} catch(e) {
 			// pass
 		}

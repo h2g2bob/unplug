@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://unplug/skin/searchpage.css" type="text/css"?>
-<?xml-stylesheet href="chrome://unplug/content/display/pop/unplug_result.css" type="text/css"?>
 <!DOCTYPE dialog [
 	<!ENTITY % dtdcommon SYSTEM "chrome://unplug/locale/common.dtd">
 	%dtdcommon;
 	<!ENTITY % dtdlocal SYSTEM "chrome://unplug/locale/searchpage.dtd">
 	%dtdlocal;
+	<!ENTITY % dtdresult SYSTEM "chrome://unplug/locale/unplug_result.dtd">
+	%dtdresult;
 	]>
 <!--
 /*
@@ -59,9 +60,6 @@
 	<script type="application/x-javascript" src="chrome://unplug/content/search/rules.js" />
 	<script type="application/x-javascript" src="chrome://unplug/content/display/pop/pop.js" />
 	
-	<script src="chrome://global/content/nsDragAndDrop.js" />
-	<script src="chrome://global/content/nsTransferable.js" />
-	
 	<dialogheader title="&header.title;" description="&header.subtitle;"/>
 	<vbox id="results" style="overflow: -moz-scrollbars-vertical; border: 1px #666666 solid;" flex="1" />
 	<spacer height="0.5em;" />
@@ -77,5 +75,105 @@
 	</hbox>
 	<spacer height="0.5em;" />
 	<progressmeter id="search_progress" mode="determined" value="0"/>
+	
+	<!-- this is the form of the result itself. We'll clone this to use in our display -->
+	<vbox id="unplug_result_template" class="unplug-result" flex="0" collapsed="true">
+		<toolbar flex="1">
+			<image class="ur-thumbnail" />
+			<vbox flex="1" style="overflow: hidden;">
+				<label class="ur-name" />
+				<label class="ur-description" />
+				<hbox>
+					<label class="ur-protocol" />
+					<label class="ur-host" />
+				</hbox>
+			</vbox>
+			<!--
+				we want these to be drop-down buttons
+				ie Open / Open in a new window
+				and Download / Dowload with dTa / download with foo
+				and Play / Play in vlc / Play in totem / Look for media players
+			-->
+			<!-- aternative is type="menu" -->
+			<toolbarbutton
+				accesskey="&copyurl.accesskey;"
+				label="&copyurl.label;"
+				tooltiptext="&copyurl.tooltip;"
+				class="menuitem-iconic copyurl"
+				type="button"
+				disabled="true"
+				tabindex="1"
+				/>
+			<toolbarbutton
+				accesskey="&dl.accesskey;"
+				label="&dl.label;"
+				type="menu-button"
+				tabindex="1"
+				onkeydown="if (event.keyCode == 32) { this.open = true; }"
+				class="big-download-button"
+				>
+				<menupopup>
+					<menuitem
+						accesskey="&dl.saveas.accesskey;"
+						label="&dl.saveas.label;"
+						tooltiptext="&dl.saveas.tooltip;"
+						class="menuitem-iconic saveas"
+						disabled="true"
+						/>
+					<menuitem
+						accesskey="&dl.dta.accesskey;"
+						label="&dl.dta.label;"
+						tooltiptext="&dl.dta.tooltip;"
+						class="menuitem-iconic dta"
+						disabled="true"
+						/>
+					<menuitem
+						accesskey="&dl.flashgot.accesskey;"
+						label="&dl.flashgot.label;"
+						tooltiptext="&dl.flashgot.tooltip;"
+						class="menuitem-iconic flashgot"
+						disabled="true"
+						/>
+					<menuitem
+						accesskey="&dl.special.accesskey;"
+						label="&dl.special.label;"
+						tooltiptext="&dl.special.tooltip;"
+						class="menuitem-iconic special"
+						disabled="true"
+						/>
+					<menuseparator />
+					<menuitem
+						accesskey="&open.tab.accesskey;"
+						label="&open.tab.label;"
+						tooltiptext="&open.tab.tooltip;"
+						class="menuitem-iconic opentab"
+						disabled="true"
+						/>
+					<menuitem
+						accesskey="&open.new.accesskey;"
+						label="&open.new.label;"
+						tooltiptext="&open.new.tooltip;"
+						class="menuitem-iconic opennew"
+						disabled="true"
+						/>
+					<menuitem
+						accesskey="&open.over.accesskey;"
+						label="&open.over.label;"
+						tooltiptext="&open.over.tooltip;"
+						class="menuitem-iconic openover"
+						disabled="true"
+						/>
+					<menuseparator />
+					<menuitem
+						accesskey="&config.accesskey;"
+						label="&config.label;"
+						tooltiptext="&config.tooltip;"
+						class="menuitem-iconic config"
+						disabled="true"
+						/>
+				</menupopup>
+			</toolbarbutton>
+		</toolbar>
+	</vbox>
 </dialog>
 
