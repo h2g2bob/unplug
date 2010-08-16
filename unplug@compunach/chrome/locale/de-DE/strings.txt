@@ -1,7 +1,7 @@
 extensions.{unplug@compunach}.description=Download embedded media
 
 # Confirmation after clicking on "Nothing found" button
-nothing_found_send_data=M\u00F6chten Sie den Entwicklern von UnPlug Informationen \u00FCber diese Webseite zukommen lassen?
+nothing_found_send_data=Möchten Sie den Entwicklern von UnPlug Informationen über diese Webseite zukommen lassen?
 
 # Short status strings during/after clicking "Nothing found" button
 nothing_found_sending=Sended...
@@ -20,9 +20,9 @@ search_no_results=keine Ergebnisse
 cannot_download_this_kind=Cannot download this kind of file
 
 # for rules.xml
-high_quality=Hohe Qualit\u00E4t
-low_quality= Niedrige Qualit\u00E4t
-mid_quality=Normale Qualit\u00E4t
-hd_quality=HD Qualit\u00E4t
+high_quality=Hohe Qualität
+low_quality= Niedrige Qualität
+mid_quality=Normale Qualität
+hd_quality=HD Qualität
 embedplayer=Eingebettetes Odjekt (vielleicht ein MediaPlayer und kein Video)
 
