@@ -1007,9 +1007,6 @@ UnPlug2Search = {
 			if (!node.tagName) {
 				continue;
 			}
-			if (node.tagName == "hook") {
-				continue;
-			}
 			var nodetagname = node.tagName.toLowerCase();
 			if (nodetagname.substring(0, 3) != "if_" && nodetagname.substring(0, 6) != "ifnot_" && nodetagname.substring(0, 9) != "optional_" && nodetagname.substring(0, 5) != "each_") {
 				try {
@@ -1028,13 +1025,37 @@ UnPlug2Search = {
 								if (!referenced_node)
 									throw "Cannot find node to goto " + node.getAttribute("goto");
 							}
-							UnPlug2Search._apply_rules_to_document(
-								url,
-								text,
-								doc,
-								referenced_node,
-								updated_variables)
+							if (node.hasAttribute("defer")) {
+								/*
+								the code below does a good job of keeping the arguments the same
+								ie: referenced_node does not change to the last one in the file inside the timeout
+								but it is a rather insane
+								*/
+								UnPlug2Search._defered_rules_count += 1;
+								window.setTimeout((function (args) {
+									return (function () {
+									UnPlug2Search._defered_rules_count -= 1;
+									UnPlug2Search._apply_rules_to_document.apply(UnPlug2Search, args);
+									})
+									})([
+										url,
+										text,
+										doc,
+										referenced_node,
+										updated_variables ])
+									, 500)
+							} else {
+								UnPlug2Search._apply_rules_to_document(
+									url,
+									text,
+									doc,
+									referenced_node,
+									updated_variables);
+							}
 							break;
+						case "hook":
+							// do nothing
+							break
 						case "download":
 						case "playlist": // synonym, eg for .3mu/.asx files which we can parse
 							var relative_url = updated_variables.subst(node.getAttribute("url"));
@@ -1071,7 +1092,7 @@ UnPlug2Search = {
 							# file naming options
 							title="A kitten"           # default -- guess from url or "no title"
 							type="flv"                 # default -- guess from url or "flv"
-							certainty="low"            # default "mid" (used to decide which name is "right" when merging duplicates)
+							certainty="low"            # default "high" (used to decide which name is "right" when merging duplicates)
 							
 							# grouping same media with different quality settings
 							mediaid="foo"              # default url (used to group media which are the same but are different quality settings
@@ -1231,6 +1252,7 @@ UnPlug2Search = {
 		UnPlug2Search.callback = function ( res ) { UnPlug2.log("Cannot use callback for result " + res); };
 		UnPlug2Search._downloads = [];
 		UnPlug2Search._do_download_poll = false;
+		UnPlug2Search._defered_rules_count = 0;
 		if (!UnPlug2Search._poll_timer) {
 			UnPlug2Search._poll_timer = window.setInterval(UnPlug2Search.poll, 100);
 		}
@@ -1241,6 +1263,9 @@ UnPlug2Search = {
 	 * TODO - depricate this in favor of statusinfo()
 	 */
 	has_finished : function () {
+		if (UnPlug2Search._defered_rules_count) {
+			return false;
+		}
 		for (var i = 0; i < UnPlug2Search._downloads.length; i++) {
 			if (UnPlug2Search._downloads[i] && UnPlug2Search._downloads[i].download)
 				return false;
@@ -1286,6 +1311,9 @@ UnPlug2Search = {
 			default:
 				info.text = UnPlug2.str("search_n_active_downloads").replace("#", info.downloads);
 				break;
+		}
+		if (UnPlug2Search._defered_rules_count) {
+			info.finished = false;
 		}
 		return info;
 	},
