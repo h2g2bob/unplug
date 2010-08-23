@@ -500,6 +500,11 @@
 			<ifnot_url host="metacafe.com" />
 			<media url="${urldecode:loc.1}" type="flv" title="${origtitle.innerHTML}" certainty="mid" />
 		</rule>
+		<rule id="generic-flv-quot">
+			<if_re ref="loc" re="[&quot;']((?:[a-z0-9]+://[^&quot;']+)?/[^&quot;']+\.(flv|mp4|mp3)(?:\?[^&quot;']+)?)[&quot;']" flags="i" />
+			<ifnot_url host="metacafe.com" />
+			<media url="${loc.1}" type="${loc.2}" title="${origtitle.innerHTML}" certainty="mid" />
+		</rule>
 		<rule id="youtube.com">
 			<if_url ref="url" host="youtube.com" />
 			<rule id="youtube-single" target="youtube-single">
