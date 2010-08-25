@@ -120,7 +120,7 @@
 				<groupbox>
 					<caption label="&about.title;" />
 					<description> &about.description; </description>
-					<label class="text-link" onclick="window.open(&quot;http://www.gnu.org/licenses/gpl-2.0.html&quot;);" value="&about.gpl;" tabindex="2"/>
+					<label class="text-link" onclick="window.open(&quot;http://www.gnu.org/licenses/agpl-3.0.html&quot;);" value="&about.agpl;" tabindex="2"/>
 
 				</groupbox>
 				<groupbox>

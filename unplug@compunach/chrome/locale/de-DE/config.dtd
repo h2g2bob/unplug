@@ -70,6 +70,7 @@
 <!ENTITY about.title "Danke, dass Sie UnPlug installiert haben">
 <!ENTITY about.description "UnPlug ist kostenlos und OpenSource.">
 <!ENTITY about.gpl "GNU General Public License">
+<!ENTITY about.agpl "GNU Affero General Public License, version 3">
 <!ENTITY about.updated "UnPlugs Einstellungen wurden ge&#228;ndert.">
 
 
