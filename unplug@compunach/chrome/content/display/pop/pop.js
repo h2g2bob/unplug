@@ -566,7 +566,7 @@ UnPlug2SearchPage = {
 		},
 		"dta" : {
 			avail : function (res) {
-				if (!UnPlug2.get_root_pref("extensions.{DDC359D1-844A-42a7-9AA1-88A850A938A8}.description")) {
+				if (!window.opener.DTA_AddingFunctions) {
 					return false;
 				}
 				if (!res.download.url) {
@@ -578,21 +578,27 @@ UnPlug2SearchPage = {
 				return true;
 			},
 			exec  : function (res, data) {
-				var url = res.download.url;
-				var post = null;
-				/*
-				post didn't seem to work
-				if (res.download.http_post) {
-					url = res.download.http_post[0];
-					post = res.download.http_post[1];
+				var fileobj = UnPlug2SearchPage._save_as_box(res.details.name, res.details.file_ext);
+				if (!fileobj) {
+					return;
 				}
-				*/
-				window.opener.DTA_AddingFunctions.saveSingleLink(
-					false, //turbo
-					url, //url
-					res.download.referer || String(UnPlug2SearchPage._win.location), // referer
-					res.details.name, // description
-					post) // post data
+				
+				var file = fileobj.file;
+				if (file.leafName.indexOf("*") >= 0) {
+					// we use the renaming mask, which treats *name*, etc as special.
+					throw "Filename contains star";
+				}
+				
+				// call String() explicitly as DTA alters string
+				link = {
+					"url" : res.download.url, // string
+					"postData" : null,
+					"referrer" : String(res.download.referer || ""), // an object with toURL
+					"dirSave" : String(file.parent.path), // an object with addFinalSlash
+					"fileName" : String(file.leafName), // string
+					"description" : String(file.leafName) } // string
+				UnPlug2.log("Hello DTA, I'm sending you: " + link.toSource());
+				window.opener.DTA_AddingFunctions.sendToDown(true, [link]);
 			}
 		},
 		"flashgot" : {

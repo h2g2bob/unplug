@@ -60,6 +60,9 @@
 	<script type="application/x-javascript" src="chrome://unplug/content/search/rules.js" />
 	<script type="application/x-javascript" src="chrome://unplug/content/display/pop/pop.js" />
 	
+	<!-- DTA extends String -->
+	<script type="application/x-javascript" src="chrome://dta/content/common/overlayFunctions.js"/>
+	
 	<dialogheader title="&header.title;" description="&header.subtitle;"/>
 	<vbox id="results" style="overflow: -moz-scrollbars-vertical; border: 1px #666666 solid;" flex="1" />
 	<spacer height="0.5em;" />
