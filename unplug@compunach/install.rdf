@@ -5,10 +5,10 @@
   <RDF:Description RDF:about="rdf:#$2b9VD"
                    em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
                    em:minVersion="1.5"
-                   em:maxVersion="4.0b3" />
+                   em:maxVersion="4.0b4" />
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="unplug@compunach"
-                   em:version="2.031"
+                   em:version="2.032"
                    em:type="2"
                    em:name="UnPlug"
                    em:description="Find and download media from websites"
