@@ -29,9 +29,9 @@
  */
 -->
 <overlay id="unplug2_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-	<script type="application/x-javascript" src="chrome://unplug/content/common.js" />
-	<script type="application/x-javascript" src="chrome://unplug/content/overlay/all.js" />
-	<script type="application/x-javascript" src="chrome://unplug/content/overlay/firefox.js" />
+	<script type="application/javascript" src="chrome://unplug/content/common.js" />
+	<script type="application/javascript" src="chrome://unplug/content/overlay/all.js" />
+	<script type="application/javascript" src="chrome://unplug/content/overlay/firefox.js" />
 	
 	<popup id="contentAreaContextMenu">
 		<menuitem id="unplug2_contextmenu" label="&menuitem.unplug;" accesskey="&menuitem.u;" insertbefore="context-viewpartialsource-selection" oncommand="UnPlug2Overlay.run();" class="menuitem-iconic" />

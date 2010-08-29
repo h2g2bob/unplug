@@ -55,13 +55,13 @@
   
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 	
-	<script type="application/x-javascript" src="chrome://unplug/content/common.js" />
-	<script type="application/x-javascript" src="chrome://unplug/content/search/search.js" />
-	<script type="application/x-javascript" src="chrome://unplug/content/search/rules.js" />
-	<script type="application/x-javascript" src="chrome://unplug/content/display/pop/pop.js" />
+	<script type="application/javascript" src="chrome://unplug/content/common.js" />
+	<script type="application/javascript" src="chrome://unplug/content/search/search.js" />
+	<script type="application/javascript" src="chrome://unplug/content/search/rules.js" />
+	<script type="application/javascript" src="chrome://unplug/content/display/pop/pop.js" />
 	
 	<!-- DTA extends String -->
-	<script type="application/x-javascript" src="chrome://dta/content/common/overlayFunctions.js"/>
+	<script type="application/javascript" src="chrome://dta/content/common/overlayFunctions.js"/>
 	
 	<dialogheader title="&header.title;" description="&header.subtitle;"/>
 	<vbox id="results" style="overflow: -moz-scrollbars-vertical; border: 1px #666666 solid;" flex="1" />
