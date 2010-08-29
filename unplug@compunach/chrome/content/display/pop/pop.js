@@ -458,29 +458,6 @@ UnPlug2SearchPage = {
 		persist.saveURI(obj_URI, null, null, null, "", ioFile);
 	},
 	
-	download_dta : function (reselem) {
-		try {
-			var source_url = reselem.getAttribute("url");
-			window.opener.DTA_AddingFunctions.saveSingleLink(
-				false, //turbo
-				source_url, //url
-				String(UnPlug2SearchPage._win.location), // referer
-				null, // description
-				null) // post data
-		} catch(e) {
-			UnPlug2.log("dta " + e);
-		}
-	},
-	
-	download_flashgot : function (reselem) {
-		try {
-			var fg = UnPlug2SearchPage._gbrowser.gFlashGotService;
-			fg.download(["http://example.com"], fg.OP_ONE);
-		} catch(e) {
-			UnPlug2.log("flashgot " + e);
-		}
-	},
-	
 	send_nothing_found_msg : function () {
 		if (!confirm(UnPlug2.str("nothing_found_send_data")))
 			return;
