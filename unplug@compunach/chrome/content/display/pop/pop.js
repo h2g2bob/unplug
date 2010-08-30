@@ -416,8 +416,8 @@ UnPlug2SearchPage = {
 			}
 		}
 		
-		// replace non-letter characters with "_"
-		name = name.replace(RegExp("[^\\w\\s_\\-\\(\\)]+", "g"), "_");
+		// replace bad characters with "_"
+		name = name.replace(RegExp("[\\*\\\\/\\?\\<\\>~#\\|`\\$\\&;:%\"']+", "g"), "_");
 		ext = ext.replace(RegExp("[^\\w\\s]+", "g"), "_");
 		
 		var nsIFilePicker = Components.interfaces.nsIFilePicker;
@@ -532,13 +532,15 @@ UnPlug2SearchPage = {
 		"saveas" : {
 			avail : function (res) { return res.download.url && (
 				res.download.url.indexOf("http://") == 0
-				|| res.download.url.indexOf("https://") == 0);
+				|| res.download.url.indexOf("https://") == 0
+				|| res.download.url.indexOf("ftp://") == 0);
 			},
 			exec  : function (res, data) {
 				var file = UnPlug2SearchPage._save_as_box(res.details.name, res.details.file_ext);
 				if (!file)
 					return;
 				
+				// keep this here
 				if (false)
 					UnPlug2SearchPage._download_with_downloadmgr(res.download.url, file.file);
 				

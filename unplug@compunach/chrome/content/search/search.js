@@ -1121,8 +1121,9 @@ UnPlug2Search = {
 									};
 							}
 							if (node.hasAttribute("referer")) {
-								download_method.referer = updated_variables.subst_optional(node.getAttribute("referer")) || undefined;
+								download_method.referer = updated_variables.subst_optional(node.getAttribute("referer"));
 							}
+							download_method.referer = download_method.referer || String(UnPlug2SearchPage._win.location);
 							
 							// make response
 							var result = UnPlug2Search._make_response_object_result(
