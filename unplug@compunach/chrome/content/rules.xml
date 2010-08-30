@@ -492,10 +492,17 @@
 		</rule><!-- each param -->
 		<!-- other rules which need re-download -->
 		<rule id="generic-flv-urlencoded">
-			<!-- eg: redtube.com -->
-			<if_re ref="loc" re="[&amp;\?&quot;](?:[a-z0-9_-]+=)?(http%3A%2F%2F[a-z0-9%_\.-]+\.flv(?:%3F[a-z0-9%_\.-]*)?)[&amp;&quot;']" flags="i" />
 			<ifnot_url host="metacafe.com" />
+			<if_re ref="loc" re="[&amp;\?&quot;](?:[a-z0-9_-]+=)?(http%3A%2F%2F[a-z0-9%_\.-]+\.flv(?:%3F[a-z0-9%_\.-]*)?)[&amp;&quot;']" flags="i" />
 			<media url="${urldecode:loc.1}" type="flv" title="${origtitle.innerHTML}" certainty="mid" />
+			<rule id="redtube.com">
+				<if_url ref="url" host="redtube.com" />
+				<rule>
+					<if_re ref="id" string="${url.path}" re="/(\d+)(\d\d\d)" />
+					<optional_re ref="title" re="&lt;h1 class=&quot;videoTitle&quot;&gt;(.*?)&lt;/h1&gt;" />
+					<media url="${urldecode:loc.1}" type="flv" title="${either:title.1:origtitle.innerHTML}" thumbnail="http://images.cdn.redtube.com/_thumbs/${leftpad:0:7:id.1}/${leftpad:0:4:id.1}${id.2}/${leftpad:0:4:id.1}${id.2}_003n.jpg" />
+				</rule>
+			</rule>
 		</rule>
 		<rule id="generic-flv-quot">
 			<ifnot_url host="xhamster.com" />
