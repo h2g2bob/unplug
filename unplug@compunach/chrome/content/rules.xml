@@ -40,6 +40,13 @@
 		<priority level="very-low">quantserve.com</priority>
 		<priority level="low">cpro.baidu.com</priority>
 		<priority level="very-low">contentabc.com</priority>
+		<priority level="very-low">adjug.com</priority>
+		<priority level="very-low">ebay.com</priority>
+		<priority level="low">mediaplex.com</priority>
+		<priority level="low">facebook.com</priority>
+		<priority level="very-low">adultfriendfinder.com</priority>
+		<priority level="very-low">mediagra.com</priority>
+		<priority level="very-low">adxpansion.com</priority>
 	</hook>
 	<!--
 		First, grab the original page title, so we know what to save it as
@@ -491,8 +498,9 @@
 			<media url="${urldecode:loc.1}" type="flv" title="${origtitle.innerHTML}" certainty="mid" />
 		</rule>
 		<rule id="generic-flv-quot">
-			<if_re ref="loc" re="[&quot;']((?:[a-z0-9]+://[^&quot;']+)?/[^&quot;']+\.(flv|mp4|mp3)(?:\?[^&quot;']+)?)[&quot;']" flags="i" />
+			<ifnot_url host="xhamster.com" />
 			<ifnot_url host="metacafe.com" />
+			<if_re ref="loc" re="[&quot;']((?:[a-z0-9]+://[^&quot;']+)?/[^&quot;']+\.(flv|mp4|mp3)(?:\?[^&quot;']+)?)[&quot;']" flags="i" />
 			<media url="${loc.1}" type="${loc.2}" title="${origtitle.innerHTML}" certainty="mid" />
 		</rule>
 		<rule id="youtube.com">
@@ -584,6 +592,12 @@
 			<optional_re ref="thumb"> &quot;unit_long(\d+)&quot; </optional_re>
 			<media url="http://media.darktube.com/${vid.1}" thumbnail="http://ss.darktube.com/thumbs/${thumb.1}.jpg" />
 		</rule>
+		<rule id="xhamster.com">
+			<if_url host="xhamster.com" />
+			<if_re ref="movie" re="'file'\s*:\s*'(\d+:[^']+\.flv)'" />
+			<optional_re ref="thumb" re="'image'\s*:\s*'(http://[^']+.jpg)'" />
+			<media url="http://xhamster.com/flv2/${movie.1}" thumbnail="${thumb.1}" title="${origtitle.innerHTML}" />
+		</rule>
 		<rule id="itsyourporn">
 			<!-- TODO unchecked -->
 			<if_url inhost="playah." />
@@ -626,14 +640,15 @@
 				</rule>
 			</each_re>
 		</rule>
-		<rule>
-			<!-- TODO unchecked -->
+		<rule id="sevenload.com">
 			<if_url host="sevenload.com" />
 			<if_re ref="configpath" re="&lt;param name=&quot;flashVars&quot; value=&quot;configPath=(http%3A%2F%2Fflash.sevenload.com[^&quot;]+)&quot;" />
 			<download url="${urldecode:configpath.1}">
-				<each_re ref="loc" re="&lt;location[^&gt;]*&gt;\s*([^&lt;]+)\s*&lt;/location&gt;">
-					<media url="${loc.1}" />
-				</each_re>
+				<if_element ref="location" tagname="location" require_attrs="innerHTML" />
+				<!-- multiple title elements, need to supply an xpath
+				<optional_element ref="title" tagname="title" require_attrs="innerHTML" /> -->
+				<optional_element ref="image" tagname="image" require_attrs="url" />
+				<media url="${location.innerHTML}" title="${either:title.innerHTML:origtitle.innerHTML}" thumbnail="${image.url}" />
 			</download>
 		</rule>
 		<rule id="addvariable">
@@ -641,7 +656,6 @@
 			<!--
 			Applies to many sites:
 				* xn-/-hentaienespaol-1nb.com
-				* xhamster.com
 				* www.movshare.net
 			-->
 			<each_re ref="video" re="(addParam|addVariable)\s*\(\s*[&quot;'](file|content_video|video)[&quot;']\s*,\s*[&quot;'](.*?)[&quot;']\s*\)">
@@ -650,11 +664,6 @@
 					<!-- same server == default -->
 					<ifnot_url host="xhamster.com" />
 					<media url="${video.3}" thumbnail="${thumbnail.3}" />
-				</rule>
-				<rule>
-					<if_url host="xhamster.com" />
-					<if_re ref="srv"> addVariable\('srv','([^']+)'\) </if_re>
-					<media url="http://dl${srv.1}.xhamster.com/flv2/${video.3}" thumbnail="${thumbnail.3}" />
 				</rule>
 			</each_re>
 		</rule>
