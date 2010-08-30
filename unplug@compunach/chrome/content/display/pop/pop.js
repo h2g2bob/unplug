@@ -175,9 +175,9 @@ UnPlug2SearchPage = {
 		} else {
 			var reselem = document.getElementById("result_" + uid);
 			var old_result = UnPlug2SearchPage.results[uid];
-			if (old_result.certainty > result.certainty) {
+			if (old_result.details.certainty < result.details.certainty) {
 				// Update
-				UnPlug2SearchPage.results[uid].details = result.description;
+				UnPlug2SearchPage.results[uid].details = result.details;
 				
 				// we need to update this.results and the widget displayed on the page with our better data
 				reselem.setAttribute("tooltiptext", reselem.getAttribute("tooltiptext") + "\n\nupdated = " + result.details.toSource());
