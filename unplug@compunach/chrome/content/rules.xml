@@ -47,6 +47,8 @@
 		<priority level="very-low">adultfriendfinder.com</priority>
 		<priority level="very-low">mediagra.com</priority>
 		<priority level="very-low">adxpansion.com</priority>
+		<priority level="low">addtoany.com</priority>
+		<priority level="low">invitemedia.com</priority>
 	</hook>
 	<!--
 		First, grab the original page title, so we know what to save it as
@@ -442,6 +444,11 @@
 						</download>
 					</rule>
 				</rule>
+				<rule id="embed-dailyshow">
+					<!-- name=movie -->
+					<if_re ref="mgid" re="^http://media\.mtvnservices\.com/(mgid:.*)$" string="${embedelem.src}" />
+					<rule goto="dailyshow-id" />
+				</rule>
 			</each_element>
 		</rule>
 		<rule id="each_param">
@@ -458,29 +465,31 @@
 					<rule id="dailyshow">
 						<!-- name=movie -->
 						<if_re ref="mgid" re="^http://media\.mtvnservices\.com/(mgid:.*)$" string="${p.value}" />
-						<download url="http://media.mtvnservices.com/player/config.jhtml?uri=${urlencode:mgid.1}" geolocate="US">
-							<each_re ref="item" re="&lt;item&gt;([\s\S]*?)&lt;/item&gt;">
-								<optional_re ref="title" string="${item.1}" re="&lt;title&gt;\s*(.*?)\s*&lt;/title&gt;" />
-								<if_element ref="xmlurl" require_attrs="url" tagname="media:content" string="${item.1}" />
-								<download url="${xmlurl.url}">
-									<each_re ref="rend" re="&lt;rendition[^&lt;&gt;]*?bitrate=&quot;(\d+)&quot;[\s\S]*?&lt;src&gt;\s*(rtmpe?|http)://(.*?)\s*&lt;/src&gt;">
-										<!-- this gives an rtmpe link -->
-										<rule>
-											<if_re re="^(1720)$" string="${rend.1}" />
-											<media url="${rend.2}://${rend.3}" description="${optional:title.1} (${rend.1} bits/sec)" title="${either:title.1:origtitle.innerHTML}" type="flv" quality="high" />
-										</rule>
-										<rule>
-											<if_re re="^(450)$" string="${rend.1}" />
-											<media url="${rend.2}://${rend.3}" description="${optional:title.1} (${rend.1} bits/sec)" title="${either:title.1:origtitle.innerHTML}" type="flv" quality="low" />
-										</rule>
-										<rule>
-											<ifnot_re re="^(1720|450)$" string="${rend.1}" />
-											<media url="${rend.2}://${rend.3}" description="${optional:title.1} (${rend.1} bits/sec)" title="${either:title.1:origtitle.innerHTML}" type="flv" />
-										</rule>
-									</each_re>
-								</download>
-							</each_re>
-						</download>
+						<rule id="dailyshow-id" target="dailyshow-id">
+							<download url="http://media.mtvnservices.com/player/config.jhtml?uri=${urlencode:mgid.1}" geolocate="US">
+								<each_re ref="item" re="&lt;item&gt;([\s\S]*?)&lt;/item&gt;">
+									<optional_re ref="title" string="${item.1}" re="&lt;title&gt;\s*(.*?)\s*&lt;/title&gt;" />
+									<if_element ref="xmlurl" require_attrs="url" tagname="media:content" string="${item.1}" />
+									<download url="${xmlurl.url}">
+										<each_re ref="rend" re="&lt;rendition[^&lt;&gt;]*?bitrate=&quot;(\d+)&quot;[\s\S]*?&lt;src&gt;\s*(rtmpe?|http)://(.*?)\s*&lt;/src&gt;">
+											<!-- this gives an rtmpe link -->
+											<rule>
+												<if_re re="^(1720)$" string="${rend.1}" />
+												<media url="${rend.2}://${rend.3}" description="${optional:title.1} (${rend.1} bits/sec)" title="${either:title.1:origtitle.innerHTML}" type="flv" quality="high" />
+											</rule>
+											<rule>
+												<if_re re="^(450)$" string="${rend.1}" />
+												<media url="${rend.2}://${rend.3}" description="${optional:title.1} (${rend.1} bits/sec)" title="${either:title.1:origtitle.innerHTML}" type="flv" quality="low" />
+											</rule>
+											<rule>
+												<ifnot_re re="^(1720|450)$" string="${rend.1}" />
+												<media url="${rend.2}://${rend.3}" description="${optional:title.1} (${rend.1} bits/sec)" title="${either:title.1:origtitle.innerHTML}" type="flv" />
+											</rule>
+										</each_re>
+									</download>
+								</each_re>
+							</download>
+						</rule>
 					</rule>
 				</rule>
 				<rule id="metacafe-param-2010">
