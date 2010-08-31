@@ -60,8 +60,10 @@
 	<script type="application/javascript" src="chrome://unplug/content/search/rules.js" />
 	<script type="application/javascript" src="chrome://unplug/content/display/pop/pop.js" />
 	
-	<!-- DTA extends String -->
+	<!-- DTA extends String in DTA 1.0 -->
 	<script type="application/javascript" src="chrome://dta/content/common/overlayFunctions.js"/>
+	<!-- DTA object in DTA 2.0 -->
+	<script type="application/javascript" src="chrome://dta/content/common/internalFunctions.js"/>
 	
 	<dialogheader title="&header.title;" description="&header.subtitle;"/>
 	<vbox id="results" style="overflow: -moz-scrollbars-vertical; border: 1px #666666 solid;" flex="1" />

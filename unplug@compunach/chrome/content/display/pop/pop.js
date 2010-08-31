@@ -568,7 +568,7 @@ UnPlug2SearchPage = {
 		},
 		"dta" : {
 			avail : function (res) {
-				if (!window.opener.DTA_AddingFunctions) {
+				if (!window.opener.DTA_AddingFunctions && !window.DTA) {
 					return false;
 				}
 				if (!res.download.url) {
@@ -600,7 +600,13 @@ UnPlug2SearchPage = {
 					"fileName" : String(file.leafName), // string
 					"description" : String(file.leafName) } // string
 				UnPlug2.log("Hello DTA, I'm sending you: " + link.toSource());
-				window.opener.DTA_AddingFunctions.sendToDown(true, [link]);
+				if (window.DTA) {
+					// DTA 2.0
+					DTA.sendLinksToManager(window, true, [link]);
+				} else {
+					// DTA 1.0
+					window.opener.DTA_AddingFunctions.sendToDown(true, [link]);
+				}
 			}
 		},
 		"flashgot" : {
