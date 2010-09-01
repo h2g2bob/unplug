@@ -296,7 +296,7 @@ UnPlug2SearchPage = {
 		reselem.className = [
 			"file-ext-" + (details.file_ext || "unknown"),
 			"certainty-" + (details.certainty < 0 ? "low" : "high"),
-			reselem.className].join(" ")
+			"unplug-result" ].join(" ")
 	},
 	
 	set_container : function (uid, reselem, details) {

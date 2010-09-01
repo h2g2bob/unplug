@@ -82,7 +82,7 @@
 	<progressmeter id="search_progress" mode="determined" value="0"/>
 	
 	<!-- this is the form of the result itself. We'll clone this to use in our display -->
-	<vbox id="unplug_result_template" class="unplug-result" flex="0" collapsed="true">
+	<vbox id="unplug_result_template" flex="0" collapsed="true">
 		<toolbar flex="1">
 			<image class="ur-thumbnail" />
 			<vbox flex="1" style="overflow: hidden;">
