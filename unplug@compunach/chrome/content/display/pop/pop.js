@@ -417,7 +417,7 @@ UnPlug2SearchPage = {
 		}
 		
 		// replace bad characters with "_"
-		name = name.replace(RegExp("[\\*\\\\/\\?\\<\\>~#\\|`\\$\\&;:%\"']+", "g"), "_");
+		name = name.replace(RegExp("[\\*\\\\/\\?\\<\\>~#\\|`\\$\\&;:%\"'\x00-\x1f]+", "g"), "_");
 		ext = ext.replace(RegExp("[^\\w\\s]+", "g"), "_");
 		
 		var nsIFilePicker = Components.interfaces.nsIFilePicker;
