@@ -520,7 +520,7 @@
 			<media url="${loc.1}" type="${loc.2}" title="${origtitle.innerHTML}" certainty="mid" />
 			<rule id="youporn">
 				<if_url host="youporn.com" />
-				<optional_re ref="contents" re="&lt;h1&gt;\s*&lt;img src=&quot;(http://ss-2.youporn.com/screenshot/.*_small\.jpg)&quot;[^&lt;&gt;]*&gt;\s*([^&lt;&gt;]+)\s*&lt;/h1&gt;" />
+				<optional_re ref="contents" re="&lt;h1&gt;\s*&lt;img src=&quot;(http://.*?.youporn.com/screenshot/.*?_small\.jpg)&quot;[^&lt;&gt;]*&gt;\s*([^&lt;&gt;]+)\s*&lt;/h1&gt;" />
 				<media url="${loc.1}" type="${loc.2}" title="${either:contents.2:origtitle.innerHTML}" thumbnail="${contents.1}" />
 			</rule>
 		</rule>
