@@ -63,6 +63,12 @@
 		<!-- possible alternative? <each_re ref="flvre" re="(https?://[a-z0-9_/\.\-]+\.flv(?:\?[a-z0-9_/\.%=&amp;\-]*)?)" flags="i"> -->
 		<each_re ref="flvre" re="[&quot;']((?:http|/)[^&quot;']+\.flv(?:\?[^&quot;']+)?)[&quot;']">
 			<media url="${flvre.1}" certainty="low" title="${origtitle.innerHTML}" type="flv" />
+			<rule id="tube8">
+				<if_url ref="url" host="tube8.com" />
+				<optional_re ref="title" re="&lt;h1 class=&quot;main-title main-sprite-img&quot;&gt;([^&lt;&gt;]+)&lt;/h1&gt;" />
+				<optional_re ref="mediaparts" re="/(\d+/\d+/[\da-f]+)/[\da-f]+\.flv" string="${flvre.1}" />
+				<media url="${flvre.1}" title="${either:title.1:origtitle.innerHTML}" thumbnail="http://t8-pics.phncdn.com/${mediaparts.1}/190x143/1.jpg" type="flv" />
+			</rule>
 		</each_re>
 	</rule>
 	<rule id="clipfish.de">
