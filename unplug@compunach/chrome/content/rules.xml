@@ -423,10 +423,11 @@
 					<rule goto="rutube-from-id" />
 				</rule>
 				<rule id="embed.xvidoes">
-					<!-- also normal site -->
+					<!-- also normal site, also xnxx.com -->
 					<if_re re="xvideos\.com" string="${embedelem.src}" />
-					<optional_re ref="title" re="&lt;strong&gt;([^&lt;&gt;]+)&lt;/strong&gt;&lt;strong&gt; \- &lt;/strong&gt;\s*\d+ min" />
-					<media url="${qparam:flv_url:htmldecode:embedelem.flashvars}" thumbnail="${qparam:url_bigthumb:htmldecode:embedelem.flashvars}" type="flv" title="${either:title.1:origtitle.innerHTML}" />
+					<optional_re ref="xv_title" re="&lt;strong&gt;([^&lt;&gt;]+)&lt;/strong&gt;&lt;strong&gt; \- &lt;/strong&gt;\s*\d+ min" />
+					<optional_re ref="xnxx_title" re="&lt;span class=&quot;style5&quot;&gt;&lt;strong&gt;\s*([^&lt;&gt;]+)\s*&lt;/strong&gt;&lt;/span&gt;" />
+					<media url="${qparam:flv_url:htmldecode:embedelem.flashvars}" thumbnail="${qparam:url_bigthumb:htmldecode:embedelem.flashvars}" type="flv" title="${either:xv_title.1:xnxx_title.1:origtitle.innerHTML}" />
 				</rule>
 				<rule id="embed.videmo">
 					<!-- TODO unchecked -->
