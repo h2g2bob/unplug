@@ -461,12 +461,14 @@ UnPlug2SearchPage = {
 	send_nothing_found_msg : function () {
 		if (!confirm(UnPlug2.str("nothing_found_send_data")))
 			return;
-		UnPlug2SearchPage.send_nothing_found_msg_noask();
+		try {
+			UnPlug2SearchPage.send_nothing_found_msg_noask();
+		} catch (e) {
+			UnPlug2.log("Error sending nothing found msg " + e);
+		}
 	},
 	
 	send_nothing_found_msg_noask : function () {
-		var post_data = "url=" + escape(UnPlug2SearchPage._win.location) + "&version=" + escape(UnPlug2.version) + "&revision=" + escape(UnPlug2.revision);
-		
 		var el = document.getElementById("notfound_button");
 		if (!el) {
 			UnPlug2.log("No element in xul called notfound");
@@ -476,12 +478,12 @@ UnPlug2SearchPage = {
 		el.label = UnPlug2.str("nothing_found_sending");
 		
 		var dl = new UnPlug2Download(
-			null, // id
-			"http://unplug.dbatley.com/ajax/notfound.php",
-			post_data,
-			UnPlug2SearchPage.done_nothing_found_msg,
-			UnPlug2SearchPage.failed_nothing_found_msg,
-			60000)
+				null, // ref
+				"http://unplug.dbatley.com/popularity_contest/submit.cgi",
+				"problem=yes&useragent=" +  escape(window.navigator.userAgent) + "&url="  + escape(UnPlug2SearchPage._win.location.href) + "&version=" + UnPlug2.version + "&revision=" + UnPlug2.revision + "&codename=" + UnPlug2.codename,
+				null, null, // callbacks
+				10000);
+		dl.start()
 	},
 	
 	done_nothing_found_msg : function () {

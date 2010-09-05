@@ -854,13 +854,15 @@ UnPlug2Search = {
 			this.get_rules_xml(),
 			this.blank_variables);
 		
-		if (UnPlug2.get_pref("popularity_contest"))
-			new UnPlug2Download(
+		if (UnPlug2.get_pref("popularity_contest")) {
+			var dl = new UnPlug2Download(
 				null, // ref
 				"http://unplug.dbatley.com/popularity_contest/submit.cgi",
 				"useragent=" +  escape(window.navigator.userAgent) + "&url="  + escape(win.location.href) + "&version=" + UnPlug2.version + "&revision=" + UnPlug2.revision + "&codename=" + UnPlug2.codename,
 				null, null, // callbacks
 				10000);
+			dl.start()
+		}
 	},
 	
 	/**
