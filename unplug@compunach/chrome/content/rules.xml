@@ -634,42 +634,6 @@
 			<if_re ref="loc" re="autoStart=true&amp;phpPath=(playah.*?com)&amp;movieName=(movies/.*?\.flv)" />
 			<media url="http://${loc.1}/flvstream.php?file=${loc.2}&amp;position=0" type="flv" description="Flash video stream" />
 		</rule>
-		<rule id="2.dailymotion.com">
-			<!-- TODO unchecked -->
-			<if_url host="dailymotion.com"/>
-			<if_re ref="urllist" re="addVariable\(&quot;video&quot;,\s*&quot;([^&quot;]+?)&quot;\)" />
-			<optional_re ref="thumb" re="addVariable\(&quot;preview&quot;,\s*&quot;([^&quot;]+?)&quot;\)" />
-			<each_re ref="urlitem" string="${urldecode:urllist.1}" re="(?:^|\|)(.*?)@@(.*?)(?:$|\|)">
-				<rule id="2.dailymotion.com.spark">
-					<if_equal a="${urlitem.2}" b="spark" />
-					<media url="${urlitem.1}" description="${translate:mid_quality} - ${urlitem.2}" thumbnail="${urldecode:thumb.1}" type="flv" />
-				</rule>
-				<rule id="2.dailymotion.com.spak-mini">
-					<if_equal a="${urlitem.2}" b="spak-mini" />
-					<media url="${urlitem.1}" description="${translate:low_quality} - ${urlitem.2}" thumbnail="${urldecode:thumb.1}" type="flv" />
-				</rule>
-				<rule id="2.dailymotion.com.v6-hd">
-					<if_equal a="${urlitem.2}" b="vp6-hd" />
-					<media url="${urlitem.1}" description="${translate:hd_quality} - ${urlitem.2}" thumbnail="${urldecode:thumb.1}" type="vp6" />
-				</rule>
-				<rule id="2.dailymotion.com.vp6-hq">
-					<if_equal a="${urlitem.2}" b="vp6-hq" />
-					<media url="${urlitem.1}" description="${translate:high_quality} - ${urlitem.2}" thumbnail="${urldecode:thumb.1}" type="vp6" />
-				</rule>
-				<rule id="2.dailymotion.com.vp6">
-					<if_equal a="${urlitem.2}" b="vp6" />
-					<media url="${urlitem.1}" description="${translate:mid_quality} - ${urlitem.2}" thumbnail="${urldecode:thumb.1}" type="vp6" />
-				</rule>
-				<rule id="2.dailymotion.com.h264">
-					<if_equal a="${urlitem.2}" b="h264" />
-					<media url="${urlitem.1}" description="${translate:mid_quality} - ${urlitem.2}" thumbnail="${urldecode:thumb.1}" type="h264" />
-				</rule>
-				<rule id="2.dailymotion.com.default">
-					<!-- catch-all which duplicates all of those above -->
-					<media url="${urlitem.1}" description="${urlitem.2}" thumbnail="${urldecode:thumb.1}" />
-				</rule>
-			</each_re>
-		</rule>
 		<rule id="sevenload.com">
 			<if_url host="sevenload.com" />
 			<if_re ref="configpath" re="&lt;param name=&quot;flashVars&quot; value=&quot;configPath=(http%3A%2F%2Fflash.sevenload.com[^&quot;]+)&quot;" />
@@ -688,7 +652,7 @@
 				* www.movshare.net
 			-->
 			<each_re ref="video" re="(addParam|addVariable)\s*\(\s*[&quot;'](file|content_video|video)[&quot;']\s*,\s*[&quot;'](.*?)[&quot;']\s*\)">
-				<optional_re ref="thumbnail">(addParam|addVariable)\s*\(\s*[&quot;'](image|thumbnail)[&quot;']\s*,\s*[&quot;'](.*?)[&quot;']\s*\) </optional_re>
+				<optional_re ref="thumbnail">(addParam|addVariable)\s*\(\s*[&quot;'](image|thumbnail|preview)[&quot;']\s*,\s*[&quot;'](.*?)[&quot;']\s*\) </optional_re>
 				<rule>
 					<!-- same server == default -->
 					<ifnot_url host="xhamster.com" />
@@ -697,6 +661,12 @@
 						<if_url host="youjizz.com" />
 						<if_re ref="yj" re="^http://(.*?)\.youjizz\.com/.*?/(.*?.flv)$" string="${video.3}" />
 						<media url="${video.3}" thumbnail="http://pics.youjizz.com/${yj.1}/${yj.2}-1.jpg" title="${origtitle.innerHTML}" />
+					</rule>
+					<rule id="dailymotion.com">
+						<if_url host="dailymotion.com" />
+						<optional_re ref="dmthumb" re="&lt;link rel=&quot;image_src&quot; type=&quot;image/jpeg&quot; href=&quot;(http://www.dailymotion.com/thumbnail/[^&quot;]+)&quot; /&gt;" />
+						<optional_re ref="dmtitle" re="&lt;span class=&quot;title&quot;[^&gt;]*&gt;([^&lt;]+)" />
+						<media url="${video.3}" thumbnail="${either:dmthumb.1:thumbnail.3}" type="flv" title="${either:dmtitle.1:origtitle.innerHTML}" />
 					</rule>
 				</rule>
 			</each_re>
