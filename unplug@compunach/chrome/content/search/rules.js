@@ -570,6 +570,7 @@ UnPlug2Rules = {
 		"divx", "avi",
 		"ogg", "ogv", "flac", "speex",
 		"mkv",
+		"3gp",
 		"flv" ],
 	
 	if_ext : {
