@@ -29,28 +29,31 @@
 -->
 <unplug>
 	<hook for="download-priority">
-		<priority level="high">youtube.com</priority>
-		<priority level="low">addthis.com</priority>
-		<priority level="low">xtendmedia.com</priority>
-		<priority level="very-low">doubleclick.net</priority>
-		<priority level="very-low">googlesyndication.com</priority>
-		<priority level="very-low">yieldmanager.com</priority>
-		<priority level="very-low">admeld.com</priority>
-		<priority level="very-low">invitemedia.com</priority>
-		<priority level="very-low">quantserve.com</priority>
-		<priority level="low">cpro.baidu.com</priority>
-		<priority level="very-low">contentabc.com</priority>
-		<priority level="very-low">adjug.com</priority>
-		<priority level="very-low">ebay.com</priority>
-		<priority level="low">mediaplex.com</priority>
-		<priority level="low">facebook.com</priority>
-		<priority level="very-low">adultfriendfinder.com</priority>
-		<priority level="very-low">mediagra.com</priority>
-		<priority level="very-low">adxpansion.com</priority>
-		<priority level="low">addtoany.com</priority>
-		<priority level="low">invitemedia.com</priority>
-		<priority level="very-low">alleliteads.com</priority>
-		<priority level="very-low">whaleads.com</priority>
+		<priority level="very-low" >247realmedia.com</priority>
+		<priority level="low"      >addtoany.com</priority>
+		<priority level="low"      >addthis.com</priority>
+		<priority level="very-low" >adjug.com</priority>
+		<priority level="very-low" >admeld.com</priority>
+		<priority level="very-low" >adxpansion.com</priority>
+		<priority level="very-low" >adultfriendfinder.com</priority>
+		<priority level="very-low" >alleliteads.com</priority>
+		<priority level="very-low" >contentabc.com</priority>
+		<priority level="low"      >cpro.baidu.com</priority>
+		<priority level="very-low" >doubleclick.net</priority>
+		<priority level="very-low" >ebay.com</priority>
+		<priority level="low"      >facebook.com</priority>
+		<priority level="very-low" >fbcdn.net</priority>
+		<priority level="very-low" >googlesyndication.com</priority>
+		<priority level="very-low" >invitemedia.com</priority>
+		<priority level="very-low" >mediagra.com</priority>
+		<priority level="low"      >mediaplex.com</priority>
+		<priority level="very-low" >mookie1.com</priority>
+		<priority level="very-low" >quantserve.com</priority>
+		<priority level="very-low" >reliablebanners.com</priority>
+		<priority level="very-low" >whaleads.com</priority>
+		<priority level="low"      >xtendmedia.com</priority>
+		<priority level="very-low" >yieldmanager.com</priority>
+		<priority level="high"     >youtube.com</priority>
 	</hook>
 	<!--
 		First, grab the original page title, so we know what to save it as
