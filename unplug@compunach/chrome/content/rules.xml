@@ -49,6 +49,8 @@
 		<priority level="very-low">adxpansion.com</priority>
 		<priority level="low">addtoany.com</priority>
 		<priority level="low">invitemedia.com</priority>
+		<priority level="very-low">alleliteads.com</priority>
+		<priority level="very-low">whaleads.com</priority>
 	</hook>
 	<!--
 		First, grab the original page title, so we know what to save it as
@@ -673,7 +675,6 @@
 			</download>
 		</rule>
 		<rule id="addvariable">
-			<!-- TODO unchecked -->
 			<!--
 			Applies to many sites:
 				* xn-/-hentaienespaol-1nb.com
@@ -684,7 +685,12 @@
 				<rule>
 					<!-- same server == default -->
 					<ifnot_url host="xhamster.com" />
-					<media url="${video.3}" thumbnail="${thumbnail.3}" />
+					<media url="${video.3}" thumbnail="${thumbnail.3}" certainty="mid" title="${origtitle.innerHTML}" />
+					<rule id="youjizz.com">
+						<if_url host="youjizz.com" />
+						<if_re ref="yj" re="^http://(.*?)\.youjizz\.com/.*?/(.*?.flv)$" string="${video.3}" />
+						<media url="${video.3}" thumbnail="http://pics.youjizz.com/${yj.1}/${yj.2}-1.jpg" title="${origtitle.innerHTML}" />
+					</rule>
 				</rule>
 			</each_re>
 		</rule>
