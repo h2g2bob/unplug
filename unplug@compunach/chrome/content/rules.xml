@@ -748,6 +748,23 @@
 				</download>
 			</rule>
 		</rule>
+		<rule id="tnaflix.com">
+			<if_url host="tnaflix.com" />
+			<if_re ref="config" re="addVariable\(\'config\',\s*\'(http://[^/]+\.tnaflix\.com/[^\']+)\'\);" />
+			<optional_re ref="title" re="&lt;h2 class=&quot;playIcon&quot;&gt;([^&lt;&gt;]+)&lt;/h2&gt;" />
+			<download url="${urldecode:config.1}">
+				<optional_re ref="thumb" re="&lt;start_thumb&gt;(http://[^&lt;&gt;]+)&lt;/start_thumb&gt;" />
+				<rule>
+					<if_re ref="file" re="&lt;file&gt;(http://cdn\-\d+\.tnaflix\.com/[^&lt;&gt;]+)&lt;/file&gt;" />
+					<media url="${file.1}" title="${either:title.1:origtitle.innerHTML}" type="flv" thumbnail="${thumb.1}" />
+				</rule>
+				<rule>
+					<if_re ref="rtmp" re="&lt;rtmp_server&gt;(rtmpe?://[^&lt;&gt;]+)&lt;/rtmp_server&gt;\s*&lt;file&gt;([^&lt;&gt;]+)&lt;/file&gt;" />
+					<media url="${rtmp.1}/${rtmp.2}" title="${either:title.1:origtitle.innerHTML}" type="flv" thumbnail="${thumb.1}" />
+				</rule>
+			</download>
+
+		</rule>
 	</download><!-- flashblock workaround -->
 	<!--
 	Lower priority
