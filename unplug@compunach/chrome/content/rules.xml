@@ -669,6 +669,11 @@
 						<if_re ref="yj" re="^http://(.*?)\.youjizz\.com/.*?/(.*?.flv)$" string="${video.3}" />
 						<media url="${video.3}" thumbnail="http://pics.youjizz.com/${yj.1}/${yj.2}-1.jpg" title="${origtitle.innerHTML}" />
 					</rule>
+					<rule id="jizzhut.com">
+						<!-- the defaults are fine. can't set thumbnail. but we are certain about it -->
+						<if_url host="jizzhut.com" />
+						<media url="${video.3}" thumbnail="${thumbnail.3}" title="${origtitle.innerHTML}" />
+					</rule>
 					<rule id="dailymotion.com">
 						<if_url host="dailymotion.com" />
 						<optional_re ref="dmthumb" re="&lt;link rel=&quot;image_src&quot; type=&quot;image/jpeg&quot; href=&quot;(http://www.dailymotion.com/thumbnail/[^&quot;]+)&quot; /&gt;" />
