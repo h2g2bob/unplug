@@ -370,9 +370,13 @@
 					</rule>
 					<rule id="generic_flashvars">
 						<each_re ref="queryparam" string="${embed.flashvars}" re="([^&amp;]+)=([^&amp;]+)">
-							<rule>
-								<if_re string="${queryparam.2}" re="\.flv(?:\?|#|;|$)" />
-								<media url="${queryparam.2}" type="flv" certainty="mid" title="${origtitle.innerHTML}" />
+							<if_re ref="filetype" string="${urldecode:queryparam.2}" re="\.(flv|mp4)(?:\?|#|;|$)" />
+							<media url="${urldecode:queryparam.2}" type="${filetype.1}" certainty="mid" title="${origtitle.innerHTML}" />
+							<rule id="yuvutu.com">
+								<if_re ref="yvid" re="^http://(vs\d+.yuvutu.com)/dl/.*?/([^/]+)/streams/(.*\.mp4)$" string="${urldecode:queryparam.2}" />
+								<optional_re ref="yvtitle" re="^yuvutu \- [^\-]+ \- (.*)$" string="${origtitle.innerHTML}" />
+								<media url="${urldecode:queryparam.2}" type="${filetype.1}" title="${either:yvtitle.1:origtitle.innerHTML}" thumbnail="http://${yvid.1}/${yvid.2}/thumbnails/${yvid.3}.jpg" />
+
 							</rule>
 						</each_re>
 					</rule>
