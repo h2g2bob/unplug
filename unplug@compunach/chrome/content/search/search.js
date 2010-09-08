@@ -39,7 +39,8 @@ UnPlug2Download = function (reference, url, post_data, callback_ok, callback_fai
 	this._extern_callback_fail = callback_fail;
 	this._done = false;
 	this._percent = 0;
-	this._xmlhttp = new XMLHttpRequest();
+	this._xmlhttp = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
+		.createInstance(Components.interfaces.nsIXMLHttpRequest);
 	this._timeout_delay = timeout;
 	this.text = null;
 	this.xmldoc = null;
@@ -62,6 +63,11 @@ UnPlug2Download = function (reference, url, post_data, callback_ok, callback_fai
 	return this;
 }
 UnPlug2Download.prototype = {
+	load_flags : (
+		// load from cache (if possible)
+		Components.interfaces.nsIRequest.LOAD_FROM_CACHE
+		// supress popup warnings, http auth prompts, etc
+		| Components.interfaces.nsIRequest.LOAD_BACKGROUND),
 	/**
 	 * Returns true if the download has started
 	 */
@@ -85,10 +91,12 @@ UnPlug2Download.prototype = {
 		
 		if (this._post_data) {
 			this._xmlhttp.open('POST', this.url, true);  
+			this._xmlhttp.channel.loadFlags |= this.load_flags;
 			this._xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 			this._xmlhttp.send(this._post_data);
 		} else {
 			this._xmlhttp.open('GET', this.url, true);  
+			this._xmlhttp.channel.loadFlags |= this.load_flags;
 			this._xmlhttp.send(null); 
 		}
 	},
