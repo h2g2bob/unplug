@@ -72,6 +72,11 @@
 				<optional_re ref="mediaparts" re="/(\d+/\d+/[\da-f]+)/[\da-f]+\.flv" string="${flvre.1}" />
 				<media url="${flvre.1}" title="${either:title.1:origtitle.innerHTML}" thumbnail="http://t8-pics.phncdn.com/${mediaparts.1}/190x143/1.jpg" type="flv" />
 			</rule>
+			<rule id="extremetube">
+				<if_re ref="thumbid" string="${flvre.1}" re="extremetube.com/dl/.*/videos/(\d+/\d+/\d+)/\d+\.flv\?" />
+				<optional_element ref="title" tagname="h1" require_attrs="title" />
+				<media url="${flvre.1}" title="${either:title.title:origtitle.innerHTML}" thumbnail="http://xt-pics.phncdn.com/thumbs/${thumbid.1}/240x180/1.jpg" type="flv" />
+			</rule>
 		</each_re>
 	</rule>
 	<rule id="clipfish.de">
