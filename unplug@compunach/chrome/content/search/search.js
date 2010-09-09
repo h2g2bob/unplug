@@ -76,13 +76,24 @@ UnPlug2Download.prototype = {
 	},
 	
 	/**
-	 * Starts the download
+	 * Starts the download (possibly after a small delay)
 	 */
-	start : function () {
+	start : function (delay) {
 		if (this._started) {
 			return;
 		}
 		this._started = true;
+		if (delay) {
+			window.setTimeout((function (that) {
+				return (function () {
+					that._do_start();
+				})
+			})(this), delay);
+		} else {
+			this._do_start();
+		}
+	},
+	_do_start : function () {
 		if (this._done) {
 			return; // this is set on cancel.
 		}
@@ -738,7 +749,8 @@ UnPlug2Search = {
 		for (var i = 0; i < startable_downloads.length && i < concurrent_downloads; ++i) {
 			var dl_id = startable_downloads[i];
 			try {
-				UnPlug2Search._downloads[dl_id].download.start();
+				// use a small (100ms) delay here so we don't block main thread for a long time
+				UnPlug2Search._downloads[dl_id].download.start(100);
 				UnPlug2.log("Starting download id = " + dl_id);
 			} catch (e) {
 				UnPlug2.log("Starting Download failed for " + dl_id + " / " + UnPlug2Search._downloads[dl_id].download + " because " + e);
