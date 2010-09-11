@@ -776,6 +776,13 @@
 			</download>
 
 		</rule>
+		<rule id="ref.megavideo.com">
+			<!-- eg: animefreak.tv. Second argument is some random hash which I don't care about. -->
+			<if_re ref="videoid" re="[&quot;']http://www.megavideo.com/v/([A-Za-z0-9_\-\.]+)([a-f0-9]{32})[&quot;']" />
+			<download url="http://www.megavideo.com/?v=${videoid.1}">
+				<rule goto="megavideo.com" />
+			</download>
+		</rule>
 	</download><!-- flashblock workaround -->
 	<!--
 	Lower priority
