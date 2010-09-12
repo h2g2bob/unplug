@@ -373,10 +373,17 @@
 						<if_ext is_media="yes" filename="${embedelem.src}" />
 						<media url="${embedelem.src}" certainty="mid" />
 					</rule>
-					<rule id="generic_flashvars">
+					<rule id="flashvars">
 						<each_re ref="queryparam" string="${embed.flashvars}" re="([^&amp;]+)=([^&amp;]+)">
-							<if_re ref="filetype" string="${urldecode:queryparam.2}" re="\.(flv|mp4)(?:\?|#|;|$)" />
-							<media url="${urldecode:queryparam.2}" type="${filetype.1}" certainty="mid" title="${origtitle.innerHTML}" />
+							<rule ref="generic_fv">
+								<if_re ref="filetype" string="${urldecode:queryparam.2}" re="\.(flv|mp4)(?:\?|#|;|$)" />
+								<ifnot_re re="^http://video.ak.facebook.com/" string="${urldecode:queryparam.2}" />
+								<media url="${urldecode:queryparam.2}" type="${filetype.1}" certainty="mid" title="${origtitle.innerHTML}" />
+							</rule>
+							<rule ref="facebook">
+								<if_re re="^http://video.ak.facebook.com/" string="${urldecode:queryparam.2}" />
+								<media url="${urldecode:queryparam.2}" type="${filetype.1}" certainty="mid" title="${origtitle.innerHTML}" referer="${urldecode:queryparam.2}" />
+							</rule>
 							<rule id="yuvutu.com">
 								<if_re ref="yvid" re="^http://(vs\d+.yuvutu.com)/dl/.*?/([^/]+)/streams/(.*\.mp4)$" string="${urldecode:queryparam.2}" />
 								<optional_re ref="yvtitle" re="^yuvutu \- [^\-]+ \- (.*)$" string="${origtitle.innerHTML}" />
