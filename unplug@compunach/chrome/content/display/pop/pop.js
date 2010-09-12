@@ -354,16 +354,11 @@ UnPlug2SearchPage = {
 		return '<UnPlug2SearchPage>';
 	},
 	
-	_download_ff2_version : function (url, file) {
-		var nsiurl = Components.classes["@mozilla.org/network/io-service;1"].
-			getService(Components.interfaces.nsIIOService).
-			newURI(url, null, null);
+	_download_ff2_version : function (url, file, referer) {
+		var nsiurl = this._io_service.newURI(url, null, null);
 		var nsireferer = nsiurl;
 		try {
-			// TODO - fix this to use the referer from result.download.referer, if avail
-			nsireferer = Components.classes["@mozilla.org/network/io-service;1"].
-				getService(Components.interfaces.nsIIOService).
-				newURI(String(UnPlug2SearchPage._win.location), null, null);
+			nsireferer = this._io_service.newURI(referer, null, null);
 		} catch(e) {
 			// pass
 		}
@@ -539,14 +534,17 @@ UnPlug2SearchPage = {
 			},
 			exec  : function (res, data) {
 				var file = UnPlug2SearchPage._save_as_box(res.details.name, res.details.file_ext);
-				if (!file)
+				if (!file) {
 					return;
+				}
 				
-				// keep this here
-				if (false)
-					UnPlug2SearchPage._download_with_downloadmgr(res.download.url, file.file);
+				// UnPlug2SearchPage._download_with_downloadmgr(res.download.url, file.file);
 				
-				UnPlug2SearchPage._download_ff2_version(res.download.url, file.fileURL);
+try {
+				UnPlug2SearchPage._download_ff2_version(res.download.url, file.fileURL, res.download.referer);
+} catch (e) {
+	alert("hello" + e);
+}
 			}
 		},
 		"opentab" : {
