@@ -525,6 +525,18 @@
 					<if_equal a="${p.name}" b="flashvars" />
 					<media url="${qparam:mediaURL:p.value}?__gda__=${qparam:gdaKey:p.value}" mediaid="metacafe-${qparam:itemID:p.value}" title="${urldecode:qparam:title:p.value}" type="flv" />
 				</rule>
+				<rule id="bbc-parliament">
+					<if_equal a="${p.name}" b="playlist" />
+					<if_re string="${p.value}" re="^http://news.bbc.co.uk/media/.*\.xml$" />
+					<download url="${p.value}">
+						<optional_re re="&quot;(http://news.bbcimg.co.uk/media/[^&quot;]*\.jpg)&quot;" ref="thumb" />
+						<optional_re re="&lt;title&gt;([^&lt;&gt;]+)&lt;/title&gt;" ref="title" />
+						<each_re ref="media" re="(&lt;media[\s\S]+?&lt;/media&gt;)">
+							<if_element ref="conn" string="${media.1}" tagname="connection" require_attrs="kind,application,server,identifier" />
+							<media url="rtmp://${conn.server}/${conn.application}/${conn.identifier}" thumbnail="${thumb.1}" title="${either:title.1:origtitle.innerHTML}" />
+						</each_re>
+					</download>
+				</rule>
 			</each_element>
 		</rule><!-- each param -->
 		<!-- other rules which need re-download -->
