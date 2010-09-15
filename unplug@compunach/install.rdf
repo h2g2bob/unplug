@@ -8,7 +8,7 @@
                    em:maxVersion="4.0b4" />
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="unplug@compunach"
-                   em:version="2.033"
+                   em:version="2.034"
                    em:type="2"
                    em:name="UnPlug"
                    em:description="Find and download media from websites"
