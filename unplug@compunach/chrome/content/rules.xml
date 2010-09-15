@@ -29,11 +29,13 @@
 -->
 <unplug>
 	<hook for="download-priority">
+		<priority level="very-low" >77.247.178.106</priority>
 		<priority level="very-low" >247realmedia.com</priority>
 		<priority level="low"      >addtoany.com</priority>
 		<priority level="low"      >addthis.com</priority>
 		<priority level="very-low" >adjug.com</priority>
 		<priority level="very-low" >admeld.com</priority>
+		<priority level="very-low" >adreactor.com</priority>
 		<priority level="very-low" >adxpansion.com</priority>
 		<priority level="very-low" >adultfriendfinder.com</priority>
 		<priority level="very-low" >alleliteads.com</priority>
