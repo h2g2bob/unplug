@@ -804,6 +804,15 @@
 				<rule goto="megavideo.com" />
 			</download>
 		</rule>
+		<rule id="youporn-alt">
+			<if_url host="youporn.com" />
+			<if_re ref="xmlloc" re="(http://download\.youporn\.com/download/\d+\?xml=1)" />
+			<optional_re ref="contents" re="&lt;h1&gt;\s*&lt;img src=&quot;(http://.*?.youporn.com.*\.jpg)&quot;[^&lt;&gt;]*&gt;\s*([^&lt;&gt;]+)\s*&lt;/h1&gt;" />
+			<download url="${xmlloc.1}">
+				<if_re ref="flvloc" re="&lt;location&gt;(.*?)&lt;/location&gt;" />
+				<media url="${flvloc.1}" type="flv" title="${either:contents.2:origtitle.innerHTML}" thumbnail="${contents.1}" />
+			</download>
+		</rule>
 	</download><!-- flashblock workaround -->
 	<!--
 	Lower priority
