@@ -349,6 +349,11 @@
 			</download>
 		</rule>
 	</rule>
+	<rule id="dailyshow-url">
+		<if_re re="(dailyshow.com|colbertnation.com)" string="${.url}" />
+		<if_re re="http://media.mtvnservices.com/(mgid:[^:]+:[^:]+:[^:]+:\d+)" ref="mgid" />
+		<rule goto="dailyshow-id" />
+	</rule>
 	<!--
 		The current flashblock workaround is to:
 		 * re-download page
@@ -496,26 +501,35 @@
 						<!-- name=movie -->
 						<if_re ref="mgid" re="^http://media\.mtvnservices\.com/(mgid:.*)$" string="${p.value}" />
 						<rule id="dailyshow-id" target="dailyshow-id">
+							<rule id="dailyshow-speculative">
+								<!-- this neatly bypasses the geolocation (i think the rtmp server might re-check it tho. -->
+								<if_re ref="parts" re="^(mgid):(cms):(item):(comedycentral\.com):(\d+)$" string="${mgid.1}" />
+								<download url="http://${parts.4}/global/feeds/entertainment/media/mediaGenEntertainment.jhtml?uri=${mgid.1}">
+									<rule goto="dailyshow-rend" />
+								</download>
+							</rule>
 							<download url="http://media.mtvnservices.com/player/config.jhtml?uri=${urlencode:mgid.1}" geolocate="US">
 								<each_re ref="item" re="&lt;item&gt;([\s\S]*?)&lt;/item&gt;">
 									<optional_re ref="title" string="${item.1}" re="&lt;title&gt;\s*(.*?)\s*&lt;/title&gt;" />
 									<if_element ref="xmlurl" require_attrs="url" tagname="media:content" string="${item.1}" />
 									<download url="${xmlurl.url}">
-										<each_re ref="rend" re="&lt;rendition[^&lt;&gt;]*?bitrate=&quot;(\d+)&quot;[\s\S]*?&lt;src&gt;\s*(rtmpe?|http)://(.*?)\s*&lt;/src&gt;">
-											<!-- this gives an rtmpe link -->
-											<rule>
-												<if_re re="^(1720)$" string="${rend.1}" />
-												<media url="${rend.2}://${rend.3}" description="${optional:title.1} (${rend.1} bits/sec)" title="${either:title.1:origtitle.innerHTML}" type="flv" quality="high" />
-											</rule>
-											<rule>
-												<if_re re="^(450)$" string="${rend.1}" />
-												<media url="${rend.2}://${rend.3}" description="${optional:title.1} (${rend.1} bits/sec)" title="${either:title.1:origtitle.innerHTML}" type="flv" quality="low" />
-											</rule>
-											<rule>
-												<ifnot_re re="^(1720|450)$" string="${rend.1}" />
-												<media url="${rend.2}://${rend.3}" description="${optional:title.1} (${rend.1} bits/sec)" title="${either:title.1:origtitle.innerHTML}" type="flv" />
-											</rule>
-										</each_re>
+										<rule id="dailyshow-rend" target="dailyshow-rend">
+											<each_re ref="rend" re="&lt;rendition[^&lt;&gt;]*?bitrate=&quot;(\d+)&quot;[\s\S]*?&lt;src&gt;\s*(rtmpe?|http)://(.*?)\s*&lt;/src&gt;">
+												<!-- this gives an rtmpe link -->
+												<rule>
+													<if_re re="^(1720)$" string="${rend.1}" />
+													<media url="${rend.2}://${rend.3}" description="${optional:title.1} (${rend.1} bits/sec)" title="${either:title.1:origtitle.innerHTML}" type="flv" quality="high" mediaid="${mgid.1}" />
+												</rule>
+												<rule>
+													<if_re re="^(450)$" string="${rend.1}" />
+													<media url="${rend.2}://${rend.3}" description="${optional:title.1} (${rend.1} bits/sec)" title="${either:title.1:origtitle.innerHTML}" type="flv" quality="low" mediaid="${mgid.1}" />
+												</rule>
+												<rule>
+													<ifnot_re re="^(1720|450)$" string="${rend.1}" />
+													<media url="${rend.2}://${rend.3}" description="${optional:title.1} (${rend.1} bits/sec)" title="${either:title.1:origtitle.innerHTML}" type="flv" mediaid="${mgid.1}" />
+												</rule>
+											</each_re>
+										</rule>
 									</download>
 								</each_re>
 							</download>
