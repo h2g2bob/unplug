@@ -581,8 +581,9 @@ UnPlug2Variables.prototype = {
 
 	youku_url : (function (mediatype, key1, key2, randomseed, streamid, piece_num) {
 		var r = (function () { return "0123456789"[Math.floor(Math.random() * 10)] });
+		var hex = "0123456789ABCDEF"
 		
-		piece_num = ((parseInt(piece_num) < 10) ? "0" : "") + piece_num;
+		piece_num = hex[Math.floor(piece_num / 16)] + hex[piece_num % 16];
 		
 		// get the codebook like in cg_hun()
 		var codebook = ""
