@@ -575,9 +575,9 @@
 			<if_re ref="loc" re="[&quot;']((?:[a-z0-9]+://[^&quot;']+)?/[^&quot;']+\.(flv|mp4|mp3)(?:\?[^&quot;']+)?)[&quot;']" flags="i" />
 			<media url="${loc.1}" type="${loc.2}" title="${origtitle.innerHTML}" certainty="mid" />
 			<rule id="youporn">
-				<if_url host="youporn.com" />
+				<if_url host="youporn.com" ref="url" />
 				<optional_re ref="contents" re="&lt;h1&gt;\s*&lt;img src=&quot;(http://.*?.youporn.com/screenshot/.*?_small\.jpg)&quot;[^&lt;&gt;]*&gt;\s*([^&lt;&gt;]+)\s*&lt;/h1&gt;" />
-				<media url="${loc.1}" type="${loc.2}" title="${either:contents.2:origtitle.innerHTML}" thumbnail="${contents.1}" />
+				<media url="${loc.1}" type="${loc.2}" title="${either:contents.2:origtitle.innerHTML}" thumbnail="${contents.1}" mediaid="${url.url}" />
 			</rule>
 			<rule id="hardsextube.com">
 	  			<if_url host="hardsextube.com" />
@@ -819,12 +819,12 @@
 			</download>
 		</rule>
 		<rule id="youporn-alt">
-			<if_url host="youporn.com" />
+			<if_url host="youporn.com" ref="url" />
 			<if_re ref="xmlloc" re="(http://download\.youporn\.com/download/\d+\?xml=1)" />
 			<optional_re ref="contents" re="&lt;h1&gt;\s*&lt;img src=&quot;(http://.*?.youporn.com.*\.jpg)&quot;[^&lt;&gt;]*&gt;\s*([^&lt;&gt;]+)\s*&lt;/h1&gt;" />
 			<download url="${xmlloc.1}">
 				<if_re ref="flvloc" re="&lt;location&gt;(.*?)&lt;/location&gt;" />
-				<media url="${flvloc.1}" type="flv" title="${either:contents.2:origtitle.innerHTML}" thumbnail="${contents.1}" />
+				<media url="${htmldecode:flvloc.1}" type="flv" title="${either:contents.2:origtitle.innerHTML}" thumbnail="${contents.1}" mediaid="${url.url}" />
 			</download>
 		</rule>
 	</download><!-- flashblock workaround -->
