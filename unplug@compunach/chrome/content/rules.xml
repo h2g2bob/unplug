@@ -846,6 +846,19 @@
 				<media url="http://${host.1}/u${uid.1}/video/${vtag.1}.240.mp4" title="${either:title.1:origtitle.innerHTML}" thumbnail="${thumb.1}" />
 			</rule>
 		</rule>
+		<rule id="facebook-video">
+			<if_url host="facebook.com" inurl="video" />
+			<optional_re ref="thumb" re="swf_id_[0-9a-f]+\.addVariable\(&quot;thumb_url&quot;,\s*&quot;(http%3A%2F%2F[^&quot;]+)&quot;\);" />
+			<optional_re ref="title" re="swf_id_[0-9a-f]+\.addVariable\(&quot;video_title&quot;,\s*&quot;([^&quot;]+)&quot;\);" />
+			<rule id="fb-high">
+				<if_re ref="highqual" re="swf_id_([0-9a-f]+)\.addVariable\(&quot;highqual_src&quot;,\s*&quot;(http%3A%2F%2F[^&quot;]+)&quot;\);" />
+				<media url="${urldecode:highqual.2}" thumbnail="${urldecode:thumb.1}" title="${urldecode:either:title.1:origtitle.innerHTML}" mediaid="${highqual.1}" quality="high" description="${translate:high_quality}" />
+			</rule>
+			<rule id="fb-low">
+				<if_re ref="lowqual" re="swf_id_([0-9a-f]+)\.addVariable\(&quot;lowqual_src&quot;,\s*&quot;(http%3A%2F%2F[^&quot;]+)&quot;\);" />
+				<media url="${urldecode:lowqual.2}" thumbnail="${urldecode:thumb.1}" title="${urldecode:either:title.1:origtitle.innerHTML}" mediaid="${lowqual.1}" quality="low" description="${translate:low_quality}" />
+			</rule>
+		</rule>
 	</download><!-- flashblock workaround -->
 	<!--
 	Lower priority
