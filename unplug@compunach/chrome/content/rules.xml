@@ -827,6 +827,25 @@
 				<media url="${htmldecode:flvloc.1}" type="flv" title="${either:contents.2:origtitle.innerHTML}" thumbnail="${contents.1}" mediaid="${url.url}" />
 			</download>
 		</rule>
+		<rule id="vkontakte">
+			<if_url host="vkontakte.ru" />
+			<rule id="vkontakte-audio">
+				<each_re ref="row" re="&lt;div class=&quot;audioRow&quot; id=&quot;audio\d+&quot;&gt;\s*&lt;table&gt;&lt;tbody&gt;([\s\S]*?)&lt;/table&gt;">
+					<if_re ref="operate" re="operate\(\d+,(\d+),(\d+),'([0-9a-f]+)',\d+\);" string="${row.1}" />
+					<optional_re ref="performer" re="id=&quot;performer\d+&quot;[^&gt;]*&gt;([^&lt;]+)" string="${row.1}" />
+					<optional_re ref="title" re="id=&quot;title\d+&quot;[^&gt;]*&gt;([^&lt;]+)" string="${row.1}" />
+					<media url="http://cs${operate.1}.vkontakte.ru/u${operate.2}/audio/${operate.3}.mp3" mediaid="${operate.2}" title="${performer.1} - ${title.1}" description="${title.1}" />
+				</each_re>
+			</rule>
+			<rule id="vkontakte-video">
+				<if_re ref="host" re="&quot;host&quot;\s*:\s*&quot;http:\\/\\/([^/&quot;]+)\\/&quot;" />
+				<if_re ref="uid" re="&quot;uid&quot;\s*:\s*&quot;(\d+)&quot;" />
+				<if_re ref="vtag" re="&quot;vtag&quot;\s*:\s*&quot;([0-9a-f]+)&quot;" />
+				<optional_re ref="title" re="&lt;div class=&quot;summary&quot;&gt;&lt;a[^&gt;]*&gt;([^&lt;]+)&lt;/a&gt;" />
+				<optional_re ref="thumb" re="'(http://cs\d+\.vkontakte\.ru/u\d+/video/l_[0-9a-f]+\.jpg)'" />
+				<media url="http://${host.1}/u${uid.1}/video/${vtag.1}.240.mp4" title="${either:title.1:origtitle.innerHTML}" thumbnail="${thumb.1}" />
+			</rule>
+		</rule>
 	</download><!-- flashblock workaround -->
 	<!--
 	Lower priority
