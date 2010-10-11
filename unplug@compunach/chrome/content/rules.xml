@@ -545,12 +545,20 @@
 					<if_equal a="${p.name}" b="playlist" />
 					<if_re string="${p.value}" re="^http://news.bbc.co.uk/media/.*\.xml$" />
 					<download url="${p.value}">
-						<optional_re re="&quot;(http://news.bbcimg.co.uk/media/[^&quot;]*\.jpg)&quot;" ref="thumb" />
-						<optional_re re="&lt;title&gt;([^&lt;&gt;]+)&lt;/title&gt;" ref="title" />
-						<each_re ref="media" re="(&lt;media[\s\S]+?&lt;/media&gt;)">
-							<if_element ref="conn" string="${media.1}" tagname="connection" require_attrs="kind,application,server,identifier" />
-							<media url="rtmp://${conn.server}/${conn.application}/${conn.identifier}" thumbnail="${thumb.1}" title="${either:title.1:origtitle.innerHTML}" />
-						</each_re>
+						<rule id="bbc-playlist" target="bbc-playlist">
+							<optional_re re="&quot;(http://news.bbcimg.co.uk/media/[^&quot;]*\.jpg)&quot;" ref="thumb" />
+							<optional_re re="&lt;title&gt;([^&lt;&gt;]+)&lt;/title&gt;" ref="title" />
+							<each_re ref="media" re="(&lt;media[\s\S]+?&lt;/media&gt;)">
+								<if_element ref="conn" string="${media.1}" tagname="connection" require_attrs="kind,application,server,identifier" />
+								<media url="rtmp://${conn.server}/${conn.application}/${conn.identifier}" thumbnail="${thumb.1}" title="${either:title.1:origtitle.innerHTML}" description="${conn.kind} / ${conn.application} / ${conn.identifier}" />
+							</each_re>
+						</rule>
+					</download>
+				</rule>
+				<rule id="bbc-news">
+					<if_equal a="${p.name}" b="externalIdentifier" />
+					<download url="http://open.live.bbc.co.uk/mediaselector/4/mtis/stream/${p.value}">
+						<rule goto="bbc-playlist" />
 					</download>
 				</rule>
 			</each_element>
