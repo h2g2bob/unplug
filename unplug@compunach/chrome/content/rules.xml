@@ -867,6 +867,15 @@
 				<media url="${urldecode:lowqual.2}" thumbnail="${urldecode:thumb.1}" title="${urldecode:either:title.1:origtitle.innerHTML}" mediaid="${lowqual.1}" quality="low" description="${translate:low_quality}" />
 			</rule>
 		</rule>
+		<rule id="pluzz.fr">
+			<if_url host="pluzz.fr" />
+			<if_re ref="vidid" re="&lt;a href=&quot;http://info\.francetelevisions\.fr/\?id-video=([^&quot;&amp;]+)&quot; id=&quot;current_video&quot;" />
+			<download url="http://www.pluzz.fr/appftv/webservices/video/getInfosVideo.php?src=cappuccino&amp;video-type=simple&amp;template=ftvi&amp;template-format=complet&amp;id-externe=${vidid.1}">
+				<if_element tagname="nom" ref="nom" require_attrs="innerHTML" />
+				<if_element tagname="chemin" ref="chemin" require_attrs="innerHTML" />
+				<media url="rtsp://videozones.francetv.fr/${chemin.innerHTML}${nom.innerHTML}" title="${origtitle.innerHTML}" />
+			</download>
+		</rule>
 	</download><!-- flashblock workaround -->
 	<!--
 	Lower priority
