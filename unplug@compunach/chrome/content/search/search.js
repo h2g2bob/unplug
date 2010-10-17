@@ -381,7 +381,7 @@ UnPlug2Variables.prototype = {
 			 * ${either:var1:var2:....}
 			 */
 			case "either":
-				while (parts) {
+				while (parts.length > 0) {
 					var p = parts.pop()
 					var z = "";
 					try {
