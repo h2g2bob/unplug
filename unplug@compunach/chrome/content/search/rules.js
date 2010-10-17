@@ -182,6 +182,11 @@ UnPlug2Rules = {
 					// problems substing variables is fine as it's optional
 					// eg <media thumbnail="..."> - errors substing thumbnail won't take down rule.
 					data[attrname] = "";
+					
+					// although we can force it to be required sometimes, like <if_re string="..." />
+					if (rule.enforce && rule.enforce.indexOf(attrname) >= 0) {
+						throw "If set, attribute " + attrname + " must be valid.";
+					}
 				}
 			}
 		}
@@ -270,6 +275,7 @@ UnPlug2Rules = {
 	if_re : {
 		order     : 90,
 		optional  : ["string", "flags", "tagname", "innerHTML", "re"],
+		enforce   : ["string"],
 		apply_ref : true,
 		execute   : function (data, url, text, doc) {
 			if (!data.innerHTML && !data.re) {
@@ -299,6 +305,7 @@ UnPlug2Rules = {
 		order     : 90,
 		required  : ["re"],
 		optional  : ["string", "flags", "tagname"],
+		enforce   : ["string"],
 		apply_ref : true,
 		execute   : function (data, url, text, doc) {
 			var re = RegExp(data.re, data.flags + "g");
@@ -314,8 +321,13 @@ UnPlug2Rules = {
 			}
 			for (var i = 0; i < texts.length; i++) {
 				var rr;
+				var k = 0;
 				while (rr = re.exec(texts[i])) {
 					response[response.length] = UnPlug2Rules._re_resp(rr);
+					if (++k > 100) {
+						UnPlug2.log("Baling out of each_re in rules.js because hit limit of " + k + ". Error is with " + data.toSource() + " on text " + texts[i].substring(100))
+						break;
+					}
 				}
 			}
 			return response;
