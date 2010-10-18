@@ -105,19 +105,15 @@
 			</download>
 		</rule>
 	</rule>
-	<rule id="veoh.com">
-		<!-- TODO veoh support is broken -->
-		<if_false />
-		<if_url host="veoh.com" />
-		<if_re ref="videoid" tagname="textarea"> "videoId":"([^"]+)" </if_re>
-		<rule id="veoh" target="veoh">
-			<download url="http://www.veoh.com/rest/video/${videoid.1}/details">
-				<each_element ref="video" tagname="video" attrs="fullPreviewHashLowPath,fullPreviewHashPath,ipodLink,fullMedResImagePath,description">
-					<!-- TODO this ipod one doesn't seem to work -->
+	<rule id="veoh-2010">
+		<if_url ref="url" host="veoh.com" />
+		<rule>
+			<if_re ref="vidid" re="/watch/([0-9A-Za-z]+)(?:$|\?|#|;)" string="${url.url}" />
+			<download url="http://www.veoh.com/rest/v2/execute.xml?apiKey=5697781E-1C60-663B-FFD8-9B49D2B56D36&amp;method=veoh.video.findByPermalink&amp;permalink=${vidid.1}&amp;">
+				<each_element ref="video" tagname="video" attrs="fullPreviewHashLowPath,fullPreviewHashPath,ipodLink,fullMedResImagePath,description,title">
 					<!-- NOTE - the final urls are at content.veoh.com, but the referers must not be from content.veoh.com (can be anywhere else) -->
-					<media url="${video.ipodLink}" description="mp4" thumbnail="${video.fullMedResImagePath}" typy="mp4" />
-					<media url="${video.fullPreviewHashLowPath}" description="${translate:low_quality}" thumbnail="${video.fullMedResImagePath}" type="flv" />
-					<media url="${video.fullPreviewHashPath}" description="${translate:mid_quality}" thumbnail="${video.fullMedResImagePath}" type="flv" />
+					<media url="${video.fullPreviewHashLowPath}" description="5 min preview: ${translate:low_quality}" thumbnail="${video.fullMedResImagePath}" type="flv" title="${video.title}" />
+					<media url="${video.fullPreviewHashPath}" description="5 min preview: ${translate:mid_quality}" thumbnail="${video.fullMedResImagePath}" type="flv" title="${video.title}" />
 				</each_element>
 			</download>
 		</rule>
