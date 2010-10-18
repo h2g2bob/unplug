@@ -38,6 +38,7 @@
 		<priority level="very-low" >adreactor.com</priority>
 		<priority level="very-low" >adxpansion.com</priority>
 		<priority level="very-low" >adultfriendfinder.com</priority>
+		<priority level="never"    >api.connect.facebook.com</priority>
 		<priority level="very-low" >alleliteads.com</priority>
 		<priority level="very-low" >contentabc.com</priority>
 		<priority level="low"      >cpro.baidu.com</priority>
