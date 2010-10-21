@@ -282,17 +282,6 @@
 			</each_element>
 		</rule>
 	</rule>
-	<rule id="keezmovies.com">
-		<if_url ref="url" host="keezmovies.com"/>
-		<rule>
-			<if_re ref="vidid" string="${url.path}" re="\-(\d+)$" />
-			<download url="http://www.keezmovies.com/watch_player.php?id=${vidid.1}">
-				<each_element ref="flvurl" tagname="flv_url" require_attrs="innerHTML">
-					<media url="${flvurl.innerHTML}" type="flv" title="${origtitle.innerHTML}" thumbnail="http://km-pics.phncdn.com/thumbs/${substring:-9:-6:leftpad:0:10:vidid.1}/${substring:-6:-3:leftpad:0:10:vidid.1}/${substring:-3:end:leftpad:0:10:vidid.1}/small.jpg" />
-				</each_element>
-			</download>
-		</rule>
-	</rule>
 	<rule id="rutube.ru-2010">
 		<if_url host="rutube.ru" ref="url" />
 		<rule>
@@ -872,6 +861,15 @@
 				<if_element tagname="chemin" ref="chemin" require_attrs="innerHTML" />
 				<media url="rtsp://videozones.francetv.fr/${chemin.innerHTML}${nom.innerHTML}" title="${origtitle.innerHTML}" />
 			</download>
+		</rule>
+		<rule id="keezmovies.com-2010">
+			<if_url host="keezmovies.com" />
+			<if_re ref="flvloc" re="flashvars\.video_url\s*=\s*'(http%3A%2F%2F[^']+keezmovies\.com%2F[^']+\.flv%3F[^']+)';" />
+			<rule>
+				<optional_re ref="numeric" re="/videos/(\d+/\d+/\d+)/(\d+)\.flv" string="${urldecode:flvloc.1}" />
+				<optional_re ref="title" re="&lt;h1[^&gt;]+&gt;([^&lt;&gt;]+)&lt;/h1&gt;" />
+				<media url="${urldecode:flvloc.1}" thumbnail="http://km-pics.phncdn.com/thumbs/${numeric.1}/small.jpg" title="${either:title.1:origtitle.innerHTML}" type="flv" />
+			</rule>
 		</rule>
 	</download><!-- flashblock workaround -->
 	<!--
