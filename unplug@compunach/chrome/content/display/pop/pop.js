@@ -539,12 +539,7 @@ UnPlug2SearchPage = {
 				}
 				
 				// UnPlug2SearchPage._download_with_downloadmgr(res.download.url, file.file);
-				
-try {
 				UnPlug2SearchPage._download_ff2_version(res.download.url, file.fileURL, res.download.referer);
-} catch (e) {
-	alert("hello" + e);
-}
 			}
 		},
 		"opentab" : {
