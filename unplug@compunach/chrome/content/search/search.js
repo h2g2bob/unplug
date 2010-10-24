@@ -98,7 +98,7 @@ UnPlug2Download.prototype = {
 			return; // this is set on cancel.
 		}
 		var realthis = this;
-		this._timeout = window.setTimeout(function () { realthis._timeout_callback(); }, this._timeout_delay);
+		this._timeout = window.setTimeout((function () { realthis._timeout_callback(); }), this._timeout_delay);
 		
 		if (this._post_data) {
 			this._xmlhttp.open('POST', this.url, true);  
@@ -710,7 +710,21 @@ UnPlug2Search = {
 	},
 	
 	poll : function () {
+		var statusinfo = UnPlug2Search.statusinfo();
+		UnPlug2Search.callback(statusinfo);
+		
+		// noting to do, so lets stop
+		if (statusinfo.finished) {
+			UnPlug2.log("Finished search");
+			UnPlug2Search._stopped = true;
+		}
+		
 		if (UnPlug2Search._stopped) {
+			// a message with type=progress finished=true will have
+			// been sent, so we can stop the poller.
+			UnPlug2.log("Stopping: search finished.");
+			window.clearInterval(UnPlug2Search._poll_timer);
+			UnPlug2Search._poll_timer = null;
 			return;
 		}
 		
@@ -863,17 +877,26 @@ UnPlug2Search = {
 	 * Callback may be called both immediately, and after additional files are downloaded.
 	 */
 	search : function (win, callback) {
-		if (!this.has_finished()) {
+		if (!this.statusinfo().finished) {
 			throw "Already in search";
 		}
 		
-		// assign callback func
+		// start search poller
+		this._reset();
 		this.callback = callback;
+		// don't let UnPlug2Search.poll suggest we've finished before we really start
+		// (ie: fix race condition). This gets decremented later.
+		UnPlug2Search._defered_rules_count += 1;
+		if (!UnPlug2Search._poll_timer) {
+			UnPlug2Search._poll_timer = window.setInterval(UnPlug2Search.poll, 100);
+		}
 		
 		this._apply_rules_to_window(
 			win,
 			this.get_rules_xml(),
 			this.blank_variables);
+		
+		UnPlug2Search._defered_rules_count -= 1; // see above
 		
 		if (UnPlug2.get_pref("popularity_contest")) {
 			var dl = new UnPlug2Download(
@@ -1174,7 +1197,8 @@ UnPlug2Search = {
 	 * The format is JSON-compatible
 	 * (no no native objects, etc)
 	 * 
-	 * Download method must be a javascrit object. It's used by download components (eg "copy url", "save with firefox", "save with dta", etc) to decide how and if they work. Examples below:
+	 * Download method must be a JSON object (it's sent to the callback function). It must have a type of "result".
+	 * It's used by download components (eg "copy url", "save with firefox", "save with dta", etc) to decide how and if they work. Examples below:
 	 * { "link" : url }
 	 * 	for basic urls
 	 * { "link" : url, "referer" : referer }.
@@ -1273,36 +1297,18 @@ UnPlug2Search = {
 	 */
 	_reset : function () {
 		// "this" is a lie!!
-		UnPlug2Search.callback = function ( res ) { UnPlug2.log("Cannot use callback for result " + res); };
+		UnPlug2Search.callback = function ( res ) { UnPlug2.log("Cannot use callback for result " + res.toSource()); };
 		UnPlug2Search._downloads = [];
 		UnPlug2Search._do_download_poll = false;
 		UnPlug2Search._defered_rules_count = 0;
-		if (!UnPlug2Search._poll_timer) {
-			UnPlug2Search._poll_timer = window.setInterval(UnPlug2Search.poll, 100);
-		}
-	},
-	
-	/**
-	 * Returns false if still doing stuff
-	 * TODO - depricate this in favor of statusinfo()
-	 */
-	has_finished : function () {
-		if (UnPlug2Search._defered_rules_count) {
-			return false;
-		}
-		for (var i = 0; i < UnPlug2Search._downloads.length; i++) {
-			if (UnPlug2Search._downloads[i] && UnPlug2Search._downloads[i].download)
-				return false;
-		}
-		// TODO - more checks about doing stuff while not downloading stuff
-		return true;
 	},
 	
 	/**
 	 * Returns information about the current status
+	 * The object returned should be JSONable and have a type of "progress"
 	 */
 	statusinfo : function () {
-		var info = { downloads : 0, finished : false, percent : 0 };
+		// count remaining objects / data
 		var attempted_downloads = 0;
 		var active_downloads = 0;
 		var completed_pct = 0;
@@ -1321,24 +1327,13 @@ UnPlug2Search = {
 				}
 			}
 		}
-		info.downloads = active_downloads;
-		// info.percent = 100 * (attempted_downloads - active_downloads) / (attempted_downloads || 1);
-		info.percent = completed_pct / (attempted_downloads || 1);
-		switch (info.downloads) {
-			case 0:
-				info.finished = true;
-				info.text = UnPlug2.str("search_done");
-				break;
-			case 1:
-				info.text = UnPlug2.str("search_1_active_download");
-				break;
-			default:
-				info.text = UnPlug2.str("search_n_active_downloads").replace("#", info.downloads);
-				break;
-		}
-		if (UnPlug2Search._defered_rules_count) {
-			info.finished = false;
-		}
+		var finished_ok = (active_downloads == 0 && UnPlug2Search._defered_rules_count == 0) ? true : false;
+		var info = {
+			type : "progress",
+			downloads : active_downloads,
+			finished : (finished_ok || UnPlug2Search._stopped) ? true : false,
+			percent : completed_pct / (attempted_downloads || 1)
+		};
 		return info;
 	},
 	

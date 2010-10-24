@@ -83,23 +83,36 @@ UnPlug2SearchPage = {
 		try {
 			UnPlug2Search._reset(); // this may not be needed because we always start from a fresh window
 			UnPlug2Search.search(this._win, this._search_callback)
-			this.poll()
 		} catch (e) {
 			UnPlug2.log(e);
 		}
 	},
 	
 	/**
-	 * See if we've finished looking for suff yet
+	 * Callback for UnPlug2Rules.search
+	 * Called for each result found. This may be asynchromous (ie, after additional files are downloaded).
 	 */
-	poll : function () {
+	_search_callback : (function (obj) {
+		UnPlug2.log("callback: " + obj.toSource());
+		switch (obj.type) {
+			case "result":
+				return UnPlug2SearchPage._search_callback_result(obj);
+			case "progress":
+				return UnPlug2SearchPage._search_callback_progress(obj);
+			default:
+				UnPlug2.log("Callback function got a " + result.type + " (not a result)!");
+				return;
+		}
+	}),
+	
+	_search_callback_progress : (function (info) {
 		try {
-			var statusinfo = UnPlug2Search.statusinfo();
-			document.getElementById("dynamic_download").value = statusinfo.text;
 			var searchbar = document.getElementById("search_progress");
-			if (statusinfo.finished) {
+			var status_label = document.getElementById("dynamic_download");
+			if (info.finished) {
 				searchbar.mode = "determined";
 				searchbar.value = "100";
+				status_label.value = UnPlug2.str("search_done");
 				
 				var num_results = UnPlug2SearchPage.results.length;
 				document.getElementById("stop_button").disabled = true;
@@ -112,31 +125,28 @@ UnPlug2SearchPage = {
 					document.getElementById("dynamic_results").value = UnPlug2.str("search_n_results").replace("#", num_results);
 				}
 			} else {
-				if (statusinfo.percent == 0 || statusinfo.percent == 100) {
+				if (info.downloads == 1){
+					status_label.value.value = UnPlug2.str("search_1_active_download");
+				} else {
+					// note: info.downloads can be zero if we've downloaded the last page,
+					// but there are items which have been marked "defer" scheduled to be run.
+					status_label.value.value = UnPlug2.str("search_n_active_downloads").replace("#", info.downloads);
+				}
+				if (info.percent == 0 || info.percent == 100) {
 					searchbar.mode = "undetermined";
 				} else {
 					searchbar.mode = "determined";
-					searchbar.value = statusinfo.percent;
+					searchbar.value = info.percent;
 				}
-				window.setTimeout(UnPlug2SearchPage.poll, 500);
 			}
 		} catch (e) {
 			UnPlug2.log(e);
 			var e = document.getElementById("dynamic_results");
 			e.value = "Have errors";
 		}
-	},
+	}),
 	
-	/**
-	 * Callback for UnPlug2Rules.search
-	 * Called for each result found. This may be asynchromous (ie, after additional files are downloaded).
-	 */
-	_search_callback : function (result) {
-		if (result.type != "result") {
-			UnPlug2.log("Callback function got a " + result.type + " (not a result)!");
-			return;
-		}
-		
+	_search_callback_result : (function (result) {
 		/*
 		 * detect if it's an exact duplicate
 		 * In JavaScript, asking if {"X" : "Y"} == {"X" : "Y"} -> false
@@ -144,8 +154,6 @@ UnPlug2SearchPage = {
 		*/
 		var download_tosource = result.download.toSource();
 		var uid = UnPlug2SearchPage.download_to_uid[download_tosource]; // TODO -- also need to check this key is not a "native object" like "length", "toString", etc!
-		
-		UnPlug2.log("FOUND: " + result.toSource() + " as " + (uid || "new result"));
 		
 		if (uid === undefined) {
 			try {
@@ -189,7 +197,7 @@ UnPlug2SearchPage = {
 				reselem.setAttribute("tooltiptext", reselem.getAttribute("tooltiptext") + "\n\nignored = " + result.details.toSource());
 			}
 		}
-	},
+	}),
 	
 	result_e_create : function () {
 		var orig = document.getElementById("unplug_result_template");
