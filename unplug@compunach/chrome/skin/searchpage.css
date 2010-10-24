@@ -92,7 +92,7 @@
 vbox.container {
 	border: 1px black solid;
 	margin: 0;
-	padding; 0;
+	padding: 0;
 }
 
 vbox.container#mediaid_none {
