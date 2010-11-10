@@ -45,8 +45,6 @@
   height="500"
   
   onload="do_load();"
-  ondialogaccept="save_configs() // XXX REMOVE "
-  ondialogcancel=""
   
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 	<script type="application/javascript" src="chrome://unplug/content/common.js" />
@@ -83,10 +81,10 @@
 	</prefpane>
 	<prefpane id="tabdownload" label="&tab.title.downloader;" image="chrome://unplug/skin/tango-16/document-save-as.png">
 		<preferences>
-			<preference id="downloader_config" name="extensions.unplug2.downloader_config" type="string"/>
+			<preference id="downloader" name="extensions.unplug2.downloader" type="string"/>
 		</preferences>
-		<menulist>
-			<menupopup preference="downloader_config">
+		<menulist preference="downloader">
+			<menupopup>
 				<menuitem label="&downloader.auto;" value="auto"/>
 				<menuitem label="&dl.saveas.label;" value="saveas"/>
 				<menuitem label="&open.over.label;" value="openover"/>
