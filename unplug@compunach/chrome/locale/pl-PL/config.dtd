@@ -29,11 +29,10 @@
 <!ENTITY configheader.subtitle "Zmieñ ustawienia">
 
 <!-- tab headings -->
-<!ENTITY tab.title.general "Opcje ogólne">
-<!ENTITY tab.title.opener "Otwieracz">
-<!ENTITY tab.title.downloader "Pobieracz">
-<!ENTITY tab.title.advanced "Zaawansowane">
 <!ENTITY tab.title.about "O wtytczce UnPlug">
+<!ENTITY tab.title.integration "Integration">
+<!ENTITY tab.title.discovery "Media discovery">
+<!ENTITY tab.title.downloads "Pobieracz">
 
 <!-- general options -->
 <!ENTITY interface.title "Gdzie dodaæ UnPlug">
@@ -53,15 +52,14 @@
 <!ENTITY rulesxml.default "Domylne">
 <!ENTITY rulesxml.default.a "D">
 
-<!-- opener tab -->
-
 <!-- downloader tab -->
+<!ENTITY downloader.title "Preferred download method">
 <!ENTITY downloader.auto "Automatycznie">
 <!ENTITY downloader.addons "Wspierane rozszerzenia">
 <!ENTITY downloader.dta "DownThemAll">
 <!ENTITY downloader.flashgot "FlashGot">
 
-<!-- advanced tab -->
+<!-- discovery tab -->
 <!ENTITY showall.title "Poka¿ dodatkowe rezultaty">
 <!ENTITY showall.label "Poka¿ rezultaty które mog¹ dzia³aæ le">
 <!ENTITY showall.label.a "S">

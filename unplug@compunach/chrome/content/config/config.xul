@@ -42,7 +42,7 @@
   defaultButton="accept"
 
   width="500"
-  height="500"
+  height="400"
   
   onload="do_load();"
   
@@ -71,7 +71,7 @@
 		<spacer flex="1" />
 		<label id="version" />
 	</prefpane>
-	<prefpane id="tabgeneral" label="%firefox" image="chrome://unplug/skin/tango-32/mail-attachment.png" >
+	<prefpane id="tabgeneral" label="&tab.title.integration;" image="chrome://unplug/skin/tango-32/mail-attachment.png" >
 		<preferences>
 			<preference id="add_to_toolsmenu" name="extensions.unplug2.add_to_toolsmenu" type="bool"/>
 			<preference id="add_to_contextmenu" name="extensions.unplug2.add_to_contextmenu" type="bool"/>
@@ -84,7 +84,7 @@
 		</groupbox>
 		<spacer flex="1" />
 	</prefpane>
-	<prefpane id="tabdiscovery" label="%discovery" image="chrome://unplug/skin/tango-32/system-search.png">
+	<prefpane id="tabdiscovery" label="&tab.title.discovery;" image="chrome://unplug/skin/tango-32/system-search.png">
 		<preferences>
 			<preference id="show_all" name="extensions.unplug2.show_all" type="bool" />
 		</preferences>
@@ -103,12 +103,12 @@
 		</groupbox>
 		<spacer flex="1" />
 	</prefpane>
-	<prefpane id="tabdownload" label="%downloading" image="chrome://unplug/skin/tango-32/document-save-as.png">
+	<prefpane id="tabdownload" label="&tab.title.downloads;" image="chrome://unplug/skin/tango-32/document-save-as.png">
 		<preferences>
 			<preference id="downloader" name="extensions.unplug2.downloader" type="string"/>
 		</preferences>
 		<groupbox>
-			<caption label="%prefered download method" />
+			<caption label="&downloader.title;" />
 			<menulist preference="downloader">
 				<menupopup>
 					<menuitem label="&downloader.auto;" value="auto"/>
