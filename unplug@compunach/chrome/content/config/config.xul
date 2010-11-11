@@ -50,12 +50,31 @@
 	<script type="application/javascript" src="chrome://unplug/content/common.js" />
 	<script type="application/javascript" src="chrome://unplug/content/config/config.js" />
 	
-	<!-- tabpanel becomes prefpane? -->
-	<prefpane id="tabgeneral" label="&tab.title.general;" image="chrome://unplug/skin/tango-16/preferences-system.png" >
+	<prefpane id="tababout" label="&tab.title.about;" image="chrome://unplug/skin/tango-32/dialog-information.png">
+		<preferences>
+			<preference id="popularity_contest" name="extensions.unplug2.popularity_contest" type="bool"/>
+		</preferences>
+		<groupbox>
+			<caption label="&about.title;" />
+			<description> &about.description; </description>
+			<label class="text-link" onclick="window.open(&quot;http://www.gnu.org/licenses/agpl-3.0.html&quot;);" value="&about.agpl;" tabindex="2"/>
+
+			<vbox id="setup_complete" style="display: none;">
+				<description>&about.updated;</description>
+			</vbox>
+		</groupbox>
+		<groupbox>
+			<caption label="&privacy.title;" />
+			<checkbox label="&privacy.popcontest;" accesskey="&privacy.popcontest.a;" preference="popularity_contest" />
+			<label onclick="window.open(&quot;http://unplug.dbatley.com/popularity_contest/&quot;);" class="text-link" value="&privacy.infolink;" accesskey="&privacy.infolink.a;" />
+		</groupbox>
+		<spacer flex="1" />
+		<label id="version" />
+	</prefpane>
+	<prefpane id="tabgeneral" label="%firefox" image="chrome://unplug/skin/tango-32/mail-attachment.png" >
 		<preferences>
 			<preference id="add_to_toolsmenu" name="extensions.unplug2.add_to_toolsmenu" type="bool"/>
 			<preference id="add_to_contextmenu" name="extensions.unplug2.add_to_contextmenu" type="bool"/>
-			<preference id="popularity_contest" name="extensions.unplug2.popularity_contest" type="bool"/>
 		</preferences>
 		<groupbox>
 			<caption label="&interface.title;" />
@@ -63,11 +82,12 @@
 			<checkbox label="&interface.contextmenu;" accesskey="&interface.contextmenu.a;" preference="add_to_contextmenu" />
 			<checkbox id="add_toolbar_button" label="&interface.toolbarbtn;" accesskey="&interface.toolbarbtn.a;" disabled="true" oncommand="toggle_toolbarbutton();" />
 		</groupbox>
-		<groupbox>
-			<caption label="&privacy.title;" />
-			<checkbox label="&privacy.popcontest;" accesskey="&privacy.popcontest.a;" preference="popularity_contest" />
-			<label onclick="window.open(&quot;http://unplug.dbatley.com/popularity_contest/&quot;);" class="text-link" value="&privacy.infolink;" accesskey="&privacy.infolink.a;" />
-		</groupbox>
+		<spacer flex="1" />
+	</prefpane>
+	<prefpane id="tabdiscovery" label="%discovery" image="chrome://unplug/skin/tango-32/system-search.png">
+		<preferences>
+			<preference id="show_all" name="extensions.unplug2.show_all" type="bool" />
+		</preferences>
 		<groupbox>
 			<caption label="&rulesxml.title;" />
 			<description> &rulesxml.description; </description>
@@ -77,51 +97,32 @@
 				<button label="&rulesxml.default;" accesskey="&rulesxml.default.a;" disabled="true" />
 			</hbox>
 		</groupbox>
-		<spacer flex="1" />
-	</prefpane>
-	<prefpane id="tabdownload" label="&tab.title.downloader;" image="chrome://unplug/skin/tango-16/document-save-as.png">
-		<preferences>
-			<preference id="downloader" name="extensions.unplug2.downloader" type="string"/>
-		</preferences>
-		<menulist preference="downloader">
-			<menupopup>
-				<menuitem label="&downloader.auto;" value="auto"/>
-				<menuitem label="&dl.saveas.label;" value="saveas"/>
-				<menuitem label="&open.over.label;" value="openover"/>
-			</menupopup>
-		</menulist>
-		<groupbox>
-			<caption label="&downloader.addons;" />
-			<label onclick="window.open(&quot;https://addons.mozilla.org/en-US/firefox/addon/201&quot;);" class="text-link" value="&downloader.dta;" />
-			<label onclick="window.open(&quot;https://addons.mozilla.org/en-US/firefox/addon/220&quot;);" class="text-link" value="&downloader.flashgot;" />
-		</groupbox>
-		<spacer flex="1" />
-	</prefpane>
-	<prefpane id="tabadvanced" label="&tab.title.advanced;" image="chrome://unplug/skin/tango-16/edit-copy.png">
-		<preferences>
-			<preference id="show_all" name="extensions.unplug2.show_all" type="bool" />
-		</preferences>
 		<groupbox>
 			<caption label="&showall.title;" />
 			<checkbox label="&showall.label;" accesskey="&showall.label.a;" preference="show_all" />
 		</groupbox>
 		<spacer flex="1" />
 	</prefpane>
-	<prefpane id="tababout" label="&tab.title.about;" image="chrome://unplug/skin/unplug-32.png">
+	<prefpane id="tabdownload" label="%downloading" image="chrome://unplug/skin/tango-32/document-save-as.png">
+		<preferences>
+			<preference id="downloader" name="extensions.unplug2.downloader" type="string"/>
+		</preferences>
 		<groupbox>
-			<caption label="&about.title;" />
-			<description> &about.description; </description>
-			<label class="text-link" onclick="window.open(&quot;http://www.gnu.org/licenses/agpl-3.0.html&quot;);" value="&about.agpl;" tabindex="2"/>
-
+			<caption label="%prefered download method" />
+			<menulist preference="downloader">
+				<menupopup>
+					<menuitem label="&downloader.auto;" value="auto"/>
+					<menuitem label="&dl.saveas.label;" value="saveas"/>
+					<menuitem label="&open.over.label;" value="openover"/>
+				</menupopup>
+			</menulist>
 		</groupbox>
 		<groupbox>
-			<vbox id="setup_complete" style="display: none;">
-				<description>&about.updated;</description>
-			</vbox>
-			<button label="&configure;" accesskey="&configure.a;" oncommand="goto_tab('main');" style="height: 3em;" tabindex="1" />
+			<caption label="&downloader.addons;" />
+			<label onclick="window.open(&quot;https://addons.mozilla.org/en-US/firefox/addon/201&quot;);" class="text-link" value="&downloader.dta;" />
+			<label onclick="window.open(&quot;https://addons.mozilla.org/en-US/firefox/addon/220&quot;);" class="text-link" value="&downloader.flashgot;" />
 		</groupbox>
 		<spacer flex="1" />
-		<label id="version" />
 	</prefpane>
 </prefwindow>
 
