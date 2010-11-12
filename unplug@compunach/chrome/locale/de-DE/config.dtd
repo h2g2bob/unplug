@@ -31,7 +31,7 @@
 <!-- tab headings -->
 <!ENTITY tab.title.about "&#220;ber UnPlug">
 <!ENTITY tab.title.integration "Integration">
-<!ENTITY tab.title.integration "Integration">
+<!ENTITY tab.title.discovery "Medien Entdeckung">
 <!ENTITY tab.title.downloads "Download">
 
 <!-- general options -->
@@ -53,7 +53,7 @@
 <!ENTITY rulesxml.default.a "S">
 
 <!-- downloader tab -->
-<!ENTITY downloader.title "Preferred download method">
+<!ENTITY downloader.title "Bevorzugten Download Methode">
 <!ENTITY downloader.auto "Automatisch">
 <!ENTITY downloader.addons "Unterst&#252;tzte Add-ons">
 <!ENTITY downloader.dta "DownThemAll">
