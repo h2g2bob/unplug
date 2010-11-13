@@ -76,7 +76,7 @@ UnPlug2DownloadMethods.add_button("saveas", {
 	}),
 	obscurity : 0,
 	css : "saveas",
-	spacer_before : false
+	group : "main"
 });
 
 UnPlug2DownloadMethods.add_button("dta", {
@@ -118,7 +118,7 @@ UnPlug2DownloadMethods.add_button("dta", {
 	}),
 	obscurity : 20,
 	css : "dta",
-	spacer_before : false
+	group : "main"
 });
 
 UnPlug2DownloadMethods.add_button("flashgot", {
@@ -139,7 +139,7 @@ UnPlug2DownloadMethods.add_button("flashgot", {
 	}),
 	obscurity : 25,
 	css : "flashgot",
-	spacer_before : false
+	group : "main"
 });
 
 UnPlug2DownloadMethods.add_button("extern-rtmp", {
@@ -153,7 +153,7 @@ UnPlug2DownloadMethods.add_button("extern-rtmp", {
 	}),
 	obscurity : 50,
 	css : "extern extern-rtmp",
-	spacer_before : true
+	group : "special"
 });
 
 UnPlug2DownloadMethods.add_button("open-tab", {
@@ -166,7 +166,7 @@ UnPlug2DownloadMethods.add_button("open-tab", {
 	}),
 	obscurity : 100,
 	css : "open open-tab",
-	spacer_before : true
+	group : "open"
 });
 
 UnPlug2DownloadMethods.add_button("open-new", {
@@ -178,7 +178,7 @@ UnPlug2DownloadMethods.add_button("open-new", {
 	}),
 	obscurity : 100,
 	css : "open open-new",
-	spacer_before : true
+	group : "open"
 });
 
 UnPlug2DownloadMethods.add_button("open-over", {
@@ -190,7 +190,7 @@ UnPlug2DownloadMethods.add_button("open-over", {
 	}),
 	obscurity : 110,
 	css : "open open-over",
-	spacer_before : true
+	group : "open"
 });
 
 

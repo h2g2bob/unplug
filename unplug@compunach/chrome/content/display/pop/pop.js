@@ -217,17 +217,27 @@ UnPlug2SearchPage = {
 		
 		var popup = reselem.getElementsByTagName("menupopup")[0];
 		var button_names = UnPlug2DownloadMethods.button_names();
+		var prev_elem_group = null;
+		var avail_elements = [];
 		for (var i = 0; i < button_names.length; ++i) {
 			var name = button_names[i];
-			var elem = document.createElement("menuitem")
 			var info = UnPlug2DownloadMethods.getinfo(name);
-			elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a"))
-			elem.setAttribute("label", UnPlug2.str("dmethod." + name));
-			elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".help"));
-			elem.className = "menuitem-iconic " + info.css;
-			elem.setAttribute("disabled", ! info.avail(result));
-			elem.addEventListener("command", UnPlug2DownloadMethods.callback(name, result), true);
-			popup.appendChild(elem);
+			if (info.avail(result)) {
+				if (prev_elem_group != info.group && avail_elements.length != 0) {
+					var spacer = document.createElement("menuseparator");
+					popup.appendChild(spacer);
+				}
+				prev_elem_group = info.group;
+				avail_elements.push(info);
+				var elem = document.createElement("menuitem");
+				prev_elem_is_spacer = false;
+				elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a"))
+				elem.setAttribute("label", UnPlug2.str("dmethod." + name));
+				elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".help"));
+				elem.className = "menuitem-iconic " + info.css;
+				elem.addEventListener("command", UnPlug2DownloadMethods.callback(name, result), true);
+				popup.appendChild(elem);
+			}
 		}
 		
 		// TODO - should also hook up main button
