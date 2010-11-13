@@ -211,63 +211,26 @@ UnPlug2SearchPage = {
 		var uid = result.uid;
 		var download = result.download;
 		var that = UnPlug2SearchPage;
+		// TODO varibales above might not have been used
 		
-		var getwidget = (function (wname) {
-			var l = reselem.getElementsByTagName("menuitem")
-			for (var i = 0; i < l.length; ++i) {
-				if (l[i].className && l[i].className.split(" ").indexOf(wname) >= 0) {
-					return l[i];
-				}
-			}
-			var l = reselem.getElementsByTagName("toolbarbutton")
-			for (var i = 0; i < l.length; ++i) {
-				if (l[i].className && l[i].className.split(" ").indexOf(wname) >= 0) {
-					return l[i];
-				}
-			}
-			return null;
-		});
+		// TODO - bug! this gets called many times for each result
 		
-		var buttons = ["copyurl", "saveas", "dta", "flashgot", "special", "opentab", "opennew", "openover", "config", "fallback"]
-		// what's available
-		var available_buttons = [];
-		for (var i = 0; i < buttons.length; ++i) {
-			var wname = buttons[i];
-			if (that.widgets[wname].avail(result)) {
-				available_buttons.push(wname);
-			}
+		var popup = document.getElementsByTagName("menupopup")[0];
+		var button_names = UnPlug2DownloadMethods.button_names();
+		for (var i = 0; i < button_names.length; ++i) {
+			var name = button_names[i];
+			var elem = document.createElement("menuitem")
+			var info = UnPlug2DownloadMethods.getinfo(name);
+			// elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a")) // TODO
+			elem.setAttribute("label", UnPlug2.str("dmethod." + name));
+			elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".help"));
+			elem.setAttribute("class", "menuitem-iconic " + info.css);
+			elem.setAttribute("disabled", ! info.avail(result));
+			elem.addEventListener("command", UnPlug2DownloadMethods.callback(name), true);
+			popup.appendChild(elem);
 		}
-		// what's best of those available (for main button action)
-		var best_downloader = null;
-		for (var i = 0; i < that.preferred_downloaders.length; ++i) {
-			var wname = that.preferred_downloaders[i];
-			if (available_buttons.indexOf(wname) >= 0) {
-				best_downloader = wname;
-				break;
-			}
-		}
-		// hook up events and enable
-		for (var i = 0; i < available_buttons.length; ++i) {
-			var wname = available_buttons[i];
-			var w = getwidget(wname);
-			// use closure to get correct scoping
-			var function_function = (function (that, uid, wname) {
-				return (function (evt) {
-					that.widgetresponse(uid, wname, wname == "config" ? "downloader" : null);
-					evt.stopPropagation();
-				});
-			});
-			if (w) {
-				w.addEventListener("command", function_function(that, uid, wname), false);
-				w.setAttribute("disabled", false);
-			}
-			if (best_downloader == wname) {
-				// also hook up main button
-				var main = getwidget("big-download-button");
-				main.addEventListener("command", function_function(that, uid, wname), false);
-				main.className = "big-download-button menuitem-iconic " + wname;
-			}
-		}
+		
+		// TODO - should also hook up main button
 		
 		// setup drag and drop
 		if (result.download.url) { // make draggable if simple url only
