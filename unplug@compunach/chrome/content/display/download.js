@@ -30,14 +30,18 @@ UnPlug2DownloadMethods = {
 	getinfo : (function (name) {
 		return this._button_data[name];
 	}),
-	callback : (function (name) {
+	callback : (function (name, result) {
 		var that = this;
-		return (function (result) {
-			that.exec(name, result);
+		return (function () {
+			try {
+				that.exec(name, result);
+			} catch (e) {
+				UnPlug2.log("Error in UnPlug2DownloadMethods for " + name + " " + result.toSource() + " with error " + e);
+			}
 		});
 	}),
 	exec : (function (name, result) {
-		var data = this._button_data;
+		var data = this._button_data[name];
 		if (!data) {
 			throw "Unknown button name " + name;
 		}
@@ -48,7 +52,7 @@ UnPlug2DownloadMethods = {
 			// if a method implements exec_fp, it wishes to use the "normal" file-picker code
 			// and we'll pass them the appropriate file object in the arguments
 			// TODO move this _save_as_box code here
-			var file = UnPlug2SearchPage._save_as_box(res.details.name, res.details.file_ext);
+			var file = UnPlug2SearchPage._save_as_box(result.details.name, result.details.file_ext);
 			if (!file) {
 				return;
 			}

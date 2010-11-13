@@ -215,22 +215,23 @@ UnPlug2SearchPage = {
 		
 		// TODO - bug! this gets called many times for each result
 		
-		var popup = document.getElementsByTagName("menupopup")[0];
+		var popup = reselem.getElementsByTagName("menupopup")[0];
 		var button_names = UnPlug2DownloadMethods.button_names();
 		for (var i = 0; i < button_names.length; ++i) {
 			var name = button_names[i];
 			var elem = document.createElement("menuitem")
 			var info = UnPlug2DownloadMethods.getinfo(name);
-			// elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a")) // TODO
+			elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a"))
 			elem.setAttribute("label", UnPlug2.str("dmethod." + name));
 			elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".help"));
-			elem.setAttribute("class", "menuitem-iconic " + info.css);
+			elem.className = "menuitem-iconic " + info.css;
 			elem.setAttribute("disabled", ! info.avail(result));
-			elem.addEventListener("command", UnPlug2DownloadMethods.callback(name), true);
+			elem.addEventListener("command", UnPlug2DownloadMethods.callback(name, result), true);
 			popup.appendChild(elem);
 		}
 		
 		// TODO - should also hook up main button
+		// TODO - should also hook up the copy url button
 		
 		// setup drag and drop
 		if (result.download.url) { // make draggable if simple url only
