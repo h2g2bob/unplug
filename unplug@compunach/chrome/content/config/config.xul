@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<?xml-stylesheet href="chrome://unplug/content/config/configwrapper.css" type="text/css"?>
-<!DOCTYPE dialog [
+<!DOCTYPE prefwindow [
 	<!ENTITY % dtdcommon SYSTEM "chrome://unplug/locale/common.dtd">
 	%dtdcommon;
 	<!ENTITY % dtdlocal SYSTEM "chrome://unplug/locale/config.dtd">
@@ -36,103 +35,94 @@
  *
  */
 -->
-<dialog id="cn_unplug2_config"
-  title="&dialog.title; - &configheader.subtitle;"
+<prefwindow id="cn_unplug2_config"
+  title="&dialog.title; – &configheader.subtitle;"
   flex="1"
   buttons="cancel,accept"
   defaultButton="accept"
 
   width="500"
-  height="500"
+  height="400"
   
   onload="do_load();"
-  ondialogaccept="save_configs()"
-  ondialogcancel=""
   
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 	<script type="application/javascript" src="chrome://unplug/content/common.js" />
 	<script type="application/javascript" src="chrome://unplug/content/config/config.js" />
-	<dialogheader title="&header.title;" description="&configheader.subtitle;"/>
-	<tabbox id="tabbox">
-		<tabs>
-			<tab label="&tab.title.general;" />
-			<tab label="&tab.title.downloader;" />
-			<tab label="&tab.title.advanced;" />
-			<tab label="&tab.title.about;" />
-		</tabs>
-		<tabpanels>
-			<tabpanel id="tabgeneral" orient="vertical">
-				<groupbox>
-					<caption label="&interface.title;" />
-					<configwrapper name="add_to_toolsmenu">
-						<checkbox label="&interface.toolsmenu;" accesskey="&interface.toolsmenu.a;" />
-					</configwrapper>
-					<configwrapper name="add_to_contextmenu">
-						<checkbox label="&interface.contextmenu;" accesskey="&interface.contextmenu.a;" />
-					</configwrapper>
-					<checkbox id="add_toolbar_button" label="&interface.toolbarbtn;" accesskey="&interface.toolbarbtn.a;" disabled="true" oncommand="toggle_toolbarbutton();" />
-				</groupbox>
-				<groupbox>
-					<caption label="&privacy.title;" />
-					<configwrapper name="popularity_contest">
-						<checkbox label="&privacy.popcontest;" accesskey="&privacy.popcontest.a;" />
-					</configwrapper>
-					<label onclick="window.open(&quot;http://unplug.dbatley.com/popularity_contest/&quot;);" class="text-link" value="&privacy.infolink;" accesskey="&privacy.infolink.a;" />
-				</groupbox>
-				<groupbox>
-					<caption label="&rulesxml.title;" />
-					<description> &rulesxml.description; </description>
-					<textbox value="chrome://unplug/content/rules.xml" disabled="true" />
-					<hbox>
-						<spacer flex="1" />
-						<button label="&rulesxml.default;" accesskey="&rulesxml.default.a;" disabled="true" />
-					</hbox>
-				</groupbox>
-				<spacer flex="1" />
-			</tabpanel>
-			<tabpanel id="tabdownload" orient="vertical">
-				<configwrapper name="downloader" id="downloader_config">
-					<menulist>
-						<menupopup>
-							<menuitem label="&downloader.auto;" value="auto"/>
-							<menuitem label="&dl.saveas.label;" value="saveas"/>
-							<menuitem label="&open.over.label;" value="openover"/>
-						</menupopup>
-					</menulist>
-				</configwrapper>
-				<groupbox>
-					<caption label="&downloader.addons;" />
-					<label onclick="window.open(&quot;https://addons.mozilla.org/en-US/firefox/addon/201&quot;);" class="text-link" value="&downloader.dta;" />
-					<label onclick="window.open(&quot;https://addons.mozilla.org/en-US/firefox/addon/220&quot;);" class="text-link" value="&downloader.flashgot;" />
-				</groupbox>
-				<spacer flex="1" />
-			</tabpanel>
-			<tabpanel id="tabadvanced" orient="vertical">
-				<groupbox>
-					<caption label="&showall.title;" />
-					<configwrapper name="show_all">
-						<checkbox label="&showall.label;" accesskey="&showall.label.a;" />
-					</configwrapper>
-				</groupbox>
-				<spacer flex="1" />
-			</tabpanel>
-			<tabpanel id="tababout" orient="vertical">
-				<groupbox>
-					<caption label="&about.title;" />
-					<description> &about.description; </description>
-					<label class="text-link" onclick="window.open(&quot;http://www.gnu.org/licenses/agpl-3.0.html&quot;);" value="&about.agpl;" tabindex="2"/>
+	
+	<prefpane id="tababout" label="&tab.title.about;" image="chrome://unplug/skin/tango-32/dialog-information.png">
+		<preferences>
+			<preference id="popularity_contest" name="extensions.unplug2.popularity_contest" type="bool"/>
+		</preferences>
+		<groupbox>
+			<caption label="&about.title;" />
+			<description> &about.description; </description>
+			<label class="text-link" onclick="window.open(&quot;http://www.gnu.org/licenses/agpl-3.0.html&quot;);" value="&about.agpl;" tabindex="2"/>
 
-				</groupbox>
-				<groupbox>
-					<vbox id="setup_complete" style="display: none;">
-						<description>&about.updated;</description>
-					</vbox>
-					<button label="&configure;" accesskey="&configure.a;" oncommand="goto_tab('main');" style="height: 3em;" tabindex="1" />
-				</groupbox>
+			<vbox id="setup_complete" style="display: none;">
+				<description>&about.updated;</description>
+			</vbox>
+		</groupbox>
+		<groupbox>
+			<caption label="&privacy.title;" />
+			<checkbox label="&privacy.popcontest;" accesskey="&privacy.popcontest.a;" preference="popularity_contest" />
+			<label onclick="window.open(&quot;http://unplug.dbatley.com/popularity_contest/&quot;);" class="text-link" value="&privacy.infolink;" accesskey="&privacy.infolink.a;" />
+		</groupbox>
+		<spacer flex="1" />
+		<label id="version" />
+	</prefpane>
+	<prefpane id="tabgeneral" label="&tab.title.integration;" image="chrome://unplug/skin/tango-32/mail-attachment.png" >
+		<preferences>
+			<preference id="add_to_toolsmenu" name="extensions.unplug2.add_to_toolsmenu" type="bool"/>
+			<preference id="add_to_contextmenu" name="extensions.unplug2.add_to_contextmenu" type="bool"/>
+		</preferences>
+		<groupbox>
+			<caption label="&interface.title;" />
+			<checkbox label="&interface.toolsmenu;" accesskey="&interface.toolsmenu.a;" preference="add_to_toolsmenu" />
+			<checkbox label="&interface.contextmenu;" accesskey="&interface.contextmenu.a;" preference="add_to_contextmenu" />
+			<checkbox id="add_toolbar_button" label="&interface.toolbarbtn;" accesskey="&interface.toolbarbtn.a;" disabled="true" oncommand="toggle_toolbarbutton();" />
+		</groupbox>
+		<spacer flex="1" />
+	</prefpane>
+	<prefpane id="tabdiscovery" label="&tab.title.discovery;" image="chrome://unplug/skin/tango-32/system-search.png">
+		<preferences>
+			<preference id="show_all" name="extensions.unplug2.show_all" type="bool" />
+		</preferences>
+		<groupbox>
+			<caption label="&rulesxml.title;" />
+			<description> &rulesxml.description; </description>
+			<textbox value="chrome://unplug/content/rules.xml" disabled="true" />
+			<hbox>
 				<spacer flex="1" />
-				<label id="version" />
-			</tabpanel>
-		</tabpanels>
-	</tabbox>
-</dialog>
+				<button label="&rulesxml.default;" accesskey="&rulesxml.default.a;" disabled="true" />
+			</hbox>
+		</groupbox>
+		<groupbox>
+			<caption label="&showall.title;" />
+			<checkbox label="&showall.label;" accesskey="&showall.label.a;" preference="show_all" />
+		</groupbox>
+		<spacer flex="1" />
+	</prefpane>
+	<prefpane id="tabdownload" label="&tab.title.downloads;" image="chrome://unplug/skin/tango-32/document-save-as.png">
+		<preferences>
+			<preference id="downloader" name="extensions.unplug2.downloader" type="string"/>
+		</preferences>
+		<groupbox>
+			<caption label="&downloader.title;" />
+			<menulist preference="downloader">
+				<menupopup>
+					<menuitem label="&downloader.auto;" value="auto"/>
+					<menuitem label="&dl.saveas.label;" value="saveas"/>
+					<menuitem label="&open.over.label;" value="openover"/>
+				</menupopup>
+			</menulist>
+		</groupbox>
+		<groupbox>
+			<caption label="&downloader.addons;" />
+			<label onclick="window.open(&quot;https://addons.mozilla.org/en-US/firefox/addon/201&quot;);" class="text-link" value="&downloader.dta;" />
+			<label onclick="window.open(&quot;https://addons.mozilla.org/en-US/firefox/addon/220&quot;);" class="text-link" value="&downloader.flashgot;" />
+		</groupbox>
+		<spacer flex="1" />
+	</prefpane>
+</prefwindow>
 

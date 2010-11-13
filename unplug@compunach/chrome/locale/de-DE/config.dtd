@@ -29,11 +29,10 @@
 <!ENTITY configheader.subtitle "Einstellungen &#228;ndern">
 
 <!-- tab headings -->
-<!ENTITY tab.title.general "Allgemein">
-<!ENTITY tab.title.opener "	&#214;ffner">
-<!ENTITY tab.title.downloader "Downloader">
-<!ENTITY tab.title.advanced "Erweitert">
 <!ENTITY tab.title.about "&#220;ber UnPlug">
+<!ENTITY tab.title.integration "Integration">
+<!ENTITY tab.title.discovery "Medien Entdeckung">
+<!ENTITY tab.title.downloads "Download">
 
 <!-- general options -->
 <!ENTITY interface.title "Firefox Men&#252;s">
@@ -53,15 +52,14 @@
 <!ENTITY rulesxml.default "Standard">
 <!ENTITY rulesxml.default.a "S">
 
-<!-- opener tab -->
-
 <!-- downloader tab -->
+<!ENTITY downloader.title "Bevorzugten Download Methode">
 <!ENTITY downloader.auto "Automatisch">
 <!ENTITY downloader.addons "Unterst&#252;tzte Add-ons">
 <!ENTITY downloader.dta "DownThemAll">
 <!ENTITY downloader.flashgot "FlashGot">
 
-<!-- advanced tab -->
+<!-- discovery tab -->
 <!ENTITY showall.title "Zeige zus&#228;tzliche Ergebnisse">
 <!ENTITY showall.label "Zeige Ergebnisse, die nicht korrekt funktionieren">
 <!ENTITY showall.label.a "f">
