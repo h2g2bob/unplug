@@ -30,8 +30,14 @@ function do_load() {
 			setup_unplug();
 		}
 	}
+	set_text();
 	detect_toolbarbutton();
-	goto_tab_requested()
+	goto_tab_requested();
+}
+
+function set_text() {
+	document.getElementById("dmethod-saveas").setAttribute("label", UnPlug2.str("dmethod.saveas"))
+	document.getElementById("dmethod-openover").setAttribute("label", UnPlug2.str("dmethod.open-over"))
 }
 
 function browser_window() {
