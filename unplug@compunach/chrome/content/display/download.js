@@ -166,8 +166,45 @@ UnPlug2DownloadMethods.add_button("rtmpdump", {
 			res.download.url.indexOf("rtmp://") == 0
 			|| res.download.url.indexOf("rtmpe://") == 0);
 	}),
-	exec : (function (res) {
-		alert("Sorry, this feature is not available yet");
+	exec_fp : (function (res, savefile) {
+		var argv = [
+			"--rtmp", res.download.url,
+			"--pageUrl", res.download.referer,
+			"--swfUrl", res.download.referer, // this is invalid, but good enough most of the time.
+			"--flv", savefile.file.path ];
+		var exec_file = this._get_exec_file();
+		if (exec_file) {
+			var process = Components.classes["@mozilla.org/process/util;1"]
+				.createInstance(Components.interfaces.nsIProcess);
+			process.init(exec_file);
+			// TODO - we should use runwAsync and use utf-16 strings
+			// this requires firefox 4, so I'll leave this as is for testing
+			process.runAsync(
+				argv,
+				argv.length,
+				{ observe : (function (subj, topic, data) {
+					// TODO - this should be associtated with a dialog of some kind
+					alert(subj + "..." + topic + "..." + data);
+					}) },
+				false );
+		} else {
+			// TODO: localize, improve
+			alert("To run this downloader, you need to install one of the following services:\n\t"
+				+ this.exec_file_list.join("\n\t"));
+		}
+	}),
+	exec_file_list : [
+		"/usr/bin/rtmpdump" ],
+	_get_exec_file : (function () {
+		for (var i = 0; i < this.exec_file_list.length; ++i) {
+			var nsifile = Components.classes["@mozilla.org/file/local;1"]
+				.createInstance(Components.interfaces.nsILocalFile);
+			nsifile.initWithPath(this.exec_file_list[i]);
+			if (nsifile.exists()) {
+				return nsifile;
+			}
+		}
+		return null;
 	}),
 	obscurity : 50,
 	css : "extern rtmpdump",
