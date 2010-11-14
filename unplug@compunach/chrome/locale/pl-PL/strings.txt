@@ -48,9 +48,9 @@ dmethod.flashgot.tip=Pobierz rozszerzeniem FlashGot.
 dmethod.copyurl=Kopiuj link
 dmethod.copyurl.a=K
 dmethod.copyurl.tip=
-dmethod.flvstreamer=Flvstreamer
-dmethod.flvstreamer.a=F
-dmethod.flvstreamer.tip=
+dmethod.rtmpdump=Rtmpdump
+dmethod.rtmpdump.a=R
+dmethod.rtmpdump.tip=
 
 dmethod.unavailable.tip=No downloader
 

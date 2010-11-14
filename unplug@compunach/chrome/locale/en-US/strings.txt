@@ -49,9 +49,9 @@ dmethod.flashgot.tip=Download with the FlashGot extension.
 dmethod.copyurl=Copy link
 dmethod.copyurl.a=y
 dmethod.copyurl.tip=Copy media location to the clipboard.
-dmethod.flvstreamer=Flvstreamer
-dmethod.flvstreamer.a=F
-dmethod.flvstreamer.tip=Get or run flvstreamer.
+dmethod.rtmpdump=Rtmpdump
+dmethod.rtmpdump.a=R
+dmethod.rtmpdump.tip=Get or run rtmpdump.
 
 dmethod.unavailable.tip=Cannot download this file.
 

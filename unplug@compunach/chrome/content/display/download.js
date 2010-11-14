@@ -78,7 +78,7 @@ UnPlug2DownloadMethods = {
 		} else {
 			data.exec(result);
 		}
-	}),
+	})
 }
 
 UnPlug2DownloadMethods.add_button("saveas", {
@@ -160,7 +160,7 @@ UnPlug2DownloadMethods.add_button("flashgot", {
 	group : "main"
 });
 
-UnPlug2DownloadMethods.add_button("flvstreamer", {
+UnPlug2DownloadMethods.add_button("rtmpdump", {
 	avail : (function (res) {
 		return res.download.url && (
 			res.download.url.indexOf("rtmp://") == 0
@@ -170,7 +170,7 @@ UnPlug2DownloadMethods.add_button("flvstreamer", {
 		alert("Sorry, this feature is not available yet");
 	}),
 	obscurity : 50,
-	css : "extern flvstreamer",
+	css : "extern rtmpdump",
 	group : "special"
 });
 

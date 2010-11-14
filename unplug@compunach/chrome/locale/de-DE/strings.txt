@@ -48,9 +48,9 @@ dmethod.flashgot.tip=Download mit dem FlashGot Addon.
 dmethod.copyurl=Kopiere Link
 dmethod.copyurl.a=K
 dmethod.copyurl.tip=
-dmethod.flvstreamer=Flvstreamer
-dmethod.flvstreamer.a=F
-dmethod.flvstreamer.tip=Verwenden Sie ein Software-Tool zum Download dieser Datei.
+dmethod.rtmpdump=Rtmpdump
+dmethod.rtmpdump.a=R
+dmethod.rtmpdump.tip=Verwenden Sie ein Software-Tool zum Download dieser Datei.
 
 dmethod.unavailable.tip=Kein Downloader
 
