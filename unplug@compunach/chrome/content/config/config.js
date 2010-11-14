@@ -30,19 +30,8 @@ function do_load() {
 			setup_unplug();
 		}
 	}
-	populate_configs();
 	detect_toolbarbutton();
 	goto_tab_requested()
-}
-
-function populate_configs() {
-	var elemlist = document.getElementsByTagName("configwrapper");
-	for (var i = 0; i < elemlist.length; i++) {
-		var el = elemlist[i];
-		var value = UnPlug2.get_pref(el.getAttribute("name"), el.getAttribute("default"));
-		el.setValue(value);
-	}
-	document.getElementById("version").setAttribute("value", "Version: " + UnPlug2.version.toFixed(3) + " (" + UnPlug2.codename + ") " + UnPlug2.revision);
 }
 
 function browser_window() {
@@ -105,34 +94,27 @@ function toggle_toolbarbutton() {
 	}
 }
 
-
-function save_configs() {
-	var elemlist = document.getElementsByTagName("configwrapper");
-	for (var i = 0; i < elemlist.length; i++) {
-		var el = elemlist[i];
-		var value = UnPlug2.set_pref(el.getAttribute("name"), el.getValue());
-	}
-}
-
 function goto_tab_requested() {
 	if (window.arguments && window.arguments.length >= 1)
 		goto_tab(window.arguments[0]);
 }
 
 function goto_tab(tabname) {
-	var tb = document.getElementById("tabbox");
+	var pwin = document.getElementById("cn_unplug2_config");
+	var p = null;
 	switch (tabname) {
 		case "welcome":
 		case "setup":
-			tb.selectedIndex = 3;
+			p = document.getElementById("tababout");
 			break;
 		case "main":
-			tb.selectedIndex = 0;
+			p = document.getElementById("tabgeneral");
 			break;
 		case "downloader":
-			tb.selectedIndex = 1;
+			p = document.getElementById("tabdownload");
 			break;
 	}
+	pwin.showPane(p);
 }
 
 /*
