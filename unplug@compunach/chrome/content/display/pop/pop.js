@@ -244,6 +244,7 @@ UnPlug2SearchPage = {
 			copy_button.setAttribute("label", UnPlug2.str("dmethod.copyurl"));
 			copy_button.setAttribute("accesskey", UnPlug2.str("dmethod.copyurl.a"));
 			copy_button.setAttribute("tooltiptext", UnPlug2.str("dmethod.copyurl.tip"));
+			copy_button.setAttribute("disabled", false);
 		} else {
 			copy_button.setAttribute("disabled", true);
 		}
