@@ -1,34 +1,51 @@
-/*
-
-TODO: not handled -- special cases
-
-"copyurl" : {
-	avail : function (res) { return (res.download.url ? true : false); },
-	exec  : function (res, data) {
-		UnPlug2SearchPage._clipboard.copyString(res.download.url);
-	}
-},
-"fallback" : {
-	avail : function (res) { return true; },
-	exec  : function (res, data) {
-		alert(UnPlug2.str("cannot_download_this_kind"));
-	}
-},
- */
-
-
 UnPlug2DownloadMethods = {
-	_button_data : {},
+	_button_lookup : {},
 	_button_names : [],
+	
 	add_button : (function(name, data) {
 		this._button_names.push(name);
-		this._button_data[name] = data;
+		this._button_lookup[name] = data;
 	}),
+	
+	finish : (function () {
+		var lookup = this._button_lookup;
+		
+		// fix for config
+		var prefer = UnPlug2.get_pref("downloader");
+		switch (prefer) {
+			case "saveas" :
+				lookup["saveas"].obscurity = -50;
+				break;
+			case "auto":
+				// use add-ons if possible
+				lookup["dta"].obscurity = -50;
+				lookup["flashgot"].obscurity = -40;
+				lookup["saveas"].obscurity = -30;
+				break;
+			case "openover":
+				lookup["open-over"].obscurity = -50;
+				break;
+			default:
+				UnPlug2.log("UnPlug2DownloadMethod preference of " + prefer + " is not supported");
+				break;
+		}
+		
+		// sort _button_names
+		this._button_names.sort(function (a, b) {
+			var aobs = lookup[a].obscurity;
+			var bobs = lookup[b].obscurity;
+			return aobs - bobs;
+		});
+	}),
+	
+	/* button_names:
+	 * returns the button names, in order of preference (ie, the most obscure last)
+	 */
 	button_names : (function () {
 		return this._button_names;
 	}),
 	getinfo : (function (name) {
-		return this._button_data[name];
+		return this._button_lookup[name];
 	}),
 	callback : (function (name, result) {
 		var that = this;
@@ -41,7 +58,7 @@ UnPlug2DownloadMethods = {
 		});
 	}),
 	exec : (function (name, result) {
-		var data = this._button_data[name];
+		var data = this._button_lookup[name];
 		if (!data) {
 			throw "Unknown button name " + name;
 		}
@@ -193,4 +210,17 @@ UnPlug2DownloadMethods.add_button("open-over", {
 	group : "open"
 });
 
+UnPlug2DownloadMethods.add_button("copyurl", {
+	avail : (function (res) {
+		return (res.download.url ? true : false);
+	}),
+	exec  : (function (res) {
+		UnPlug2SearchPage._clipboard.copyString(res.download.url);
+	}),
+	obscurity : 200,
+	css : "copyurl",
+	group : "copy"
+});
+
+UnPlug2DownloadMethods.finish();
 

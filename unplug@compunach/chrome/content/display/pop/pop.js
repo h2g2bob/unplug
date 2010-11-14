@@ -207,18 +207,15 @@ UnPlug2SearchPage = {
 	},
 	
 	result_e_set_download : function (reselem, result) {
-		// variables for use in the callbaks (closures)
-		var uid = result.uid;
-		var download = result.download;
-		var that = UnPlug2SearchPage;
-		// TODO varibales above might not have been used
-		
-		// TODO - bug! this gets called many times for each result
-		
 		var popup = reselem.getElementsByTagName("menupopup")[0];
 		var button_names = UnPlug2DownloadMethods.button_names();
 		var prev_elem_group = null;
 		var avail_elements = [];
+		
+		// we want to replace the old callbacks with new callbacks
+		while (popup.firstChild) {
+			popup.removeChild(popup.firstChild);
+		}
 		for (var i = 0; i < button_names.length; ++i) {
 			var name = button_names[i];
 			var info = UnPlug2DownloadMethods.getinfo(name);
@@ -228,7 +225,7 @@ UnPlug2SearchPage = {
 					popup.appendChild(spacer);
 				}
 				prev_elem_group = info.group;
-				avail_elements.push(info);
+				avail_elements.push(name);
 				var elem = document.createElement("menuitem");
 				prev_elem_is_spacer = false;
 				elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a"))
@@ -240,8 +237,24 @@ UnPlug2SearchPage = {
 			}
 		}
 		
-		// TODO - should also hook up main button
-		// TODO - should also hook up the copy url button
+		var copy_button = reselem.getElementsByTagName("toolbarbutton")[0];
+		var copy_info = UnPlug2DownloadMethods.getinfo("copyurl");
+		if (copy_info && copy_info.avail(result)) {
+			copy_button.addEventListener("command", UnPlug2DownloadMethods.callback("copyurl", result), true);
+		} else {
+			copy_button.setAttribute("disabled", true);
+		}
+		
+		var main_button = reselem.getElementsByTagName("toolbarbutton")[1];
+		if (avail_elements.length == 0) {
+			main_button.setAttribute("disabled", true);
+			main_button.className = "menuitem-icon unavailable"
+		} else {
+			var name = avail_elements[0];
+			var info = UnPlug2DownloadMethods.getinfo(name);
+			main_button.className = "menuitem-iconic " + info.css;
+			main_button.addEventListener("command", UnPlug2DownloadMethods.callback(name, result), true);
+		}
 		
 		// setup drag and drop
 		if (result.download.url) { // make draggable if simple url only

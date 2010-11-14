@@ -111,8 +111,8 @@
 			<caption label="&downloader.title;" />
 			<menulist preference="downloader">
 				<menupopup>
-					<menuitem label="&downloader.auto;" value="auto"/>
 					<menuitem label="&dl.saveas.label;" value="saveas"/>
+					<menuitem label="&downloader.auto;" value="auto"/>
 					<menuitem label="&open.over.label;" value="openover"/>
 				</menupopup>
 			</menulist>
