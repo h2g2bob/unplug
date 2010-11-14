@@ -27,3 +27,32 @@ mid_quality=Normal quality
 hd_quality=High definition
 embedplayer=Embedded object (may be media player, not video)
 
+# download methods
+dmethod.open-tab=Open in a new tab
+dmethod.open-tab.a=t
+dmethod.open-tab.tip=Open in a new tab.
+dmethod.open-new=Open in a new window
+dmethod.open-new.a=n
+dmethod.open-new.tip=Open in a new window.
+dmethod.open-over=Open over the current window
+dmethod.open-over.a=v
+dmethod.open-over.tip=Equivalent to clicking a link to the media on the page.
+dmethod.saveas=Save as
+dmethod.saveas.a=S
+dmethod.saveas.tip=Use Firefox's default download manager.
+dmethod.dta=DownThemAll
+dmethod.dta.a=A
+dmethod.dta.tip=Download with the DownThemAll extension.
+dmethod.flashgot=FlashGot
+dmethod.flashgot.a=F
+dmethod.flashgot.tip=Download with the FlashGot extension.
+dmethod.copyurl=Copy link
+dmethod.copyurl.a=y
+dmethod.copyurl.tip=Copy media location to the clipboard.
+dmethod.flvstreamer=Flvstreamer
+dmethod.flvstreamer.a=F
+dmethod.flvstreamer.tip=Get or run flvstreamer.
+
+dmethod.unavailable.tip=Cannot download this file.
+
+

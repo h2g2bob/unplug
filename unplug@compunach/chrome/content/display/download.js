@@ -49,12 +49,13 @@ UnPlug2DownloadMethods = {
 	}),
 	callback : (function (name, result) {
 		var that = this;
-		return (function () {
+		return (function (evt) {
 			try {
 				that.exec(name, result);
 			} catch (e) {
 				UnPlug2.log("Error in UnPlug2DownloadMethods for " + name + " " + result.toSource() + " with error " + e);
 			}
+			evt.stopPropagation();
 		});
 	}),
 	exec : (function (name, result) {
@@ -87,7 +88,7 @@ UnPlug2DownloadMethods.add_button("saveas", {
 			|| res.download.url.indexOf("https://") == 0
 			|| res.download.url.indexOf("ftp://") == 0);
 	}),
-	exec_fp : (function (res) {
+	exec_fp : (function (res, file) {
 		// TODO -- move _download_ff2_version in here
 		UnPlug2SearchPage._download_ff2_version(res.download.url, file.fileURL, res.download.referer);
 	}),
@@ -159,7 +160,7 @@ UnPlug2DownloadMethods.add_button("flashgot", {
 	group : "main"
 });
 
-UnPlug2DownloadMethods.add_button("extern-rtmp", {
+UnPlug2DownloadMethods.add_button("flvstreamer", {
 	avail : (function (res) {
 		return res.download.url && (
 			res.download.url.indexOf("rtmp://") == 0
@@ -169,7 +170,7 @@ UnPlug2DownloadMethods.add_button("extern-rtmp", {
 		alert("Sorry, this feature is not available yet");
 	}),
 	obscurity : 50,
-	css : "extern extern-rtmp",
+	css : "extern flvstreamer",
 	group : "special"
 });
 

@@ -25,3 +25,33 @@ low_quality=Niska jakość
 mid_quality=Normalna jakość
 hd_quality=High definition
 embedplayer=Osadzony objekt (prawdopodobnie odtwarzacz, nie wideo)
+
+# download methods
+dmethod.open-tab=Otwórz w nowej karcie
+dmethod.open-tab.a=k
+dmethod.open-tab.tip=
+dmethod.open-new=Otwórz w nowym oknie
+dmethod.open-new.a=n
+dmethod.open-new.tip=
+dmethod.open-over=Otwórz w tym oknie
+dmethod.open-over.a=o
+dmethod.open-over.tip=
+dmethod.saveas=Zapisz jako
+dmethod.saveas.a=Z
+dmethod.saveas.tip=Użyj wbudowanego menedżera pobrań Firefoxa.
+dmethod.dta=DownThemAll
+dmethod.dta.a=A
+dmethod.dta.tip=Pobierz rozszerzeniem DownThemAll.
+dmethod.flashgot=FlashGot
+dmethod.flashgot.a=F
+dmethod.flashgot.tip=Pobierz rozszerzeniem FlashGot.
+dmethod.copyurl=Kopiuj link
+dmethod.copyurl.a=K
+dmethod.copyurl.tip=
+dmethod.flvstreamer=Flvstreamer
+dmethod.flvstreamer.a=F
+dmethod.flvstreamer.tip=
+
+dmethod.unavailable.tip=No downloader
+
+

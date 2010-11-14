@@ -230,9 +230,9 @@ UnPlug2SearchPage = {
 				prev_elem_is_spacer = false;
 				elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a"))
 				elem.setAttribute("label", UnPlug2.str("dmethod." + name));
-				elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".help"));
+				elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
 				elem.className = "menuitem-iconic " + info.css;
-				elem.addEventListener("command", UnPlug2DownloadMethods.callback(name, result), true);
+				elem.addEventListener("command", UnPlug2DownloadMethods.callback(name, result), false);
 				popup.appendChild(elem);
 			}
 		}
@@ -240,7 +240,10 @@ UnPlug2SearchPage = {
 		var copy_button = reselem.getElementsByTagName("toolbarbutton")[0];
 		var copy_info = UnPlug2DownloadMethods.getinfo("copyurl");
 		if (copy_info && copy_info.avail(result)) {
-			copy_button.addEventListener("command", UnPlug2DownloadMethods.callback("copyurl", result), true);
+			copy_button.addEventListener("command", UnPlug2DownloadMethods.callback("copyurl", result), false);
+			copy_button.setAttribute("label", UnPlug2.str("dmethod.copyurl"));
+			copy_button.setAttribute("accesskey", UnPlug2.str("dmethod.copyurl.a"));
+			copy_button.setAttribute("tooltiptext", UnPlug2.str("dmethod.copyurl.tip"));
 		} else {
 			copy_button.setAttribute("disabled", true);
 		}
@@ -249,11 +252,13 @@ UnPlug2SearchPage = {
 		if (avail_elements.length == 0) {
 			main_button.setAttribute("disabled", true);
 			main_button.className = "menuitem-icon unavailable"
+			main_button.setAttribute("tooltiptext", UnPlug2.str("dmethod.unavailable.tip"));
 		} else {
 			var name = avail_elements[0];
 			var info = UnPlug2DownloadMethods.getinfo(name);
 			main_button.className = "menuitem-iconic " + info.css;
-			main_button.addEventListener("command", UnPlug2DownloadMethods.callback(name, result), true);
+			main_button.addEventListener("command", UnPlug2DownloadMethods.callback(name, result), false);
+			main_button.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
 		}
 		
 		// setup drag and drop
