@@ -51,7 +51,7 @@
 }
 
 .unplug-result .menuitem-iconic.extern {
-	list-style-image: url("chrome://unplug/skin/star-in-circle-16.png");
+	list-style-image: url("chrome://unplug/skin/tango-16/applications-system.png");
 }
 
 .unplug-result .menuitem-iconic.copyurl {
