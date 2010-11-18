@@ -33,18 +33,6 @@ UnPlug2SearchPage = {
 		this._gbrowser = args.gbrowser;
 		this._flashgot = args.flashgotserv;
 		
-		// firefox 
-		this._download_mgr = Components.classes["@mozilla.org/download-manager;1"]
-			.getService(Components.interfaces.nsIDownloadManager);
-		
-		// io service
-		this._io_service = Components.classes["@mozilla.org/network/io-service;1"]
-			.getService(Components.interfaces.nsIIOService)
-		
-		// clipboard
-		this._clipboard = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
-			.getService(Components.interfaces.nsIClipboardHelper);  
-		
 		// preferered downloaders from config
 		switch (UnPlug2.get_pref("downloader")) {
 			case "saveas":
@@ -353,105 +341,6 @@ UnPlug2SearchPage = {
 	
 	toString : function () {
 		return '<UnPlug2SearchPage>';
-	},
-	
-	_download_ff2_version : function (url, file, referer) {
-		var nsiurl = this._io_service.newURI(url, null, null);
-		var nsireferer = nsiurl;
-		try {
-			nsireferer = this._io_service.newURI(referer, null, null);
-		} catch(e) {
-			// pass
-		}
-		
-		var persistArgs = {
-			source      : nsiurl,
-			contentType : "application/octet-stream",
-			target      : file,
-			postData    : null,
-			bypassCache : false
-		};
-
-		// var persist = makeWebBrowserPersist();
-		var persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].
-			createInstance(Components.interfaces.nsIWebBrowserPersist);
-
-		// Calculate persist flags.
-		const nsIWBP = Components.interfaces.nsIWebBrowserPersist;
-		persist.persistFlags = (
-			nsIWBP.PERSIST_FLAGS_REPLACE_EXISTING_FILES |
-			nsIWBP.PERSIST_FLAGS_FROM_CACHE |
-			nsIWBP.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION );
-
-		// Create download and initiate it (below)
-		var tr = Components.classes["@mozilla.org/transfer;1"].createInstance(Components.interfaces.nsITransfer);
-
-		tr.init(persistArgs.source, persistArgs.target, "", null, null, null, persist);
-
-		persist.progressListener = tr;
-		persist.saveURI(persistArgs.source, null, nsireferer, persistArgs.postData, null, persistArgs.target);
-	},
-	
-	/**
-	 * return file or null.
-	 */
-	_save_as_box : function (name, ext) {
-		// make string, strip whitespace
-		name = (name || "no name").replace(RegExp("(^\\s|\\s$)", "g"), "");
-		ext = (ext || "").replace(RegExp("(^\\s+|\\s+$)", "g"), "");
-		
-		// look for .ext in name
-		if (!ext) {
-			var ext_re = RegExp("\\.(\\w{1,5})$");
-			var ext_match = ext_re.exec(name);
-			if (ext_match) {
-				ext = ext_match[1];
-				name = name.replace(ext_re, "");
-			} else {
-				ext = "flv"; // fallback
-			}
-		}
-		
-		// replace bad characters with "_"
-		name = name.replace(RegExp("[\\*\\\\/\\?\\<\\>~#\\|`\\$\\&;:%\"'\x00-\x1f]+", "g"), "_");
-		ext = ext.replace(RegExp("[^\\w\\s]+", "g"), "_");
-		
-		var nsIFilePicker = Components.interfaces.nsIFilePicker;
-		var filepicker = Components.classes["@mozilla.org/filepicker;1"]
-			.createInstance(nsIFilePicker);
-		
-		filepicker.defaultString = name + "." + ext;
-		//filepicker.defaultExtention = ext;
-		filepicker.init(window, "Save as", nsIFilePicker.modeSave);
-		var ret = filepicker.show();
-		
-		if (ret != nsIFilePicker.returnOK && ret != nsIFilePicker.returnReplace)
-			return null; // cancelled
-		
-		return { "file" : filepicker.file, "fileURL" : filepicker.fileURL };
-	},
-	
-	/*
-	 * save String url into a nsIFile file
-	 */
-	_download_with_downloadmgr : function (source_url, file) {
-		var persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"]
-			.createInstance(Components.interfaces.nsIWebBrowserPersist);
-		
-		var ioFile = this._io_service.newFileURI(file);   
-		var obj_URI = this._io_service.newURI(source_url, null, null);
-		
-		persist.progressListener = this._download_mgr.addDownload(
-			0, // aDownloadType
-			obj_URI, // source
-			ioFile, // target
-			"", // aDisplayName
-			null, //aMIMEInfo
-			Date.now(), // aStartTim
-			null, // aTempFile,
-			persist); // aCancelable
-		
-		persist.saveURI(obj_URI, null, null, null, "", ioFile);
 	},
 	
 	send_nothing_found_msg : function () {

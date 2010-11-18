@@ -26,7 +26,7 @@ UnPlug2DownloadMethods = {
 				lookup["open-over"].obscurity = -50;
 				break;
 			default:
-				UnPlug2.log("UnPlug2DownloadMethod preference of " + prefer + " is not supported");
+				UnPlug2.log("UnPlug2DownloadMethods preference of " + prefer + " is not supported");
 				break;
 		}
 		
@@ -70,7 +70,7 @@ UnPlug2DownloadMethods = {
 			// if a method implements exec_fp, it wishes to use the "normal" file-picker code
 			// and we'll pass them the appropriate file object in the arguments
 			// TODO move this _save_as_box code here
-			var file = UnPlug2SearchPage._save_as_box(result.details.name, result.details.file_ext);
+			var file = this._save_as_box(result.details.name, result.details.file_ext);
 			if (!file) {
 				return;
 			}
@@ -78,6 +78,46 @@ UnPlug2DownloadMethods = {
 		} else {
 			data.exec(result);
 		}
+	}),
+	
+	/**
+	 * Displays save-as box
+	 * return { file : nsIFile?, fileURL : nsIFileURL? }, or null for cancel.
+	 */
+	_save_as_box : (function (name, ext) {
+		// make string, strip whitespace
+		name = (name || "no name").replace(RegExp("(^\\s|\\s$)", "g"), "");
+		ext = (ext || "").replace(RegExp("(^\\s+|\\s+$)", "g"), "");
+		
+		// look for .ext in name
+		if (!ext) {
+			var ext_re = RegExp("\\.(\\w{1,5})$");
+			var ext_match = ext_re.exec(name);
+			if (ext_match) {
+				ext = ext_match[1];
+				name = name.replace(ext_re, "");
+			} else {
+				ext = "flv"; // fallback
+			}
+		}
+		
+		// replace bad characters with "_"
+		name = name.replace(RegExp("[\\*\\\\/\\?\\<\\>~#\\|`\\$\\&;:%\"'\x00-\x1f]+", "g"), "_");
+		ext = ext.replace(RegExp("[^\\w\\s]+", "g"), "_");
+		
+		var nsIFilePicker = Components.interfaces.nsIFilePicker;
+		var filepicker = Components.classes["@mozilla.org/filepicker;1"]
+			.createInstance(nsIFilePicker);
+		
+		filepicker.defaultString = name + "." + ext;
+		//filepicker.defaultExtention = ext;
+		filepicker.init(window, "Save as", nsIFilePicker.modeSave);
+		var ret = filepicker.show();
+		
+		if (ret != nsIFilePicker.returnOK && ret != nsIFilePicker.returnReplace)
+			return null; // cancelled
+		
+		return { "file" : filepicker.file, "fileURL" : filepicker.fileURL };
 	})
 }
 
@@ -89,8 +129,42 @@ UnPlug2DownloadMethods.add_button("saveas", {
 			|| res.download.url.indexOf("ftp://") == 0);
 	}),
 	exec_fp : (function (res, file) {
-		// TODO -- move _download_ff2_version in here
-		UnPlug2SearchPage._download_ff2_version(res.download.url, file.fileURL, res.download.referer);
+		var io_service = Components.classes["@mozilla.org/network/io-service;1"]
+			.getService(Components.interfaces.nsIIOService)
+		var nsiurl = io_service.newURI(res.download.url, null, null);
+		var nsireferer = nsiurl;
+		try {
+			nsireferer = io_service.newURI(res.download.referer, null, null);
+		} catch(e) {
+			// pass
+		}
+		
+		var persistArgs = {
+			source      : nsiurl,
+			contentType : "application/octet-stream",
+			target      : file.fileURL,
+			postData    : null,
+			bypassCache : false
+		};
+
+		// var persist = makeWebBrowserPersist();
+		var persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].
+			createInstance(Components.interfaces.nsIWebBrowserPersist);
+
+		// Calculate persist flags.
+		const nsIWBP = Components.interfaces.nsIWebBrowserPersist;
+		persist.persistFlags = (
+			nsIWBP.PERSIST_FLAGS_REPLACE_EXISTING_FILES |
+			nsIWBP.PERSIST_FLAGS_FROM_CACHE |
+			nsIWBP.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION );
+
+		// Create download and initiate it (below)
+		var tr = Components.classes["@mozilla.org/transfer;1"].createInstance(Components.interfaces.nsITransfer);
+
+		tr.init(persistArgs.source, persistArgs.target, "", null, null, null, persist);
+
+		persist.progressListener = tr;
+		persist.saveURI(persistArgs.source, null, nsireferer, persistArgs.postData, null, persistArgs.target);
 	}),
 	obscurity : 0,
 	css : "saveas",
@@ -216,7 +290,9 @@ UnPlug2DownloadMethods.add_button("copyurl", {
 		return (res.download.url ? true : false);
 	}),
 	exec  : (function (res) {
-		UnPlug2SearchPage._clipboard.copyString(res.download.url);
+		var clipboard = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
+			.getService(Components.interfaces.nsIClipboardHelper);  
+		clipboard.copyString(res.download.url);
 	}),
 	obscurity : 200,
 	css : "copyurl",
