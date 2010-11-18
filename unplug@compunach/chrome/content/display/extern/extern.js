@@ -28,13 +28,11 @@ try{
 
 // get requests from unplug window
 var receive_signal = (function (event) {
-	alert(6)
-	alert(event.origin);
 	if (event.origin.indexOf("chrome:") != 0) {
 		return;
 	}
 	var msg = window.JSON.parse(event.data);
-	alert(msg.toSource());
+	UnPlug2DownloadMethods.exec_from_signal(msg);
 });
 window.addEventListener("message", receive_signal, false);
 

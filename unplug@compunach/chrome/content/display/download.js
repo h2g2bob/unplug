@@ -66,7 +66,11 @@ var UnPlug2DownloadMethods = {
 		if (!data.avail(result)) {
 			throw "Cannot use DownloadMethod " + name + " with " + result.toSource();
 		}
-		if (data.exec_fp) {
+		if (data.signal_get_argv) {
+			UnPlug2ExternDownloader.signal({
+				result: result,
+				name : name });
+		} else if (data.exec_fp) {
 			// if a method implements exec_fp, it wishes to use the "normal" file-picker code
 			// and we'll pass them the appropriate file object in the arguments
 			// TODO move this _save_as_box code here
@@ -78,6 +82,48 @@ var UnPlug2DownloadMethods = {
 		} else {
 			data.exec(result);
 		}
+	}),
+	
+	exec_from_signal : (function (signal) {
+		var data = this._button_lookup[signal.name];
+		if (!data) {
+			throw "Unknown button name " + signal.name;
+		}
+		var file = this._save_as_box(signal.result.details.name, signal.result.details.file_ext);
+		if (!file) {
+			return null;
+		}
+		
+		var exec_file = null;
+		for (var i = 0; i < data.exec_file_list.length; ++i) {
+			var nsifile = Components.classes["@mozilla.org/file/local;1"]
+				.createInstance(Components.interfaces.nsILocalFile);
+			nsifile.initWithPath(data.exec_file_list[i]);
+			if (nsifile.exists()) {
+				exec_file = nsifile;
+				break;
+			}
+		}
+		if (!exec_file) {
+			// TODO: localize, improve
+			alert("To run this downloader, you need to install one of the following services:\n\t"
+				+ data.exec_file_list.join("\n\t"));
+			return null;
+		}
+		var argv = data.signal_get_argv(signal.result, file);
+		var process = Components.classes["@mozilla.org/process/util;1"]
+			.createInstance(Components.interfaces.nsIProcess);
+		process.init(exec_file);
+		// TODO - we should use runwAsync and use utf-16 strings
+		// this requires firefox 4, so I'll leave this as is for testing
+		process.runAsync(
+			argv,
+			argv.length,
+			null, // we could use an nsIObserver here, but we'll just poll process.isRunning for now
+			false );
+		return {
+			process : process,
+			file : file.file }
 	}),
 	
 	/**
@@ -295,53 +341,15 @@ UnPlug2DownloadMethods.add_button("rtmpdump", {
 			res.download.url.indexOf("rtmp://") == 0
 			|| res.download.url.indexOf("rtmpe://") == 0);
 	}),
-	exec_fp : (function (res, savefile) {
-		UnPlug2ExternDownloader.signal(res);
-		// XXX stuff below here actually works!!
-		// XXX we should import this file into extern.xul/extern.js
-		// XXX pass the extern.xul window the result (and possibly savefile location?)
-		// XXX and get it to do its magic.
-		return
-		
-		var argv = [
+	signal_get_argv : (function (res, savefile) {
+		return [
 			"--rtmp", res.download.url,
 			"--pageUrl", res.download.referer,
 			"--swfUrl", res.download.referer, // this is invalid, but good enough most of the time.
 			"--flv", savefile.file.path ];
-		var exec_file = this._get_exec_file();
-		if (exec_file) {
-			var process = Components.classes["@mozilla.org/process/util;1"]
-				.createInstance(Components.interfaces.nsIProcess);
-			process.init(exec_file);
-			// TODO - we should use runwAsync and use utf-16 strings
-			// this requires firefox 4, so I'll leave this as is for testing
-			process.runAsync(
-				argv,
-				argv.length,
-				{ observe : (function (subj, topic, data) {
-					// TODO - this should be associtated with a dialog of some kind
-					alert(subj + "..." + topic + "..." + data);
-					}) },
-				false );
-		} else {
-			// TODO: localize, improve
-			alert("To run this downloader, you need to install one of the following services:\n\t"
-				+ this.exec_file_list.join("\n\t"));
-		}
 	}),
 	exec_file_list : [
 		"/usr/bin/rtmpdump" ],
-	_get_exec_file : (function () {
-		for (var i = 0; i < this.exec_file_list.length; ++i) {
-			var nsifile = Components.classes["@mozilla.org/file/local;1"]
-				.createInstance(Components.interfaces.nsILocalFile);
-			nsifile.initWithPath(this.exec_file_list[i]);
-			if (nsifile.exists()) {
-				return nsifile;
-			}
-		}
-		return null;
-	}),
 	obscurity : 50,
 	css : "extern rtmpdump",
 	group : "special"
