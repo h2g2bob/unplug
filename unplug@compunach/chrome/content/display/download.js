@@ -1,4 +1,4 @@
-UnPlug2DownloadMethods = {
+var UnPlug2DownloadMethods = {
 	_button_lookup : {},
 	_button_names : [],
 	
@@ -80,6 +80,61 @@ UnPlug2DownloadMethods = {
 		}
 	})
 }
+
+var UnPlug2ExternDownloader = {
+	/* nsIWindowMediator looked interesing -- we could enumerate all the
+	windows of type dialog for example.
+	
+	// XXX should use this method:
+	// for each dialog in nsIWindowMediator
+	// (as defined at ./objdir-ff-release/dist/idl/nsIWindowMediator.idl)
+	// check if the location is this.url
+	
+		var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+			.getService(Components.interfaces.nsIWindowMediator);
+		wm.getMostRecentWindow("dialog");
+		...
+	
+	nsIWindowWatcher looks better -- we can grab any window which says they
+	are what we want, and do postMessage() to it.
+	
+	We don't actually care about MiTM attacks here, I think? We only send JSON,
+	over a postMessage(), so would only be an information leak / DoS.
+	*/
+	window_name : "x-unplug-exten-dld",
+	url : "chrome://unplug/content/display/extern/extern.xul",
+	get_window : (function () {
+		var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+			.getService(Components.interfaces.nsIWindowMediator);
+		// var wl = wm.getEnumerator("dialog");
+		var wl = wm.getEnumerator(null);
+		while (wl.hasMoreElements()) {
+			var win = wl.getNext().QueryInterface(Components.interfaces.nsIDOMWindow);
+			if (win.location == this.url) {
+				return win;
+			}
+		}
+		return null;
+	}),
+	signal : (function (action) {
+		var action = window.JSON.stringify(action);
+		var extern_window = this.get_window();
+		if (extern_window) {
+			extern_window.postMessage(action, "*");
+		} else {
+			extern_window = window.openDialog(this.url, "", "chrome");
+			var onload = (function (action) {
+				return (function () {
+					this.postMessage(action, "*");
+				});
+			})(action);
+			extern_window.addEventListener("load", onload, false);
+		}
+	})
+}
+
+
+// ----- download method definitions follow -----
 
 UnPlug2DownloadMethods.add_button("saveas", {
 	avail : (function (res) {
@@ -167,6 +222,13 @@ UnPlug2DownloadMethods.add_button("rtmpdump", {
 			|| res.download.url.indexOf("rtmpe://") == 0);
 	}),
 	exec_fp : (function (res, savefile) {
+		UnPlug2ExternDownloader.signal(res);
+		// XXX stuff below here actually works!!
+		// XXX we should import this file into extern.xul/extern.js
+		// XXX pass the extern.xul window the result (and possibly savefile location?)
+		// XXX and get it to do its magic.
+		return
+		
 		var argv = [
 			"--rtmp", res.download.url,
 			"--pageUrl", res.download.referer,
