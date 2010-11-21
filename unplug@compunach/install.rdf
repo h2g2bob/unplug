@@ -4,11 +4,11 @@
          xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <RDF:Description RDF:about="rdf:#$2b9VD"
                    em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
-                   em:minVersion="1.5"
+                   em:minVersion="3.0"
                    em:maxVersion="4.0b6" />
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="unplug@compunach"
-                   em:version="2.035"
+                   em:version="2.037"
                    em:type="2"
                    em:name="UnPlug"
                    em:description="Find and download media from websites"

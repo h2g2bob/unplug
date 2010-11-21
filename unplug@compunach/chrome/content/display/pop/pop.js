@@ -29,10 +29,6 @@ UnPlug2SearchPage = {
 		// parent window (the one we want to search)
 		this._win = args.tgt_window;
 		
-		// parent window's getBrowser() and global window namespace
-		this._gbrowser = args.gbrowser;
-		this._flashgot = args.flashgotserv;
-		
 		// preferered downloaders from config
 		switch (UnPlug2.get_pref("downloader")) {
 			case "saveas":

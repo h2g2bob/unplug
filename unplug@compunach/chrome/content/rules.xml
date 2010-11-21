@@ -369,7 +369,7 @@
 					<rule id="flashvars">
 						<each_re ref="queryparam" string="${embed.flashvars}" re="([^&amp;]+)=([^&amp;]+)">
 							<rule ref="generic_fv">
-								<if_re ref="filetype" string="${urldecode:queryparam.2}" re="\.(flv|mp4)(?:\?|#|;|$)" />
+								<if_re ref="filetype" string="${urldecode:queryparam.2}" re="\.(flv|mp4|avi|wmv)(?:\?|#|;|$)" />
 								<ifnot_re re="^http://video.ak.facebook.com/" string="${urldecode:queryparam.2}" />
 								<media url="${urldecode:queryparam.2}" type="${filetype.1}" certainty="mid" title="${origtitle.innerHTML}" />
 							</rule>

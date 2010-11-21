@@ -44,8 +44,8 @@ var UnPlug2DownloadMethods = {
 				break;
 			case "auto":
 				// use add-ons if possible
-				lookup["dta"].obscurity = -50;
-				lookup["flashgot"].obscurity = -40;
+				lookup["flashgot"].obscurity = -50;
+				lookup["dta"].obscurity = -40;
 				lookup["saveas"].obscurity = -30;
 				break;
 			case "openover":
@@ -180,15 +180,32 @@ var UnPlug2DownloadMethods = {
 		var nsIFilePicker = Components.interfaces.nsIFilePicker;
 		var filepicker = Components.classes["@mozilla.org/filepicker;1"]
 			.createInstance(nsIFilePicker);
+		filepicker.init(window, "Save as", nsIFilePicker.modeSave);
 		
+		// default directory
+		var path = UnPlug2.get_pref("savepath");
+		if (!path) {
+			path = Components.classes["@mozilla.org/download-manager;1"]
+				.getService(Components.interfaces.nsIDownloadManager)
+				.defaultDownloadsDirectory.path;
+		}
+		if (path) {
+			var f = Components.classes["@mozilla.org/file/local;1"]
+				.createInstance(Components.interfaces.nsILocalFile);
+			f.initWithPath(path);
+			if (f.exists() && f.isDirectory()) {
+				filepicker.displayDirectory = f;
+			}
+		}
+		
+		// default file name
 		filepicker.defaultString = name + "." + ext;
 		//filepicker.defaultExtention = ext;
-		filepicker.init(window, "Save as", nsIFilePicker.modeSave);
-		var ret = filepicker.show();
 		
+		var ret = filepicker.show();
 		if (ret != nsIFilePicker.returnOK && ret != nsIFilePicker.returnReplace)
 			return null; // cancelled
-		
+		UnPlug2.set_pref("savepath", filepicker.file.parent.path);
 		return { "file" : filepicker.file, "fileURL" : filepicker.fileURL };
 	})
 }
@@ -335,28 +352,40 @@ UnPlug2DownloadMethods.add_button("dta", {
 			window.opener.DTA_AddingFunctions.sendToDown(true, [link]);
 		}
 	}),
-	obscurity : 20,
+	obscurity : 25,
 	css : "dta",
 	group : "main"
 });
 
 UnPlug2DownloadMethods.add_button("flashgot", {
 	avail : (function (res) {
-		if (UnPlug2SearchPage._flashgot) {
-			// flashgot installed
-			return (res.download.url && (
-				res.download.url.indexOf("http://") == 0
-				|| res.download.url.indexOf("https://") == 0))
-		} else {
+		if (! Components.classes["@maone.net/flashgot-service;1"]) {
 			// flashgot not installed
 			return false;
 		}
+		// flashgot is installed
+		return (res.download.url && (
+			res.download.url.indexOf("http://") == 0
+			|| res.download.url.indexOf("https://") == 0))
 	}),
 	exec  : (function (res) {
-		var fg = UnPlug2SearchPage._flashgot;
-		fg.download([res.download.url], fg.OP_ONE);
+		var flashgot_service = Components.classes["@maone.net/flashgot-service;1"]
+			.getService(Components.interfaces.nsISupports)
+			.wrappedJSObject;
+		var name = res.details.name + "." + res.details.file_ext;
+		var links=[{
+			href: res.download.url,
+			description: name,
+			fname : name,
+			// XXX can we set the save-as thingy?
+			noRedir: false }];
+		links.referrer = res.download.referer || null;
+		links.document = window.document; // origWindow XXX TODO should not be from chrome
+		links.browserWindow = flashgot_service.getBrowserWindow(links.document);
+		flashgot_service.download(links);
+		flashgot_service.DMS[flashgot_service.defaultDM].download(links, flashgot_service.OP_ONE)
 	}),
-	obscurity : 25,
+	obscurity : 20,
 	css : "flashgot",
 	group : "main"
 });
@@ -386,8 +415,11 @@ UnPlug2DownloadMethods.add_button("open-tab", {
 		return (res.download.url ? true : false);
 	}),
 	exec  : (function (res) {
-		var t = UnPlug2SearchPage._gbrowser.addTab(res.download.url);
-		UnPlug2SearchPage._gbrowser.selectedTab = t;
+		var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]  
+			.getService(Components.interfaces.nsIWindowMediator);  
+		var gbrowser = wm.getMostRecentWindow("navigator:browser").gBrowser;
+		var t = gbrowser.addTab(res.download.url);  
+		gbrowser.selectedTab = t;
 	}),
 	obscurity : 100,
 	css : "open open-tab",
