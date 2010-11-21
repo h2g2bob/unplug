@@ -29,22 +29,6 @@ UnPlug2SearchPage = {
 		// parent window (the one we want to search)
 		this._win = args.tgt_window;
 		
-		// parent window's getBrowser() and global window namespace
-		this._gbrowser = args.gbrowser;
-		this._flashgot = args.flashgotserv;
-		
-		// firefox 
-		this._download_mgr = Components.classes["@mozilla.org/download-manager;1"]
-			.getService(Components.interfaces.nsIDownloadManager);
-		
-		// io service
-		this._io_service = Components.classes["@mozilla.org/network/io-service;1"]
-			.getService(Components.interfaces.nsIIOService)
-		
-		// clipboard
-		this._clipboard = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
-			.getService(Components.interfaces.nsIClipboardHelper);  
-		
 		// preferered downloaders from config
 		switch (UnPlug2.get_pref("downloader")) {
 			case "saveas":
@@ -207,66 +191,59 @@ UnPlug2SearchPage = {
 	},
 	
 	result_e_set_download : function (reselem, result) {
-		// variables for use in the callbaks (closures)
-		var uid = result.uid;
-		var download = result.download;
-		var that = UnPlug2SearchPage;
+		var popup = reselem.getElementsByTagName("menupopup")[0];
+		var button_names = UnPlug2DownloadMethods.button_names();
+		var prev_elem_group = null;
+		var avail_elements = [];
 		
-		var getwidget = (function (wname) {
-			var l = reselem.getElementsByTagName("menuitem")
-			for (var i = 0; i < l.length; ++i) {
-				if (l[i].className && l[i].className.split(" ").indexOf(wname) >= 0) {
-					return l[i];
+		// we want to replace the old callbacks with new callbacks
+		while (popup.firstChild) {
+			popup.removeChild(popup.firstChild);
+		}
+		for (var i = 0; i < button_names.length; ++i) {
+			var name = button_names[i];
+			var info = UnPlug2DownloadMethods.getinfo(name);
+			if (info.avail(result)) {
+				if (prev_elem_group != info.group && avail_elements.length != 0) {
+					var spacer = document.createElement("menuseparator");
+					popup.appendChild(spacer);
 				}
-			}
-			var l = reselem.getElementsByTagName("toolbarbutton")
-			for (var i = 0; i < l.length; ++i) {
-				if (l[i].className && l[i].className.split(" ").indexOf(wname) >= 0) {
-					return l[i];
-				}
-			}
-			return null;
-		});
-		
-		var buttons = ["copyurl", "saveas", "dta", "flashgot", "special", "opentab", "opennew", "openover", "config", "fallback"]
-		// what's available
-		var available_buttons = [];
-		for (var i = 0; i < buttons.length; ++i) {
-			var wname = buttons[i];
-			if (that.widgets[wname].avail(result)) {
-				available_buttons.push(wname);
+				prev_elem_group = info.group;
+				avail_elements.push(name);
+				var elem = document.createElement("menuitem");
+				prev_elem_is_spacer = false;
+				elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a"))
+				elem.setAttribute("label", UnPlug2.str("dmethod." + name));
+				elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
+				elem.className = "menuitem-iconic " + info.css;
+				elem.addEventListener("command", UnPlug2DownloadMethods.callback(name, result), false);
+				popup.appendChild(elem);
 			}
 		}
-		// what's best of those available (for main button action)
-		var best_downloader = null;
-		for (var i = 0; i < that.preferred_downloaders.length; ++i) {
-			var wname = that.preferred_downloaders[i];
-			if (available_buttons.indexOf(wname) >= 0) {
-				best_downloader = wname;
-				break;
-			}
+		
+		var copy_button = reselem.getElementsByTagName("toolbarbutton")[0];
+		var copy_info = UnPlug2DownloadMethods.getinfo("copyurl");
+		if (copy_info && copy_info.avail(result)) {
+			copy_button.addEventListener("command", UnPlug2DownloadMethods.callback("copyurl", result), false);
+			copy_button.setAttribute("label", UnPlug2.str("dmethod.copyurl"));
+			copy_button.setAttribute("accesskey", UnPlug2.str("dmethod.copyurl.a"));
+			copy_button.setAttribute("tooltiptext", UnPlug2.str("dmethod.copyurl.tip"));
+			copy_button.setAttribute("disabled", false);
+		} else {
+			copy_button.setAttribute("disabled", true);
 		}
-		// hook up events and enable
-		for (var i = 0; i < available_buttons.length; ++i) {
-			var wname = available_buttons[i];
-			var w = getwidget(wname);
-			// use closure to get correct scoping
-			var function_function = (function (that, uid, wname) {
-				return (function (evt) {
-					that.widgetresponse(uid, wname, wname == "config" ? "downloader" : null);
-					evt.stopPropagation();
-				});
-			});
-			if (w) {
-				w.addEventListener("command", function_function(that, uid, wname), false);
-				w.setAttribute("disabled", false);
-			}
-			if (best_downloader == wname) {
-				// also hook up main button
-				var main = getwidget("big-download-button");
-				main.addEventListener("command", function_function(that, uid, wname), false);
-				main.className = "big-download-button menuitem-iconic " + wname;
-			}
+		
+		var main_button = reselem.getElementsByTagName("toolbarbutton")[1];
+		if (avail_elements.length == 0) {
+			main_button.setAttribute("disabled", true);
+			main_button.className = "menuitem-icon unavailable"
+			main_button.setAttribute("tooltiptext", UnPlug2.str("dmethod.unavailable.tip"));
+		} else {
+			var name = avail_elements[0];
+			var info = UnPlug2DownloadMethods.getinfo(name);
+			main_button.className = "menuitem-iconic " + info.css;
+			main_button.addEventListener("command", UnPlug2DownloadMethods.callback(name, result), false);
+			main_button.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
 		}
 		
 		// setup drag and drop
@@ -362,105 +339,6 @@ UnPlug2SearchPage = {
 		return '<UnPlug2SearchPage>';
 	},
 	
-	_download_ff2_version : function (url, file, referer) {
-		var nsiurl = this._io_service.newURI(url, null, null);
-		var nsireferer = nsiurl;
-		try {
-			nsireferer = this._io_service.newURI(referer, null, null);
-		} catch(e) {
-			// pass
-		}
-		
-		var persistArgs = {
-			source      : nsiurl,
-			contentType : "application/octet-stream",
-			target      : file,
-			postData    : null,
-			bypassCache : false
-		};
-
-		// var persist = makeWebBrowserPersist();
-		var persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].
-			createInstance(Components.interfaces.nsIWebBrowserPersist);
-
-		// Calculate persist flags.
-		const nsIWBP = Components.interfaces.nsIWebBrowserPersist;
-		persist.persistFlags = (
-			nsIWBP.PERSIST_FLAGS_REPLACE_EXISTING_FILES |
-			nsIWBP.PERSIST_FLAGS_FROM_CACHE |
-			nsIWBP.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION );
-
-		// Create download and initiate it (below)
-		var tr = Components.classes["@mozilla.org/transfer;1"].createInstance(Components.interfaces.nsITransfer);
-
-		tr.init(persistArgs.source, persistArgs.target, "", null, null, null, persist);
-
-		persist.progressListener = tr;
-		persist.saveURI(persistArgs.source, null, nsireferer, persistArgs.postData, null, persistArgs.target);
-	},
-	
-	/**
-	 * return file or null.
-	 */
-	_save_as_box : function (name, ext) {
-		// make string, strip whitespace
-		name = (name || "no name").replace(RegExp("(^\\s|\\s$)", "g"), "");
-		ext = (ext || "").replace(RegExp("(^\\s+|\\s+$)", "g"), "");
-		
-		// look for .ext in name
-		if (!ext) {
-			var ext_re = RegExp("\\.(\\w{1,5})$");
-			var ext_match = ext_re.exec(name);
-			if (ext_match) {
-				ext = ext_match[1];
-				name = name.replace(ext_re, "");
-			} else {
-				ext = "flv"; // fallback
-			}
-		}
-		
-		// replace bad characters with "_"
-		name = name.replace(RegExp("[\\*\\\\/\\?\\<\\>~#\\|`\\$\\&;:%\"'\x00-\x1f]+", "g"), "_");
-		ext = ext.replace(RegExp("[^\\w\\s]+", "g"), "_");
-		
-		var nsIFilePicker = Components.interfaces.nsIFilePicker;
-		var filepicker = Components.classes["@mozilla.org/filepicker;1"]
-			.createInstance(nsIFilePicker);
-		
-		filepicker.defaultString = name + "." + ext;
-		//filepicker.defaultExtention = ext;
-		filepicker.init(window, "Save as", nsIFilePicker.modeSave);
-		var ret = filepicker.show();
-		
-		if (ret != nsIFilePicker.returnOK && ret != nsIFilePicker.returnReplace)
-			return null; // cancelled
-		
-		return { "file" : filepicker.file, "fileURL" : filepicker.fileURL };
-	},
-	
-	/*
-	 * save String url into a nsIFile file
-	 */
-	_download_with_downloadmgr : function (source_url, file) {
-		var persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"]
-			.createInstance(Components.interfaces.nsIWebBrowserPersist);
-		
-		var ioFile = this._io_service.newFileURI(file);   
-		var obj_URI = this._io_service.newURI(source_url, null, null);
-		
-		persist.progressListener = this._download_mgr.addDownload(
-			0, // aDownloadType
-			obj_URI, // source
-			ioFile, // target
-			"", // aDisplayName
-			null, //aMIMEInfo
-			Date.now(), // aStartTim
-			null, // aTempFile,
-			persist); // aCancelable
-		
-		persist.saveURI(obj_URI, null, null, null, "", ioFile);
-	},
-	
 	send_nothing_found_msg : function () {
 		if (!confirm(UnPlug2.str("nothing_found_send_data")))
 			return;
@@ -513,154 +391,6 @@ UnPlug2SearchPage = {
 	 */
 	configure : function (tabname) {
 		window.openDialog("chrome://unplug/content/config/config.xul", "", "", tabname);
-	},
-	
-	/*
-	 * For callbacks from unplug_result button presses
-	 */
-	widgets : {
-		"special" : {
-			avail : function (res) { return res.download.url && (
-				res.download.url.indexOf("rtmp://") == 0
-				|| res.download.url.indexOf("rtmpe://") == 0);
-			},
-			exec : function (res, data) {
-				alert("Sorry, this feature is not available yet");
-			}
-		},
-		"copyurl" : {
-			avail : function (res) { return (res.download.url ? true : false); },
-			exec  : function (res, data) {
-				UnPlug2SearchPage._clipboard.copyString(res.download.url);
-			}
-		},
-		"saveas" : {
-			avail : function (res) { return res.download.url && (
-				res.download.url.indexOf("http://") == 0
-				|| res.download.url.indexOf("https://") == 0
-				|| res.download.url.indexOf("ftp://") == 0);
-			},
-			exec  : function (res, data) {
-				var file = UnPlug2SearchPage._save_as_box(res.details.name, res.details.file_ext);
-				if (!file) {
-					return;
-				}
-				
-				// UnPlug2SearchPage._download_with_downloadmgr(res.download.url, file.file);
-				UnPlug2SearchPage._download_ff2_version(res.download.url, file.fileURL, res.download.referer);
-			}
-		},
-		"opentab" : {
-			avail : function (res) { return (res.download.url ? true : false); },
-			exec  : function (res, data) {
-				var t = UnPlug2SearchPage._gbrowser.addTab(res.download.url);
-				UnPlug2SearchPage._gbrowser.selectedTab = t;
-			}
-		},
-		"opennew" : {
-			avail : function (res) { return (res.download.url ? true : false); },
-			exec  : function (res, data) {
-				window.open(res.download.url);
-			}
-		},
-		"openover" : {
-			avail : function (res) { return (res.download.url ? true : false); },
-			exec  : function (res, data) {
-				UnPlug2SearchPage._win.location = res.download.url;
-			}
-		},
-		"dta" : {
-			avail : function (res) {
-				if (!window.opener.DTA_AddingFunctions && !window.DTA) {
-					return false;
-				}
-				if (!res.download.url) {
-					return false;
-				}
-				if (res.download.url.indexOf("http://") != 0 && res.download.url.indexOf("https://") != 0) {
-					return false;
-				}
-				return true;
-			},
-			exec  : function (res, data) {
-				var fileobj = UnPlug2SearchPage._save_as_box(res.details.name, res.details.file_ext);
-				if (!fileobj) {
-					return;
-				}
-				
-				var file = fileobj.file;
-				if (file.leafName.indexOf("*") >= 0) {
-					// we use the renaming mask, which treats *name*, etc as special.
-					throw "Filename contains star";
-				}
-				
-				// call String() explicitly as DTA alters string
-				link = {
-					"url" : res.download.url, // string
-					"postData" : null,
-					"referrer" : String(res.download.referer || ""), // an object with toURL
-					"dirSave" : String(file.parent.path), // an object with addFinalSlash
-					"fileName" : String(file.leafName), // string
-					"description" : String(file.leafName) } // string
-				UnPlug2.log("Hello DTA, I'm sending you: " + link.toSource());
-				if (window.DTA) {
-					// DTA 2.0
-					DTA.sendLinksToManager(window, true, [link]);
-				} else {
-					// DTA 1.0
-					window.opener.DTA_AddingFunctions.sendToDown(true, [link]);
-				}
-			}
-		},
-		"flashgot" : {
-			avail : function (res) {
-				if (UnPlug2SearchPage._flashgot) {
-					// flashgot installed
-					return (res.download.url && (
-						res.download.url.indexOf("http://") == 0
-						|| res.download.url.indexOf("https://") == 0))
-				} else {
-					// flashgot not installed
-					return false;
-				}
-			},
-			exec  : function (res, data) {
-				var fg = UnPlug2SearchPage._flashgot;
-				fg.download([res.download.url], fg.OP_ONE);
-			}
-		},
-		"fallback" : {
-			avail : function (res) { return true; },
-			exec  : function (res, data) {
-				alert(UnPlug2.str("cannot_download_this_kind"));
-			}
-		},
-		"config" : {
-			avail : function (res) { return true; },
-			exec  : function (res, data) {
-				UnPlug2SearchPage.configure(data);
-			}
-		}
-	},
-	
-	widgetresponse : function (reference, widgetname, widgetdata) {
-		try {
-			var result = this.results[reference];
-			if (!UnPlug2SearchPage.widgets[widgetname].avail(result)) {
-				throw ("Widget " + widgetname + " not available for result " + result.toSource());
-			}
-			UnPlug2SearchPage.widgets[widgetname].exec(result, widgetdata);
-		} catch(e) {
-			UnPlug2.log("widgetresponse: " + e);
-		}
-	},
-	
-	widgetavailable : function (result, widgetname) {
-		try {
-			return UnPlug2SearchPage.widgets[widgetname].avail(result);
-		} catch(e) {
-			UnPlug2.log("widgetavailable: " + e);
-		}
 	},
 	
 	endofobject : 1 }

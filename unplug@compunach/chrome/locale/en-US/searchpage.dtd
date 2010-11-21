@@ -30,6 +30,9 @@
 <!ENTITY notfound.accesskey   "N">
 <!ENTITY stop.label           "Stop">
 <!ENTITY stop.accesskey       "S">
-
-
+<!ENTITY config.label         "Configure">
+<!ENTITY config.accesskey     "C">
+<!ENTITY config.tooltip       "Edit UnPlug's settings.">
+<!ENTITY dl.label             "Download">
+<!ENTITY dl.accesskey         "D">
 

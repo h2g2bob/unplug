@@ -111,9 +111,9 @@
 			<caption label="&downloader.title;" />
 			<menulist preference="downloader">
 				<menupopup>
-					<menuitem label="&downloader.auto;" value="auto"/>
-					<menuitem label="&dl.saveas.label;" value="saveas"/>
-					<menuitem label="&open.over.label;" value="openover"/>
+					<menuitem id="dmethod-saveas" value="saveas" />
+					<menuitem id="dmethod-auto" value="&downloader.auto;" />
+					<menuitem id="dmethod-openover" value="openover" />
 				</menupopup>
 			</menulist>
 		</groupbox>

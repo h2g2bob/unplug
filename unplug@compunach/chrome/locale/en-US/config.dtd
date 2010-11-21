@@ -54,7 +54,7 @@
 
 <!-- downloader tab -->
 <!ENTITY downloader.title "Preferred download method">
-<!ENTITY downloader.auto "Automatic">
+<!ENTITY downloader.auto "Use add-ons">
 <!ENTITY downloader.addons "Supported Add-ons">
 <!ENTITY downloader.dta "DownThemAll">
 <!ENTITY downloader.flashgot "FlashGot">

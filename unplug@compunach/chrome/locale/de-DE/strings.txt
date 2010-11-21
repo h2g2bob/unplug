@@ -26,3 +26,32 @@ mid_quality=Normale Qualität
 hd_quality=HD Qualität
 embedplayer=Eingebettetes Odjekt (vielleicht ein MediaPlayer und kein Video)
 
+# download methods
+dmethod.open-tab=In neuem Tab Öffnen
+dmethod.open-tab.a=T
+dmethod.open-tab.tip=
+dmethod.open-new=In neuem Fenster Öffnen
+dmethod.open-new.a=F
+dmethod.open-new.tip=
+dmethod.open-over=Im aktuellen Fenster Öffnen
+dmethod.open-over.a=a
+dmethod.open-over.tip=
+dmethod.saveas=Speichern als
+dmethod.saveas.a=S
+dmethod.saveas.tip=Benutze den Download Manager von Firefox.
+dmethod.dta=DownThemAll
+dmethod.dta.a=A
+dmethod.dta.tip=Download mit dem DownThemAll Addon.
+dmethod.flashgot=FlashGot
+dmethod.flashgot.a=G
+dmethod.flashgot.tip=Download mit dem FlashGot Addon.
+dmethod.copyurl=Kopiere Link
+dmethod.copyurl.a=K
+dmethod.copyurl.tip=
+dmethod.rtmpdump=Rtmpdump
+dmethod.rtmpdump.a=R
+dmethod.rtmpdump.tip=Verwenden Sie ein Software-Tool zum Download dieser Datei.
+
+dmethod.unavailable.tip=Kein Downloader
+
+

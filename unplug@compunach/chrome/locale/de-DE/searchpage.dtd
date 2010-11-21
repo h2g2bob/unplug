@@ -30,6 +30,9 @@
 <!ENTITY notfound.accesskey   "N">
 <!ENTITY stop.label           "Stoppen">
 <!ENTITY stop.accesskey       "S">
-
-
+<!ENTITY config.label         "Einstellungen">
+<!ENTITY config.accesskey     "E">
+<!ENTITY config.tooltip       "">
+<!ENTITY dl.label             "Download">
+<!ENTITY dl.accesskey         "D">
 
