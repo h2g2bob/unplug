@@ -112,7 +112,7 @@
 			<menulist preference="downloader">
 				<menupopup>
 					<menuitem id="dmethod-saveas" value="saveas" />
-					<menuitem id="dmethod-auto" value="&downloader.auto;" />
+					<menuitem id="dmethod-auto" value="auto" label="&downloader.auto;" />
 					<menuitem id="dmethod-openover" value="openover" />
 				</menupopup>
 			</menulist>

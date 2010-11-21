@@ -18,8 +18,8 @@ UnPlug2DownloadMethods = {
 				break;
 			case "auto":
 				// use add-ons if possible
-				lookup["dta"].obscurity = -50;
-				lookup["flashgot"].obscurity = -40;
+				lookup["flashgot"].obscurity = -50;
+				lookup["dta"].obscurity = -40;
 				lookup["saveas"].obscurity = -30;
 				break;
 			case "openover":
