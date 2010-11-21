@@ -33,18 +33,19 @@ UnPlug2Extern = {
 		var dupe = template.cloneNode(true);
 		var labels = dupe.getElementsByTagName("label");
 		dupe.setAttribute("collapsed", false);
-		labels[0].setAttribute("value", filename);
-		labels[1].setAttribute("value", UnPlug2.str("dmethod." + download_method));
+		dupe.getElementsByTagName("description")[0].setAttribute("value", filename);
+		labels[0].setAttribute("value", UnPlug2.str("dmethod." + download_method));
 		container.appendChild(dupe);
-		this.set_program_box_status(dupe, 0, "Loading");
+		this.set_program_box_status(dupe, 0, "running");
 		return dupe;
 	}),
 	
 	set_program_box_status : (function (doc, file_size, process_status) {
 		var labels = doc.getElementsByTagName("label");
 		file_size = (file_size / (1024 * 1024)).toPrecision(2) + " MiB";
-		labels[2].setAttribute("value", file_size);
-		labels[3].setAttribute("value", process_status);
+		labels[1].setAttribute("value", file_size);
+		labels[2].setAttribute("value", UnPlug2.str("proc.status." + process_status));
+		doc.className = "process process-status-" + process_status;
 	}),
 	
 	receive_signal_callback : (function () {
@@ -57,9 +58,22 @@ UnPlug2Extern = {
 			var rtn = UnPlug2DownloadMethods.exec_from_signal(msg);
 			if (rtn) {
 				rtn.node = extern.add_program_box(msg.name, rtn.file.leafName);
+				extern.setup_kill_button(rtn);
 				extern.watching.push(rtn);
 			}
 		});
+	}),
+	
+	setup_kill_button : (function (rtn) {
+		rtn.node.getElementsByTagName("button")[0].addEventListener("command", (function () {
+			rtn.was_killed = true;
+			rtn.process.kill();
+		}), false);
+	}),
+	
+	remove_kill_button : (function (doc) {
+		var n = doc.getElementsByTagName("button")[0];
+		n.parentNode.removeChild(n);
 	}),
 	
 	poll : (function () {
@@ -70,14 +84,15 @@ UnPlug2Extern = {
 				file_size = item.file.fileSize;
 			}
 			if (item.process.isRunning) {
-				extern.set_program_box_status(item.node, file_size, "Running");
+				extern.set_program_box_status(item.node, file_size, "running");
 			} else {
-				if (item.process.exitValue) {
-					extern.set_program_box_status(item.node, file_size, "Error");
+				if (item.was_killed || item.process.exitValue) {
+					extern.set_program_box_status(item.node, file_size, "error");
 				} else {
-					extern.set_program_box_status(item.node, file_size, "Done");
+					extern.set_program_box_status(item.node, file_size, "done");
 				}
 				// remove from array
+				extern.remove_kill_button(item.node);
 				return false;
 			}
 			return true;

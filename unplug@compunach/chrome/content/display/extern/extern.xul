@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<?xml-stylesheet href="chrome://unplug/skin/searchpage.css" type="text/css"?>
+<?xml-stylesheet href="chrome://unplug/skin/extern.css" type="text/css"?>
 <!DOCTYPE dialog [
 	<!ENTITY % dtdcommon SYSTEM "chrome://unplug/locale/common.dtd">
 	%dtdcommon;
-	<!ENTITY % dtdspecial SYSTEM "chrome://unplug/locale/special.dtd">
-	%dtdspecial;
 	]>
 <!--
 /*
@@ -58,14 +56,12 @@
 			<spacer flex="1" />
 		</vbox>
 	</vbox>
-	<groupbox collapsed="true" id="program-template">
-		<hbox>
-			<label value="Fish swimming.flv" />
-			<spacer flex="1" />
-			<label value="Rtmpdump" />
-			<label value="0.0 MiB" />
-			<label value="Running" />
-		</hbox>
-	</groupbox>
+	<hbox collapsed="true" id="program-template" align="center">
+		<description value="(filename)" flex="1" crop="end" class="filename" />
+		<label value="(method)" />
+		<button label="Stop" />
+		<label value="(size)" />
+		<label value="(status)" class="status" />
+	</hbox>
 </dialog>
 

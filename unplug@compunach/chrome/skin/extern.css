@@ -1,0 +1,20 @@
+
+.process .filename {
+	overflow: hidden;
+}
+
+.process .status {
+	font-weight: bold;
+}
+
+.process-status-done .status {
+	color: #00cc00;
+}
+
+.process-status-error .status {
+	color: #cc0000;
+}
+
+.process-status-running .status {
+	color: #000000;
+}

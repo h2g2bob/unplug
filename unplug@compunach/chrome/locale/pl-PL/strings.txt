@@ -54,4 +54,7 @@ dmethod.rtmpdump.tip=
 
 dmethod.unavailable.tip=No downloader
 
+proc.status.error=Error
+proc.status.running=Running
+proc.status.done=Done
 

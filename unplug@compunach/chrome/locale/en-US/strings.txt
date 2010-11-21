@@ -55,4 +55,8 @@ dmethod.rtmpdump.tip=Get or run rtmpdump.
 
 dmethod.unavailable.tip=Cannot download this file.
 
+proc.status.error=Error
+proc.status.running=Running
+proc.status.done=Done
+
 
