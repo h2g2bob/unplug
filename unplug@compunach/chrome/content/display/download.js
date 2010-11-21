@@ -225,28 +225,40 @@ UnPlug2DownloadMethods.add_button("dta", {
 			window.opener.DTA_AddingFunctions.sendToDown(true, [link]);
 		}
 	}),
-	obscurity : 20,
+	obscurity : 25,
 	css : "dta",
 	group : "main"
 });
 
 UnPlug2DownloadMethods.add_button("flashgot", {
 	avail : (function (res) {
-		if (UnPlug2SearchPage._flashgot) {
-			// flashgot installed
-			return (res.download.url && (
-				res.download.url.indexOf("http://") == 0
-				|| res.download.url.indexOf("https://") == 0))
-		} else {
+		if (! Components.classes["@maone.net/flashgot-service;1"]) {
 			// flashgot not installed
 			return false;
 		}
+		// flashgot is installed
+		return (res.download.url && (
+			res.download.url.indexOf("http://") == 0
+			|| res.download.url.indexOf("https://") == 0))
 	}),
 	exec  : (function (res) {
-		var fg = UnPlug2SearchPage._flashgot;
-		fg.download([res.download.url], fg.OP_ONE);
+		var flashgot_service = Components.classes["@maone.net/flashgot-service;1"]
+			.getService(Components.interfaces.nsISupports)
+			.wrappedJSObject;
+		var name = res.details.name + "." + res.details.file_ext;
+		var links=[{
+			href: res.download.url,
+			description: name,
+			fname : name,
+			// XXX can we set the save-as thingy?
+			noRedir: false }];
+		links.referrer = res.download.referer || null;
+		links.document = window.document; // origWindow XXX TODO should not be from chrome
+		links.browserWindow = flashgot_service.getBrowserWindow(links.document);
+		flashgot_service.download(links);
+		flashgot_service.DMS[flashgot_service.defaultDM].download(links, flashgot_service.OP_ONE)
 	}),
-	obscurity : 25,
+	obscurity : 20,
 	css : "flashgot",
 	group : "main"
 });

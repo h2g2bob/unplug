@@ -31,7 +31,6 @@ UnPlug2SearchPage = {
 		
 		// parent window's getBrowser() and global window namespace
 		this._gbrowser = args.gbrowser;
-		this._flashgot = args.flashgotserv;
 		
 		// preferered downloaders from config
 		switch (UnPlug2.get_pref("downloader")) {

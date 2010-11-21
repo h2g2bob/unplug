@@ -47,9 +47,7 @@ UnPlug2Overlay = {
 				// window of document to examine
 				"tgt_window"     : this.get_current_window(),
 				// gBrowser element
-				"gbrowser"       : getBrowser(),
-				// gFlashGotService, if installed
-				"flashgotserv" : window.gFlashGotService };
+				"gbrowser"       : getBrowser() }
 			try {
 				UnPlug2Overlay._popup_win_ref.close();
 			} catch(e) {
