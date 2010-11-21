@@ -45,9 +45,7 @@ UnPlug2Overlay = {
 		try {
 			var data = {
 				// window of document to examine
-				"tgt_window"     : this.get_current_window(),
-				// gBrowser element
-				"gbrowser"       : getBrowser() }
+				"tgt_window"     : this.get_current_window() }
 			try {
 				UnPlug2Overlay._popup_win_ref.close();
 			} catch(e) {

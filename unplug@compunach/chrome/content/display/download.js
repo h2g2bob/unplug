@@ -282,8 +282,11 @@ UnPlug2DownloadMethods.add_button("open-tab", {
 		return (res.download.url ? true : false);
 	}),
 	exec  : (function (res) {
-		var t = UnPlug2SearchPage._gbrowser.addTab(res.download.url);
-		UnPlug2SearchPage._gbrowser.selectedTab = t;
+		var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]  
+			.getService(Components.interfaces.nsIWindowMediator);  
+		var gbrowser = wm.getMostRecentWindow("navigator:browser").gBrowser;
+		var t = gbrowser.addTab(res.download.url);  
+		gbrowser.selectedTab = t;
 	}),
 	obscurity : 100,
 	css : "open open-tab",
