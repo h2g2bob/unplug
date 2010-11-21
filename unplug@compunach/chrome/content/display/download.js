@@ -108,15 +108,32 @@ UnPlug2DownloadMethods = {
 		var nsIFilePicker = Components.interfaces.nsIFilePicker;
 		var filepicker = Components.classes["@mozilla.org/filepicker;1"]
 			.createInstance(nsIFilePicker);
+		filepicker.init(window, "Save as", nsIFilePicker.modeSave);
 		
+		// default directory
+		var path = UnPlug2.get_pref("savepath");
+		if (!path) {
+			path = Components.classes["@mozilla.org/download-manager;1"]
+				.getService(Components.interfaces.nsIDownloadManager)
+				.defaultDownloadsDirectory.path;
+		}
+		if (path) {
+			var f = Components.classes["@mozilla.org/file/local;1"]
+				.createInstance(Components.interfaces.nsILocalFile);
+			f.initWithPath(path);
+			if (f.exists() && f.isDirectory()) {
+				filepicker.displayDirectory = f;
+			}
+		}
+		
+		// default file name
 		filepicker.defaultString = name + "." + ext;
 		//filepicker.defaultExtention = ext;
-		filepicker.init(window, "Save as", nsIFilePicker.modeSave);
-		var ret = filepicker.show();
 		
+		var ret = filepicker.show();
 		if (ret != nsIFilePicker.returnOK && ret != nsIFilePicker.returnReplace)
 			return null; // cancelled
-		
+		UnPlug2.set_pref("savepath", filepicker.file.parent.path);
 		return { "file" : filepicker.file, "fileURL" : filepicker.fileURL };
 	})
 }
