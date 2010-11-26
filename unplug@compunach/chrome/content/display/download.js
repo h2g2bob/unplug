@@ -99,7 +99,6 @@ var UnPlug2DownloadMethods = {
 		} else if (data.exec_fp) {
 			// if a method implements exec_fp, it wishes to use the "normal" file-picker code
 			// and we'll pass them the appropriate file object in the arguments
-			// TODO move this _save_as_box code here
 			var file = this._save_as_box(result.details.name, result.details.file_ext);
 			if (!file) {
 				return;
@@ -405,6 +404,8 @@ UnPlug2DownloadMethods.add_button("rtmpdump", {
 	}),
 	exec_file_list : [
 		"/usr/bin/rtmpdump" ],
+	weblinks : [
+		{ url : "http://rtmpdump.mplayerhq.hu/", label : "rtmpdump.mplayerhq.hu" }],
 	obscurity : 50,
 	css : "extern rtmpdump",
 	group : "special"

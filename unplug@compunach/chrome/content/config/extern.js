@@ -24,7 +24,9 @@
  *
  */
 
-var config_name = "rtmpdump"; // TODO should be set from window.arguments
+var get_config_name = (function () {
+	return (window.arguments && window.arguments[0]) || "ERROR";
+});
 
 var is_valid_file = (function (fname) {
 	var f = Components.classes["@mozilla.org/file/local;1"]
@@ -34,29 +36,53 @@ var is_valid_file = (function (fname) {
 });
 
 var onload = (function () {
-	var value = UnPlug2.get_pref("dlmethod." + config_name) || "";
-	document.getElementById("execfile").value = "";
-	if (value && is_valid_file(value)) {
-		document.getElementById("execfile").value = value;
-	} else {
-		var config_info = UnPlug2DownloadMethods.getinfo(config_name);
-		if (config_info && config_info.exec_file_list) {
-			for (var i = 0; i < config_info.exec_file_list.length; ++i) {
-				if (is_valid_file(config_info.exec_file_list[i])) {
-					document.getElementById("execfile").value = config_info.exec_file_list[i];
-					break;
+	var config_name = get_config_name();
+	var config_info = UnPlug2DownloadMethods.getinfo(config_name);
+	
+	var setup_dialog = (function () {
+		document.getElementById("need-to-install").setAttribute("value",
+			UnPlug2.str("need_to_install").replace("%s", UnPlug2.str("dmethod." + config_name)));
+		document.getElementById("location-of").setAttribute("value",
+			UnPlug2.str("location_of").replace("%s", UnPlug2.str("dmethod." + config_name)));
+		if (config_info && config_info.weblinks) {
+			var linkbox = document.getElementById("link-box");
+			for (var i = 0; i < config_info.weblinks.length; ++i) {
+				var l = document.createElement("label");
+				l.className = "text-link";
+				l.setAttribute("href", config_info.weblinks[i].url);
+				l.setAttribute("value", config_info.weblinks[i].label);
+				linkbox.appendChild(l);
+			}
+		}
+	});
+	var search_usual_places = (function () {
+		var value = UnPlug2.get_pref("dmethod." + config_name) || "";
+		document.getElementById("execfile").value = "";
+		if (value && is_valid_file(value)) {
+			document.getElementById("execfile").value = value;
+		} else {
+			if (config_info && config_info.exec_file_list) {
+				for (var i = 0; i < config_info.exec_file_list.length; ++i) {
+					if (is_valid_file(config_info.exec_file_list[i])) {
+						document.getElementById("execfile").value = config_info.exec_file_list[i];
+						break;
+					}
 				}
 			}
 		}
-	}
-	document.getElementById("execfile").disabled = false;
-	document.getElementById("browsebutton").disabled = false;
+		document.getElementById("execfile").disabled = false;
+		document.getElementById("browsebutton").disabled = false;
+	});
+	setup_dialog();
+	window.setTimeout(search_usual_places, 2);
 });
+window.addEventListener("load", onload, false);
 
 var onaccept = (function () {
+	var config_name = get_config_name();
 	var elem = document.getElementById("execfile");
 	if (!elem.value || is_valid_file(elem.value)) {
-		UnPlug2.set_pref("dlmethod." + config_name, elem.value);
+		UnPlug2.set_pref("dmethod." + config_name, elem.value);
 	} else {
 		alert("Not an executable file: " + elem.value);
 		elem.focus();
@@ -76,3 +102,4 @@ var dobrowse = (function () {
 		document.getElementById("execfile").value = filepicker.file.path;
 	}
 });
+

@@ -42,22 +42,20 @@
   width="500"
   height="400"
 
-  onload="onload();"
   ondialogaccept="return onaccept();"
 
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 	<script type="application/javascript" src="chrome://unplug/content/common.js" />
-	<script type="application/javascript" src="chrome://unplug/content/config/extern.js" />
 	<script type="application/javascript" src="chrome://unplug/content/display/download.js" />
+	<script type="application/javascript" src="chrome://unplug/content/config/extern.js" />
 	
-	<description>You need to install rtmpdump to download this file.</description>
+	<description id="need-to-install" />
 	<hbox>
-		<label>Webpage:</label>
-		<label class="text-link" href="http://rtmpdump.mplayerhq.hu/">rtmpdump.mplayerhq.hu</label>
+		<hbox id="link-box" />
 		<spacer flex="1" />
 	</hbox>
 	<spacer style="height: 0.8em;" />
-	<label>Location of rtmpdump</label>
+	<label id="location-of" />
 	<hbox>
 		<textbox value="" id="execfile" flex="1" disabled="true" />
 		<button label="Browse" oncommand="dobrowse()" disabled="true" id="browsebutton" />

@@ -57,3 +57,7 @@ dmethod.unavailable.tip=Kein Downloader
 proc.status.error=Fehler
 proc.status.running=Läufen
 proc.status.done=Fertig
+
+# external download methods
+need_to_install=You need to install %s to download this file
+location_of=Location of %s
