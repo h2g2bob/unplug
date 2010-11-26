@@ -120,6 +120,10 @@
 			<label onclick="window.open(&quot;https://addons.mozilla.org/en-US/firefox/addon/201&quot;);" class="text-link" value="&downloader.dta;" />
 			<label onclick="window.open(&quot;https://addons.mozilla.org/en-US/firefox/addon/220&quot;);" class="text-link" value="&downloader.flashgot;" />
 		</groupbox>
+		<hbox>
+			<button label="Configure rmpdump" oncommand="window.openDialog(&quot;chrome://unplug/content/config/extern.xul&quot;, &quot;chrome,modal&quot;, &quot;unplug_extern&quot;, &quot;rtmpdump&quot;);" />
+			<spacer flex="1" />
+		</hbox>
 		<spacer flex="1" />
 	</prefpane>
 </prefwindow>
