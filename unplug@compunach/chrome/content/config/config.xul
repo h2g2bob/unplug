@@ -5,8 +5,6 @@
 	%dtdcommon;
 	<!ENTITY % dtdlocal SYSTEM "chrome://unplug/locale/config.dtd">
 	%dtdlocal;
-	<!ENTITY % dtdunplugresult SYSTEM "chrome://unplug/locale/unplug_result.dtd">
-	%dtdunplugresult;
 	]>
 <!--
 /*
