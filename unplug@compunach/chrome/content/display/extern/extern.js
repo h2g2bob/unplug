@@ -51,6 +51,12 @@ UnPlug2Extern = {
 	receive_signal_callback : (function () {
 		var extern = this;
 		return (function (event) {
+			/*
+			 * IMPORTANT
+			 * Anyone can send signals to this window, so it is
+			 * vitally important to check the message comes from
+			 * privilidged code (chrome).
+			 */
 			if (event.origin.indexOf("chrome:") != 0) {
 				return;
 			}

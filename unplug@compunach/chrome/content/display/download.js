@@ -92,6 +92,11 @@ var UnPlug2DownloadMethods = {
 		if (!data.avail(result)) {
 			throw "Cannot use DownloadMethod " + name + " with " + result.toSource();
 		}
+		var exec_file = UnPlug2.get_pref("dmethod." + name);
+		if (!this._nsifile_if_exec(exec_file)) {
+			window.openDialog("chrome://unplug/content/config/extern.xul", "chrome,modal", "unplug_extern", name);
+			return; // note: signal to downloader won't get sent
+		}
 		if (data.signal_get_argv) {
 			UnPlug2ExternDownloader.signal({
 				result: result,
@@ -110,6 +115,17 @@ var UnPlug2DownloadMethods = {
 	}),
 	
 	exec_from_signal : (function (signal) {
+		/*
+		 * This code is executed from display/extern/extern.xul
+		 * and is triggered by sending that window a postMessage.
+		 *
+		 * IMPORTANT
+		 * Currently this shows a save-as dialog, but future versions
+		 * may start a download without asking. In practice this means
+		 * data may be saved to an arbitary location on disk, so this
+		 * should only be called based on a response from priviliged
+		 * code.
+		 */
 		var data = this._button_lookup[signal.name];
 		if (!data) {
 			throw "Unknown button name " + signal.name;
@@ -119,29 +135,22 @@ var UnPlug2DownloadMethods = {
 			return null;
 		}
 		
-		var exec_file = null;
-		for (var i = 0; i < data.exec_file_list.length; ++i) {
-			var nsifile = Components.classes["@mozilla.org/file/local;1"]
-				.createInstance(Components.interfaces.nsILocalFile);
-			nsifile.initWithPath(data.exec_file_list[i]);
-			if (nsifile.exists()) {
-				exec_file = nsifile;
-				break;
-			}
-		}
+		var exec_file = UnPlug2.get_pref("dmethod." + signal.name);
+		exec_file = this._nsifile_if_exec(exec_file);
 		if (!exec_file) {
-			// TODO: localize, improve
-			alert("To run this downloader, you need to install one of the following services:\n\t"
-				+ data.exec_file_list.join("\n\t"));
-			return null;
+			throw "UnPlug display - this is not an exec_file"
 		}
 		var argv = data.signal_get_argv(signal.result, file);
 		var process = Components.classes["@mozilla.org/process/util;1"]
 			.createInstance(Components.interfaces.nsIProcess);
 		process.init(exec_file);
-		// TODO - we should use runwAsync and use utf-16 strings
-		// this requires firefox 4, so I'll leave this as is for testing
-		process.runAsync(
+		// we use runwAsync and use utf-16 strings, otherwise you get junk for
+		// filenames due to the unicode encoding conversions
+		if (!process.runwAsync) {
+			alert("Firefox 4 required");
+			throw "nsIProcess.runwAsync is not implemented";
+		}
+		process.runwAsync(
 			argv,
 			argv.length,
 			null, // we could use an nsIObserver here, but we'll just poll process.isRunning for now
@@ -206,29 +215,20 @@ var UnPlug2DownloadMethods = {
 			return null; // cancelled
 		UnPlug2.set_pref("savepath", filepicker.file.parent.path);
 		return { "file" : filepicker.file, "fileURL" : filepicker.fileURL };
+	}),
+
+	_nsifile_if_exec : (function (fname) {
+		if (!fname) {
+			return null;
+		}
+		var f = Components.classes["@mozilla.org/file/local;1"]
+			.createInstance(Components.interfaces.nsILocalFile);
+		f.initWithPath(fname);
+		return (f.exists() && f.isExecutable()) ? f : null;
 	})
 }
 
 var UnPlug2ExternDownloader = {
-	/* nsIWindowMediator looked interesing -- we could enumerate all the
-	windows of type dialog for example.
-	
-	// XXX should use this method:
-	// for each dialog in nsIWindowMediator
-	// (as defined at ./objdir-ff-release/dist/idl/nsIWindowMediator.idl)
-	// check if the location is this.url
-	
-		var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-			.getService(Components.interfaces.nsIWindowMediator);
-		wm.getMostRecentWindow("dialog");
-		...
-	
-	nsIWindowWatcher looks better -- we can grab any window which says they
-	are what we want, and do postMessage() to it.
-	
-	We don't actually care about MiTM attacks here, I think? We only send JSON,
-	over a postMessage(), so would only be an information leak / DoS.
-	*/
 	window_name : "x-unplug-exten-dld",
 	url : "chrome://unplug/content/display/extern/extern.xul",
 	get_window : (function () {
