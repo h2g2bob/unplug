@@ -871,6 +871,23 @@
 				<media url="${urldecode:flvloc.1}" thumbnail="http://km-pics.phncdn.com/thumbs/${numeric.1}/small.jpg" title="${either:title.1:origtitle.innerHTML}" type="flv" />
 			</rule>
 		</rule>
+		<rule id="crunchyroll-2010">
+			<if_url host="crunchyroll.com" />
+			<if_re ref="config" re="\{&quot;config_url&quot;:&quot;(http%3A%2F%2Fwww.crunchyroll.com%2Fxml%2F%3Freq%3DRpcApiVideoPlayer_GetStandardConfig%26[^&quot;]+)&quot;\}" />
+			<download url="${urldecode:config.1}">
+				<optional_re ref="series_title" re="&lt;series_title&gt;([^&lt;]+)&lt;/series_title&gt;" />
+				<optional_re ref="episode_title" re="&lt;episode_title&gt;([^&lt;]+)&lt;/episode_title&gt;" />
+				<optional_re ref="episode_number" re="&lt;episode_number&gt;([^&lt;]+)&lt;/episode_number&gt;" />
+				<optional_re ref="thumb" re="&lt;episode_image_url&gt;(http://[&lt;]+\.jpg)&lt;/episode_image_url&gt;" />
+				<each_re ref="stream" re="&lt;stream_info&gt;([\s\S]+)&lt;/stream_info&gt;">
+					<if_re ref="host" string="${stream.1}" re="&lt;host&gt;(rtmpe?://[^&lt;]+/)&lt;/host&gt;" />
+					<if_re ref="file" string="${stream.1}" re="&lt;file&gt;([^&lt;]+)&lt;/file&gt;" />
+					<optional_re ref="media_id" string="${stream.1}" re="&lt;media_id&gt;([^&lt;]+)&lt;/media_id&gt;" />
+					<optional_re ref="video_encode_quality" string="${stream.1}" re="&lt;video_encode_quality&gt;(\d+)&lt;/video_encode_quality&gt;" />
+					<media url="${host.1}${htmldecode:file.1}" mediaid="${media_id.1}" thumbnail="${thumb.1}" title="${optional:series_title.1} ${optional:episode_number.1} ${optional:episode_title.1}" description="Quality: ${video_encode_quality.1}" />
+				</each_re>
+			</download>
+		</rule>
 	</download><!-- flashblock workaround -->
 	<!--
 	Lower priority
