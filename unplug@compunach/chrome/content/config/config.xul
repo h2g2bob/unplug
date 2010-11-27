@@ -5,8 +5,6 @@
 	%dtdcommon;
 	<!ENTITY % dtdlocal SYSTEM "chrome://unplug/locale/config.dtd">
 	%dtdlocal;
-	<!ENTITY % dtdunplugresult SYSTEM "chrome://unplug/locale/unplug_result.dtd">
-	%dtdunplugresult;
 	]>
 <!--
 /*
@@ -122,6 +120,10 @@
 			<label href="https://addons.mozilla.org/en-US/firefox/addon/201" class="text-link" value="&downloader.dta;" />
 			<label href="https://addons.mozilla.org/en-US/firefox/addon/220" class="text-link" value="&downloader.flashgot;" />
 		</groupbox>
+		<hbox>
+			<button label="Configure rmpdump" oncommand="window.openDialog(&quot;chrome://unplug/content/config/extern.xul&quot;, &quot;chrome,modal&quot;, &quot;unplug_extern&quot;, &quot;rtmpdump&quot;);" />
+			<spacer flex="1" />
+		</hbox>
 		<spacer flex="1" />
 	</prefpane>
 </prefwindow>

@@ -1,4 +1,30 @@
-UnPlug2DownloadMethods = {
+/*
+ *         _        ___
+ *    /\ / /___    / _ \ /\ /\  _ ___
+ *   / // // _ \  / // // // // // _ \
+ *  / // // // / / ___// // // // // /
+ *  \___//_//_/ /_/   /_/ \___/ \_  /
+ *                             \___/
+ * 
+ *  Compunach UnPlug
+ *  Copyright (C) 2010 David Batley <unplug@dbatley.com>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+var UnPlug2DownloadMethods = {
 	_button_lookup : {},
 	_button_names : [],
 	
@@ -66,10 +92,18 @@ UnPlug2DownloadMethods = {
 		if (!data.avail(result)) {
 			throw "Cannot use DownloadMethod " + name + " with " + result.toSource();
 		}
-		if (data.exec_fp) {
+		var exec_file = UnPlug2.get_pref("dmethod." + name);
+		if (!this._nsifile_if_exec(exec_file)) {
+			window.openDialog("chrome://unplug/content/config/extern.xul", "chrome,modal", "unplug_extern", name);
+			return; // note: signal to downloader won't get sent
+		}
+		if (data.signal_get_argv) {
+			UnPlug2ExternDownloader.signal({
+				result: result,
+				name : name });
+		} else if (data.exec_fp) {
 			// if a method implements exec_fp, it wishes to use the "normal" file-picker code
 			// and we'll pass them the appropriate file object in the arguments
-			// TODO move this _save_as_box code here
 			var file = this._save_as_box(result.details.name, result.details.file_ext);
 			if (!file) {
 				return;
@@ -78,6 +112,52 @@ UnPlug2DownloadMethods = {
 		} else {
 			data.exec(result);
 		}
+	}),
+	
+	exec_from_signal : (function (signal) {
+		/*
+		 * This code is executed from display/extern/extern.xul
+		 * and is triggered by sending that window a postMessage.
+		 *
+		 * IMPORTANT
+		 * Currently this shows a save-as dialog, but future versions
+		 * may start a download without asking. In practice this means
+		 * data may be saved to an arbitary location on disk, so this
+		 * should only be called based on a response from priviliged
+		 * code.
+		 */
+		var data = this._button_lookup[signal.name];
+		if (!data) {
+			throw "Unknown button name " + signal.name;
+		}
+		var file = this._save_as_box(signal.result.details.name, signal.result.details.file_ext);
+		if (!file) {
+			return null;
+		}
+		
+		var exec_file = UnPlug2.get_pref("dmethod." + signal.name);
+		exec_file = this._nsifile_if_exec(exec_file);
+		if (!exec_file) {
+			throw "UnPlug display - this is not an exec_file"
+		}
+		var argv = data.signal_get_argv(signal.result, file);
+		var process = Components.classes["@mozilla.org/process/util;1"]
+			.createInstance(Components.interfaces.nsIProcess);
+		process.init(exec_file);
+		// we use runwAsync and use utf-16 strings, otherwise you get junk for
+		// filenames due to the unicode encoding conversions
+		if (!process.runwAsync) {
+			alert("Firefox 4 required");
+			throw "nsIProcess.runwAsync is not implemented";
+		}
+		process.runwAsync(
+			argv,
+			argv.length,
+			null, // we could use an nsIObserver here, but we'll just poll process.isRunning for now
+			false );
+		return {
+			process : process,
+			file : file.file }
 	}),
 	
 	/**
@@ -135,8 +215,54 @@ UnPlug2DownloadMethods = {
 			return null; // cancelled
 		UnPlug2.set_pref("savepath", filepicker.file.parent.path);
 		return { "file" : filepicker.file, "fileURL" : filepicker.fileURL };
+	}),
+
+	_nsifile_if_exec : (function (fname) {
+		if (!fname) {
+			return null;
+		}
+		var f = Components.classes["@mozilla.org/file/local;1"]
+			.createInstance(Components.interfaces.nsILocalFile);
+		f.initWithPath(fname);
+		return (f.exists() && f.isExecutable()) ? f : null;
 	})
 }
+
+var UnPlug2ExternDownloader = {
+	window_name : "x-unplug-exten-dld",
+	url : "chrome://unplug/content/display/extern/extern.xul",
+	get_window : (function () {
+		var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+			.getService(Components.interfaces.nsIWindowMediator);
+		// var wl = wm.getEnumerator("dialog");
+		var wl = wm.getEnumerator(null);
+		while (wl.hasMoreElements()) {
+			var win = wl.getNext().QueryInterface(Components.interfaces.nsIDOMWindow);
+			if (win.location == this.url) {
+				return win;
+			}
+		}
+		return null;
+	}),
+	signal : (function (action) {
+		var action = window.JSON.stringify(action);
+		var extern_window = this.get_window();
+		if (extern_window) {
+			extern_window.postMessage(action, "*");
+		} else {
+			extern_window = window.openDialog(this.url, "", "chrome");
+			var onload = (function (action) {
+				return (function () {
+					this.postMessage(action, "*");
+				});
+			})(action);
+			extern_window.addEventListener("load", onload, false);
+		}
+	})
+}
+
+
+// ----- download method definitions follow -----
 
 UnPlug2DownloadMethods.add_button("saveas", {
 	avail : (function (res) {
@@ -269,9 +395,17 @@ UnPlug2DownloadMethods.add_button("rtmpdump", {
 			res.download.url.indexOf("rtmp://") == 0
 			|| res.download.url.indexOf("rtmpe://") == 0);
 	}),
-	exec : (function (res) {
-		alert("Sorry, this feature is not available yet");
+	signal_get_argv : (function (res, savefile) {
+		return [
+			"--rtmp", res.download.url,
+			"--pageUrl", res.download.referer,
+			"--swfUrl", res.download.referer, // this is invalid, but good enough most of the time.
+			"--flv", savefile.file.path ];
 	}),
+	exec_file_list : [
+		"/usr/bin/rtmpdump" ],
+	weblinks : [
+		{ url : "http://rtmpdump.mplayerhq.hu/", label : "rtmpdump.mplayerhq.hu" }],
 	obscurity : 50,
 	css : "extern rtmpdump",
 	group : "special"

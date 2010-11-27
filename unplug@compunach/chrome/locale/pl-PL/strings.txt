@@ -54,4 +54,11 @@ dmethod.rtmpdump.tip=
 
 dmethod.unavailable.tip=No downloader
 
+proc.status.error=Error
+proc.status.running=Running
+proc.status.done=Done
+
+# external download methods
+need_to_install=You need to install %s to download this file
+location_of=Location of %s
 
