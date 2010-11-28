@@ -92,12 +92,12 @@ var UnPlug2DownloadMethods = {
 		if (!data.avail(result)) {
 			throw "Cannot use DownloadMethod " + name + " with " + result.toSource();
 		}
-		var exec_file = UnPlug2.get_pref("dmethod." + name);
-		if (!this._nsifile_if_exec(exec_file)) {
-			window.openDialog("chrome://unplug/content/config/extern.xul", "chrome,modal", "unplug_extern", name);
-			return; // note: signal to downloader won't get sent
-		}
 		if (data.signal_get_argv) {
+			var exec_file = UnPlug2.get_pref("dmethod." + name);
+			if (!this._nsifile_if_exec(exec_file)) {
+				window.openDialog("chrome://unplug/content/config/extern.xul", "chrome,modal", "unplug_extern", name);
+				return; // note: signal to downloader won't get sent
+			}
 			UnPlug2ExternDownloader.signal({
 				result: result,
 				name : name });
