@@ -470,6 +470,15 @@
 					<if_re ref="mgid" re="^http://media\.mtvnservices\.com/(mgid:.*)$" string="${embedelem.src}" />
 					<rule goto="dailyshow-id" />
 				</rule>
+				<rule id="embed-smotri">
+					<if_re re="http://pics\.smotri\.com/.*?\.swf" string="${embedelem.src}" />
+					<download url="http://smotri.com/video/view/url/bot/" post="ticket=${qparam:file:embedelem.src}&amp;begun=1&amp;video%5Furl=1&amp;devid=LoadupFlashPlayer&amp;context=">
+						<if_re ref="vidurl" re="&quot;_vidURL&quot;\s*:\s*&quot;([^&quot;]+)&quot;" />
+						<optional_re ref="imgurl" re="&quot;_imgURL&quot;\s*:\s*&quot;([^&quot;]+)&quot;" />
+						<optional_re ref="videoid" re="&quot;video_id&quot;\s*:\s*&quot;([^&quot;]+)&quot;" />
+						<media url="${jsdecode:vidurl.1}" videoid="${jsdecode:videoid.1}" title="${origtitle.innerHTML}" thumbnail="${jsdecode:imgurl.1}" />
+					</download>
+				</rule>
 			</each_element>
 		</rule>
 		<rule id="each_param">
