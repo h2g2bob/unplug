@@ -289,8 +289,8 @@
 			<if_re ref="v" re="^(.*)$" string="${qparam:v:url.url}" />
 			<optional_elem tagname="h1" require_attrs="innerHTML" />
 			<rule id="rutube-from-id" target="rutube-from-id">
-				<download url="http://bl.rutube.ru/${v.1}.xml?schema=rtmp">
-					<if_re ref="final" re="&lt;finalAddress&gt;&lt;!\[CDATA\[([a-z0-9]+://.*?)\]\]&gt;&lt;/finalAddress&gt;" />
+				<download url="http://bl.rutube.ru/${v.1}.xml?max-age=0&amp;referer=${optional:urlencode:url.url}&amp;schema=rtmp">
+					<if_re ref="final" re="&lt;finalAddress&gt;\s*&lt;!\[CDATA\[([a-z0-9]+://.*?)\]\]&gt;\s*&lt;/finalAddress&gt;" />
 					<media url="${final.1}" thumbnail="http://img.rutube.ru/thumbs/${substring:0:2:v.1}/${substring:2:4:v.1}/${v.1}-1.jpg" title="${either:h1.innerHTML:origtitle.innerHTML}" type="flv" mediaid="rutube-${v.1}" />
 				</download>
 			</rule>
