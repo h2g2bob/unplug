@@ -52,8 +52,6 @@
 <!ENTITY rulesxml.default "Alapértelmezett">
 <!ENTITY rulesxml.default.a "A">
 
-<!-- opener tab -->
-
 <!-- downloader tab -->
 <!ENTITY downloader.title "Kívánt letöltési mód">
 <!ENTITY downloader.auto "Kiegészítők használata">
