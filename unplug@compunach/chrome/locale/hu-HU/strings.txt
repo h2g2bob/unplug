@@ -1,0 +1,64 @@
+extensions.{unplug@compunach}.description=Beágyazott média letöltés
+
+# Confirmation after clicking on "Nothing found" button
+nothing_found_send_data=Akarsz információt küldeni az Unplug fejlesztőinek erről a weboldalról?
+
+# Short status strings during/after clicking "Nothing found" button
+nothing_found_sending=Küldés...
+nothing_found_done=Köszönet!
+nothing_found_failed=Hiba
+
+# for below the search box
+search_done=Kész
+search_busy=Dolgozik
+search_1_active_download=1 oldal keresés
+search_n_active_downloads=# oldal keresés
+search_no_results_yet=Nincs találat
+search_1_result=1 találat
+search_n_results=# találat
+search_no_results=Nincs találat
+cannot_download_this_kind=Nem lehet letölteni ezt a típusú fájlt
+
+
+# for rules.xml
+high_quality=Magas minőség
+low_quality=Alacsony minőség
+mid_quality=Normál minőség
+hd_quality=Nagy felbontás
+embedplayer=Beágyazott objektum (valószínűleg médialejátszó, nem video)
+
+# download methods
+dmethod.open-tab=Megnyitás új fülön
+dmethod.open-tab.a=f
+dmethod.open-tab.tip=Megnyitás új fülön.
+dmethod.open-new=Megnyitás új ablakban
+dmethod.open-new.a=a
+dmethod.open-new.tip=Megnyitás új ablakban.
+dmethod.open-over=Megnyitás a jelenlegi ablakban
+dmethod.open-over.a=j
+dmethod.open-over.tip=Egyenértékű a weboldalon lévő média linkjére kattintással.
+dmethod.saveas=Mentés másként
+dmethod.saveas.a=M
+dmethod.saveas.tip=A Firefox alapértelmezett letöltéskezelőjének használata.
+dmethod.dta=DownThemAll
+dmethod.dta.a=A
+dmethod.dta.tip=Letöltés a DownThemAll kiegészítővel.
+dmethod.flashgot=FlashGot
+dmethod.flashgot.a=F
+dmethod.flashgot.tip=Letöltés a FlashGot kiegészítővel.
+dmethod.copyurl=Link másolása
+dmethod.copyurl.a=L
+dmethod.copyurl.tip=Média címének másolása a vágólapra.
+dmethod.rtmpdump=Rtmpdump
+dmethod.rtmpdump.a=R
+dmethod.rtmpdump.tip=Eszköz (rtmpdump) beszerzése vagy futtatása.
+dmethod.unavailable.tip=Nem lehet letölteni ezt a fájlt.
+
+proc.status.error=Error
+proc.status.running=Running
+proc.status.done=Done
+
+# external download methods
+need_to_install=You need to install %s to download this file
+location_of=Location of %s
+

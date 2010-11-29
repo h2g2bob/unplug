@@ -1,0 +1,75 @@
+<!--
+/*
+ *         _        ___
+ *    /\ / /___    / _ \ /\ /\  _ ___
+ *   / // // _ \  / // // // // // _ \
+ *  / // // // / / ___// // // // // /
+ *  \___//_//_/ /_/   /_/ \___/ \_  /
+ *                             \___/
+ * 
+ *  Compunach UnPlug
+ *  Copyright (C) 2009 David Batley <unplug@dbatley.com>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+-->
+
+<!ENTITY configheader.subtitle "Beállítások módosítása">
+
+<!-- tab headings -->
+<!ENTITY tab.title.about "UnPlug névjegye">
+<!ENTITY tab.title.integration "Integráció">
+<!ENTITY tab.title.discovery "Média keresése">
+<!ENTITY tab.title.downloads "Letöltések">
+
+<!-- general options -->
+<!ENTITY interface.title "Hol jelenjen meg az UnPlug">
+<!ENTITY interface.toolsmenu "Menüpont hozzáadása az Eszközök menühöz">
+<!ENTITY interface.toolsmenu.a "E">
+<!ENTITY interface.contextmenu "Menüpont hozzáadása a helyi (jobb gombos) menühöz">
+<!ENTITY interface.contextmenu.a "h">
+<!ENTITY interface.toolbarbtn "Eszköztárgomb hozzáadása">
+<!ENTITY interface.toolbarbtn.a "g">
+<!ENTITY privacy.title "Személyes szféra">
+<!ENTITY privacy.popcontest "Weboldalcímek küldése az UnPlug használatáról">
+<!ENTITY privacy.popcontest.a "c">
+<!ENTITY privacy.infolink "További információk erről">
+<!ENTITY privacy.infolink.a "T">
+<!ENTITY rulesxml.title "Rules.xml fájl">
+<!ENTITY rulesxml.description "A Rules.xml a weblapok médiatartalmának megtalálásáról tárol információt.">
+<!ENTITY rulesxml.default "Alapértelmezett">
+<!ENTITY rulesxml.default.a "A">
+
+<!-- downloader tab -->
+<!ENTITY downloader.title "Kívánt letöltési mód">
+<!ENTITY downloader.auto "Kiegészítők használata">
+<!ENTITY downloader.addons "Támogatott kiegészítők">
+<!ENTITY downloader.dta "DownThemAll">
+<!ENTITY downloader.flashgot "FlashGot">
+
+<!-- discovery tab -->
+<!ENTITY showall.title "További eredmények megjelenítése">
+<!ENTITY showall.label "A hibásan működő eredményeket is megjeleníti">
+<!ENTITY showall.label.a "h">
+
+<!-- about tab -->
+<!ENTITY about.title "Köszönet az UnPlug telepítéséért">
+<!ENTITY about.description "Az UnPlug ingyenes és nyílt forrású.">
+<!ENTITY about.gpl "GNU General Public Licenc">
+<!ENTITY about.agpl "GNU Affero General Public License, version 3">
+<!ENTITY about.updated "Az UnPlug beállításai frissültek.">
+
+
+
