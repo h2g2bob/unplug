@@ -10,6 +10,7 @@ skin        unplug     default    chrome/skin/
 locale      unplug     en-US      chrome/locale/en-US/
 locale      unplug     de-DE      chrome/locale/de-DE/
 locale      unplug     pl-PL      chrome/locale/pl-PL/
+locale      unplug     hu-HU      chrome/locale/hu-HU/
 
 
 
