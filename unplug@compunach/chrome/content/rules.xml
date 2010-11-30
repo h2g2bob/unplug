@@ -539,7 +539,7 @@
 				</rule>
 				<rule id="bbc-parliament">
 					<if_equal a="${p.name}" b="playlist" />
-					<if_re string="${p.value}" re="^http://news.bbc.co.uk/media/.*\.xml$" />
+					<if_re string="${p.value}" re="^(http://news.bbc.co.uk/media/.*\.xml|http://playlists\.bbc\.co\.uk/news/.*?/playlist.sxml)$" />
 					<download url="${p.value}">
 						<rule id="bbc-playlist" target="bbc-playlist">
 							<optional_re re="&quot;(http://news.bbcimg.co.uk/media/[^&quot;]*\.jpg)&quot;" ref="thumb" />
