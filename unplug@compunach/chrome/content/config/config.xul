@@ -121,7 +121,7 @@
 			<label href="https://addons.mozilla.org/en-US/firefox/addon/220" class="text-link" value="&downloader.flashgot;" />
 		</groupbox>
 		<hbox>
-			<button label="Configure rmpdump" oncommand="window.openDialog(&quot;chrome://unplug/content/config/extern.xul&quot;, &quot;chrome,modal&quot;, &quot;unplug_extern&quot;, &quot;rtmpdump&quot;);" />
+			<button label="Configure rtmpdump" oncommand="window.openDialog(&quot;chrome://unplug/content/config/extern.xul&quot;, &quot;chrome,modal&quot;, &quot;unplug_extern&quot;, &quot;rtmpdump&quot;);" />
 			<spacer flex="1" />
 		</hbox>
 		<spacer flex="1" />
