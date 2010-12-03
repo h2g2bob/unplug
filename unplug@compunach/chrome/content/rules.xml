@@ -841,13 +841,21 @@
 					<media url="http://cs${operate.1}.vkontakte.ru/u${operate.2}/audio/${operate.3}.mp3" mediaid="${operate.2}" title="${performer.1} - ${title.1}" description="${title.1}" />
 				</each_re>
 			</rule>
-			<rule id="vkontakte-video">
+			<rule id="vkontakte-video-old">
 				<if_re ref="host" re="&quot;host&quot;\s*:\s*&quot;http:\\/\\/([^/&quot;]+)\\/&quot;" />
 				<if_re ref="uid" re="&quot;uid&quot;\s*:\s*&quot;(\d+)&quot;" />
 				<if_re ref="vtag" re="&quot;vtag&quot;\s*:\s*&quot;([0-9a-f]+)&quot;" />
 				<optional_re ref="title" re="&lt;div class=&quot;summary&quot;&gt;&lt;a[^&gt;]*&gt;([^&lt;]+)&lt;/a&gt;" />
 				<optional_re ref="thumb" re="'(http://cs\d+\.vkontakte\.ru/u\d+/video/l_[0-9a-f]+\.jpg)'" />
 				<media url="http://${host.1}/u${uid.1}/video/${vtag.1}.240.mp4" title="${either:title.1:origtitle.innerHTML}" thumbnail="${thumb.1}" />
+			</rule>
+			<rule id="vkontakte-video-2010-11">
+				<if_re ref="host" re="&quot;host&quot;\s*:\s*&quot;([^&quot;]+)&quot;" />
+				<if_re ref="vkid" re="&quot;vkid&quot;\s*:\s*&quot;(\d+)&quot;" />
+				<if_re ref="vtag" re="&quot;vtag&quot;\s*:\s*&quot;([0-9a-f]+)\-?&quot;" />
+				<optional_re ref="title" re="&lt;div class=&quot;summary&quot;&gt;&lt;a[^&gt;]*&gt;([^&lt;]+)&lt;/a&gt;" />
+				<optional_re ref="thumb" re="&quot;thumb&quot;\s*:\s*&quot;([^&quot;]+)&quot;" />
+				<media url="http://${jsdecode:host.1}/assets/videos/${vtag.1}-${vkid.1}.vk.flv" title="${urldecode:either:title.1:origtitle.innerHTML}" thumbnail="${jsdecode:thumb.1}" type="flv" mediaid="${vkid.1}" />
 			</rule>
 		</rule>
 		<rule id="facebook-video">
