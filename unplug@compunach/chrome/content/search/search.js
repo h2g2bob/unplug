@@ -297,12 +297,12 @@ UnPlug2Variables.prototype = {
 			 * Decodes url %nn escape codes in variable
 			 */
 			case "urldecode":
-				return unescape(this._subst_apply_functions(parts)).replace("+", " ", "g");
+				return decodeURI(this._subst_apply_functions(parts)).replace("+", " ", "g");
 			/**
 			 * Encodes url %nn escape codes in variable
 			 */
 			case "urlencode":
-				return escape(this._subst_apply_functions(parts));
+				return encodeURI(this._subst_apply_functions(parts));
 			/**
 			 * decode html entities TODO
 			 */
