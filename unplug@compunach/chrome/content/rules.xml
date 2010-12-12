@@ -858,7 +858,7 @@
 				</each_re>
 			</rule>
 			<rule id="vkontakte-video-old">
-				<if_re ref="host" re="&quot;host&quot;\s*:\s*&quot;http:\\/\\/([^/&quot;]+)\\/&quot;" />
+				<if_re ref="host" re="&quot;host&quot;\s*:\s*&quot;(?:http:\\/\\/)?([^&quot;]+?)(?:\\/)?&quot;" />
 				<if_re ref="uid" re="&quot;uid&quot;\s*:\s*&quot;(\d+)&quot;" />
 				<if_re ref="vtag" re="&quot;vtag&quot;\s*:\s*&quot;([0-9a-f]+)&quot;" />
 				<optional_re ref="title" re="&lt;div class=&quot;summary&quot;&gt;&lt;a[^&gt;]*&gt;([^&lt;]+)&lt;/a&gt;" />
@@ -866,8 +866,8 @@
 				<media url="http://${host.1}/u${uid.1}/video/${vtag.1}.240.mp4" title="${either:title.1:origtitle.innerHTML}" thumbnail="${thumb.1}" />
 			</rule>
 			<rule id="vkontakte-video-2010-11">
-				<if_re ref="host" re="&quot;host&quot;\s*:\s*&quot;([^&quot;]+)&quot;" />
-				<if_re ref="vkid" re="&quot;vkid&quot;\s*:\s*&quot;(\d+)&quot;" />
+				<if_re ref="host" re="&quot;host&quot;\s*:\s*&quot;(?:http:\\/\\/)?([^&quot;]+?)(?:\\/)?&quot;" />
+				<if_re ref="vkid" re="&quot;vkid&quot;\s*:\s*&quot;?(\d+)&quot;?" />
 				<if_re ref="vtag" re="&quot;vtag&quot;\s*:\s*&quot;([0-9a-f]+)\-?&quot;" />
 				<optional_re ref="title" re="&quot;md_title&quot;\s*:\s*&quot;([^&quot;]+)&quot;" />
 				<optional_re ref="thumb" re="&quot;thumb&quot;\s*:\s*&quot;([^&quot;]+)&quot;" />
@@ -875,8 +875,8 @@
 			</rule>
 			<rule id="vkontakte-multi-2010-12">
 				<each_re ref="vid" re="&lt;a href=&quot;video\d+_\d+&quot; onclick=&quot;return showVideoBoxCommon\(([^&quot;]+)\);&quot;&gt;">
-					<if_re ref="host" re="&quot;host&quot;\s*:\s*&quot;([^&quot;]+)&quot;" string="${htmldecode:vid.1}" />
-					<if_re ref="vkid" re="&quot;vkid&quot;\s*:\s*&quot;(\d+)&quot;" string="${htmldecode:vid.1}" />
+					<if_re ref="host" re="&quot;host&quot;\s*:\s*&quot;(?:http:\\/\\/)?([^&quot;]+?)(?:\\/)?&quot;" string="${htmldecode:vid.1}" />
+					<if_re ref="vkid" re="&quot;vkid&quot;\s*:\s*&quot;?(\d+)&quot;?" string="${htmldecode:vid.1}" />
 					<if_re ref="vtag" re="&quot;vtag&quot;\s*:\s*&quot;([0-9a-f]+)\-?&quot;" string="${htmldecode:vid.1}" />
 					<optional_re ref="title" re="&quot;md_title&quot;\s*:\s*&quot;([^&quot;]+)&quot;" string="${htmldecode:vid.1}" />
 					<optional_re ref="thumb" re="&quot;thumb&quot;\s*:\s*&quot;([^&quot;]+)&quot;" string="${htmldecode:vid.1}" />
