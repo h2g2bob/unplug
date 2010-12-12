@@ -93,11 +93,22 @@ var UnPlug2DownloadMethods = {
 			throw "Cannot use DownloadMethod " + name + " with " + result.toSource();
 		}
 		if (data.signal_get_argv) {
+			// check nsiProcess supports runwAsync -- see below
+			// this will avoid disapointment of downloading rtmpdump before being
+			// told there was no point
+			var process = Components.classes["@mozilla.org/process/util;1"]
+				.createInstance(Components.interfaces.nsIProcess);
+			if (!process.runwAsync) {
+				alert("Firefox 4 required");
+				throw "nsIProcess.runwAsync is not implemented";
+			}
+			// work out where rtmpdump lives
 			var exec_file = UnPlug2.get_pref("dmethod." + name);
 			if (!this._nsifile_if_exec(exec_file)) {
 				window.openDialog("chrome://unplug/content/config/extern.xul", "chrome,modal", "unplug_extern", name);
 				return; // note: signal to downloader won't get sent
 			}
+			// open download window and get it to call exec_from_siganl
 			UnPlug2ExternDownloader.signal({
 				result: result,
 				name : name });
