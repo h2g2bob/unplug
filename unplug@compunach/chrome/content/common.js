@@ -40,6 +40,8 @@ UnPlug2 = {
 		this._js_console = Components.classes["@mozilla.org/consoleservice;1"]
 			.getService(Components.interfaces.nsIConsoleService);
 		this._re_trim = /^\s*(.*?)\s*$/m;
+		this._unicodeconvert = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"]
+			.createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
 	},
 	
 	/**
@@ -125,6 +127,11 @@ UnPlug2 = {
 		if (!x)
 			return "";
 		return UnPlug2._re_trim.exec(x)[1];
+	},
+	
+	decode : function (encoding, s) {
+		this._unicodeconvert.charset = encoding
+		return this._unicodeconvert.ConvertToUnicode(s);
 	},
 	
 	toString : function () {

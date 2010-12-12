@@ -297,12 +297,20 @@ UnPlug2Variables.prototype = {
 			 * Decodes url %nn escape codes in variable
 			 */
 			case "urldecode":
-				return decodeURI(this._subst_apply_functions(parts)).replace("+", " ", "g");
+				// we could use decodeURI here, but that fails to
+				// unescape all the characters we want (colon, slash, ...)
+				// but we still want to interpret as unicode
+				var v = this._subst_apply_functions(parts)
+				return UnPlug2.decode("UTF-8", unescape(v)).replace("+", " ", "g");
+			case "urldecode_unicode":
+				var encoding = parts.pop();
+				var v = this._subst_apply_functions(parts)
+				return UnPlug2.decode(encoding, unescape(v)).replace("+", " ", "g");
 			/**
 			 * Encodes url %nn escape codes in variable
 			 */
 			case "urlencode":
-				return encodeURI(this._subst_apply_functions(parts));
+				return escape(this._subst_apply_functions(parts));
 			/**
 			 * decode html entities TODO
 			 */
