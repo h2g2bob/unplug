@@ -84,7 +84,9 @@ UnPlug2Extern = {
 	
 	poll : (function () {
 		var extern = this;
-		extern.watching.filter(function (item, idx, arr) {
+		// TODO this makes this not threadsafe, we may mess up if we
+		// call watching.push() from a different thread.
+		extern.watching = extern.watching.filter(function (item, idx, arr) {
 			var file_size = 0;
 			if (item.file.exists()) {
 				file_size = item.file.fileSize;
@@ -103,6 +105,13 @@ UnPlug2Extern = {
 			}
 			return true;
 		});
+	}),
+	
+	want_close : (function () {
+		if (this.watching.length > 0) {
+			return confirm("Current downloads will no longer be listed if you close this window.");
+		}
+		return true;
 	})
 }
 
