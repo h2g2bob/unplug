@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://unplug/skin/overlay_firefox.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://unplug/locale/overlay.dtd" >
+<!--
+/*
+ *         _        ___
+ *    /\ / /___    / _ \ /\ /\  _ ___
+ *   / // // _ \  / // // // // // _ \
+ *  / // // // / / ___// // // // // /
+ *  \___//_//_/ /_/   /_/ \___/ \_  /
+ *                             \___/
+ * 
+ *  Compunach UnPlug
+ *  Copyright (C) 2010 David Batley <unplug@dbatley.com>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+-->
+<overlay id="unplug2_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	<script type="application/javascript" src="chrome://unplug/content/common.js" />
+	<script type="application/javascript" src="chrome://unplug/content/overlay/all.js" />
+	<script type="application/javascript" src="chrome://unplug/content/overlay/seamonkey.js" />
+	
+	<statusbarpanel id="component-bar">
+		<!--
+		probably want a toolbar button of some kind to match other items added to that area
+		width/height also doesn't work properly here
+		-->
+		<image src="chrome://unplug/skin/unplug-16.png" width="16" height="16" oncommand="UnPlug2Overlay.run();" insertbefore="" tooltiptext="&toolbarbutton.unplug.tip;" />
+	</statusbarpanel>
+	
+	<!-- this doesn't work at all
+	<toolbarpalette id="BrowserToolbarPalette">
+		<toolbarbutton id="unplug2_toolbarbutton" class="toolbarbutton" name="unplug2_toolbarbutton" tooltiptext="&toolbarbutton.unplug.tip;" oncommand="UnPlug2Overlay.run();" label="&toolbarbutton.unplug;" />
+	</toolbarpalette>
+	-->
+</overlay>
+
