@@ -7,7 +7,8 @@ toolbar[iconsize="small"] toolbarbutton#unplug2_toolbarbutton {
 }
 
 menuitem#unplug2_toolsmenu ,
-menuitem#unplug2_contextmenu {
+menuitem#unplug2_contextmenu,
+toolbarbutton#unplug2_taskbutton {
 	list-style-image : url(chrome://unplug/skin/unplug-16.png);
 }
 
