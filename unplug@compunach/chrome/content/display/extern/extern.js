@@ -42,7 +42,13 @@ UnPlug2Extern = {
 	
 	set_program_box_status : (function (doc, file_size, process_status) {
 		var labels = doc.getElementsByTagName("label");
-		file_size = (file_size / (1024 * 1024)).toPrecision(2) + " MiB";
+		if (file_size < 20 * 1024 * 1024) {
+			file_size = (file_size / 1024).toFixed(1) + " KiB";
+		} else if (file_size < 20 * 1024 * 1024 * 1024) {
+			file_size = (file_size / (1024 * 1024)).toFixed(1) + " MiB";
+		} else {
+			file_size = (file_size / (1024 * 1024 * 1024)).toFixed(1) + " GiB";
+		}
 		labels[1].setAttribute("value", file_size);
 		labels[2].setAttribute("value", UnPlug2.str("proc.status." + process_status));
 		doc.className = "process process-status-" + process_status;
