@@ -64,12 +64,16 @@ var UnPlug2DownloadMethods = {
 		});
 	}),
 	
-	/* button_names:
+	/* avail_buttons:
 	 * returns the button names, in order of preference (ie, the most obscure last)
 	 */
-	button_names : (function () {
-		return this._button_names;
+	avail_buttons : (function (result) {
+		var that = this;
+		return this._button_names.filter(function (val) {
+			return that._button_lookup[val].avail(result);
+		});
 	}),
+	
 	get_extern_tool_names : (function () {
 		var out = [];
 		for (var i = 0; i < this._button_names.length; ++i) {
@@ -80,9 +84,11 @@ var UnPlug2DownloadMethods = {
 		}
 		return out;
 	}),
+	
 	getinfo : (function (name) {
 		return this._button_lookup[name];
 	}),
+	
 	callback : (function (name, result) {
 		var that = this;
 		return (function (evt) {
