@@ -1,0 +1,12 @@
+<!--
+This is the dtd file for overlay.xul
+
+Created 03/06/06 by jb marcon
+
+No translation needed.
+-->
+
+<!ENTITY menuitem.unplug "UnPlug">
+<!ENTITY menuitem.u "U">
+<!ENTITY toolbarbutton.unplug "UnPlug">
+<!ENTITY toolbarbutton.unplug.tip "UnPlug - Rechercher des médias dans cette page">

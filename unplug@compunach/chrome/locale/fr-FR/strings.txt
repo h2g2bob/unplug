@@ -1,0 +1,66 @@
+extensions.{unplug@compunach}.description=Télécharger le média intégré
+
+# Confirmation after clicking on "Nothing found" button
+nothing_found_send_data=Voulez-vous envoyer des informations sur cette page web aux développeurs d'UnPlug ?
+
+# Short status strings during/after clicking "Nothing found" button
+nothing_found_sending=Envoi...
+nothing_found_done=Merci !
+nothing_found_failed=Échec
+
+# for below the search box
+search_done=Terminé
+search_busy=Occupé
+search_1_active_download=Recherche 1 page
+search_n_active_downloads=Recherche # pages
+search_no_results_yet=Pas encore de résultat
+search_1_result=1 résultat
+search_n_results=# résultats
+search_no_results=Aucun résultat
+cannot_download_this_kind=Impossible de télécharger ce type de fichier
+
+
+# for rules.xml
+high_quality=Haute qualité
+low_quality=Basse qualité
+mid_quality=Qualité normale
+hd_quality=Haute définition
+embedplayer=Objet intégré (pas une vidéo, possiblement un lecteur)
+
+# download methods
+dmethod.open-tab=Ouvrir dans un nouvel onglet
+dmethod.open-tab.a=o
+dmethod.open-tab.tip=Ouvrir dans un nouvel onglet.
+dmethod.open-new=Ouvrir dans une nouvelle fenêtre
+dmethod.open-new.a=f
+dmethod.open-new.tip=Ouvrir dans une nouvelle fenêtre.
+dmethod.open-over=Ouvrir au-dessus de la fenêtre courante
+dmethod.open-over.a=c
+dmethod.open-over.tip=Équivaut à cliquer sur un lien vers le média dans la page.
+dmethod.saveas=Enregistrer sous
+dmethod.saveas.a=s
+dmethod.saveas.tip=Utiliser le gestionnaire de téléchargement par défaut de Firefox.
+dmethod.dta=DownThemAll
+dmethod.dta.a=D
+dmethod.dta.tip=Télécharger avec l'extension DownThemAll.
+dmethod.flashgot=FlashGot
+dmethod.flashgot.a=F
+dmethod.flashgot.tip=Télécharger avec l'extension FlashGot.
+dmethod.copyurl=Copier le lien
+dmethod.copyurl.a=l
+dmethod.copyurl.tip=Copier l'emplacement du média dans le presse-papiers.
+dmethod.rtmpdump=Rtmpdump
+dmethod.rtmpdump.a=R
+dmethod.rtmpdump.tip=Obtenir ou exécuter rtmpdump.
+
+dmethod.unavailable.tip=Impossible de télécharger ce fichier.
+
+proc.status.error=Erreur
+proc.status.running=En cours
+proc.status.done=Terminé
+
+# external download methods
+need_to_install=Vous devez installer %s pour télécharger ce fichier
+location_of=Emplacement de %s
+
+
