@@ -1,0 +1,66 @@
+extensions.{unplug@compunach}.description=Ladda ner inbäddade mediefiler
+
+# Confirmation after clicking on "Nothing found" button
+nothing_found_send_data=Vill du skicka information om den här webbsidan till utvecklarna av UnPlug?
+
+# Short status strings during/after clicking "Nothing found" button
+nothing_found_sending=Skickar...
+nothing_found_done=Tusen tack!
+nothing_found_failed=Misslyckades
+
+# for below the search box
+search_done=Sökning slutförd
+search_busy=Upptagen
+search_1_active_download=Söker på 1 sida
+search_n_active_downloads=Söker på # sidor
+search_no_results_yet=Inga resultat ännu
+search_1_result=1 resultat
+search_n_results=# resultat
+search_no_results=Inga resultat
+cannot_download_this_kind=Kan inte ladda ner den här typen av fil
+
+
+# for rules.xml
+high_quality=Hög kvalitet
+low_quality=Låg kvalitet
+mid_quality=Normal kvalitet
+hd_quality=Hög upplösning
+embedplayer=Inbäddat objekt (kan vara mediespelare, inte video)
+
+# download methods
+dmethod.open-tab=Öppna i en ny flik
+dmethod.open-tab.a=f
+dmethod.open-tab.tip=Öppna i en ny flik.
+dmethod.open-new=Öppna i ett nytt fönster
+dmethod.open-new.a=n
+dmethod.open-new.tip=Öppna i ett nytt fönster.
+dmethod.open-over=Öppna över det aktuella fönstret
+dmethod.open-over.a=v
+dmethod.open-over.tip=Motsvarar att klicka på en länk till mediefilerna på sidan.
+dmethod.saveas=Spara som...
+dmethod.saveas.a=S
+dmethod.saveas.tip=Använd Firefox standardnerladdningshanterare (Filhämtaren).
+dmethod.dta=DownThemAll
+dmethod.dta.a=A
+dmethod.dta.tip=Ladda ner med tillägget DownThemAll.
+dmethod.flashgot=FlashGot
+dmethod.flashgot.a=F
+dmethod.flashgot.tip=Ladda ner med tillägget FlashGot.
+dmethod.copyurl=Kopiera länk
+dmethod.copyurl.a=p
+dmethod.copyurl.tip=Kopiera mediefilens adress till Urklipp.
+dmethod.rtmpdump=RTMPDump
+dmethod.rtmpdump.a=R
+dmethod.rtmpdump.tip=Hämta eller kör RTMPDump.
+
+dmethod.unavailable.tip=Kan inte ladda ner den här filen.
+
+proc.status.error=Fel
+proc.status.running=Körs...
+proc.status.done=Slutförd
+
+# external download methods
+need_to_install=Du måste installera %s för att ladda ner den här filen
+location_of=Sökväg till %s
+
+

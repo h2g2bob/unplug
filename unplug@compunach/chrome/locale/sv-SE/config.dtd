@@ -1,0 +1,75 @@
+<!--
+/*
+ *         _        ___
+ *    /\ / /___    / _ \ /\ /\  _ ___
+ *   / // // _ \  / // // // // // _ \
+ *  / // // // / / ___// // // // // /
+ *  \___//_//_/ /_/   /_/ \___/ \_  /
+ *                             \___/
+ * 
+ *  Compunach UnPlug
+ *  Copyright (C) 2009 David Batley <unplug@dbatley.com>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+-->
+
+<!ENTITY configheader.subtitle "Ändra inställningar">
+
+<!-- tab headings -->
+<!ENTITY tab.title.about "Om UnPlug">
+<!ENTITY tab.title.integration "Integration">
+<!ENTITY tab.title.discovery "Mediesökning">
+<!ENTITY tab.title.downloads "Nerladdningar">
+
+<!-- general options -->
+<!ENTITY interface.title "Var skall UnPlug läggas till?">
+<!ENTITY interface.toolsmenu "Lägg till länk i Verktyg-menyn">
+<!ENTITY interface.toolsmenu.a "t">
+<!ENTITY interface.contextmenu "Lägg till länk i snabbmenyn">
+<!ENTITY interface.contextmenu.a "y">
+<!ENTITY interface.toolbarbtn "Lägg till verktygsfältsknapp">
+<!ENTITY interface.toolbarbtn.a "f">
+<!ENTITY privacy.title "Sekretess">
+<!ENTITY privacy.popcontest "Skicka in information om vilka webbplatser du använder UnPlug på">
+<!ENTITY privacy.popcontest.a "S">
+<!ENTITY privacy.infolink "Läs mer här">
+<!ENTITY privacy.infolink.a "O">
+<!ENTITY rulesxml.title "Filen rules.xml">
+<!ENTITY rulesxml.description "Rules.xml innehåller information om hur mediefiler hittas på webbsidor.">
+<!ENTITY rulesxml.default "Standard">
+<!ENTITY rulesxml.default.a "a">
+
+<!-- downloader tab -->
+<!ENTITY downloader.title "Föredragen nerladdningsmetod">
+<!ENTITY downloader.auto "Använd tillägg">
+<!ENTITY downloader.addons "Tillägg som stöds">
+<!ENTITY downloader.dta "DownThemAll">
+<!ENTITY downloader.flashgot "FlashGot">
+
+<!-- discovery tab -->
+<!ENTITY showall.title "Visa ytterligare resultat">
+<!ENTITY showall.label "Visa resultat som inte fungerar korrekt">
+<!ENTITY showall.label.a "V">
+
+<!-- about tab -->
+<!ENTITY about.title "Tack för att du installerar UnPlug">
+<!ENTITY about.description "UnPlug är gratis programvara med öppen källkod.">
+<!ENTITY about.gpl "GNU General Public License">
+<!ENTITY about.agpl "GNU Affero General Public License, version 3">
+<!ENTITY about.updated "UnPlugs inställningar har uppdaterats.">
+
+
+
