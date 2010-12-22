@@ -122,12 +122,12 @@
 			<label href="https://addons.mozilla.org/en-US/firefox/addon/220" class="text-link" value="&downloader.flashgot;" />
 		</groupbox>
 		<groupbox>
-			<caption label="External tools" />
+			<caption label="&extern.list.header;" />
 			<hbox>
 				<menulist id="extern-tool" flex="1">
 					<menupopup />
 				</menulist>
-				<button label="Edit" accesskey="E" oncommand="edit_extern_tool();" />
+				<button label="&extern.edit;" accesskey="&extern.edit.a;" oncommand="edit_extern_tool();" />
 			</hbox>
 		</groupbox>
 		<spacer flex="1" />

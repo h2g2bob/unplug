@@ -59,6 +59,10 @@
 <!ENTITY downloader.dta "DownThemAll">
 <!ENTITY downloader.flashgot "FlashGot">
 
+<!ENTITY extern.list.header "External tools">
+<!ENTITY extern.edit "Edit">
+<!ENTITY extern.edit.a "E">
+
 <!-- discovery tab -->
 <!ENTITY showall.title "Poka¿ dodatkowe rezultaty">
 <!ENTITY showall.label "Poka¿ rezultaty które mog¹ dzia³aæ le">
