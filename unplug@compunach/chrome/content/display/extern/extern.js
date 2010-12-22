@@ -91,12 +91,12 @@ UnPlug2Extern = {
 			var prompt_service = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
 				.getService(Components.interfaces.nsIPromptService);
 			var checkbox = { "value" : true };
-			var button = prompt_service.confirmEx(window, "UnPlug: Cancel download",
-				"Would you like to cancel the download of " + rtn.file.leafName + "?",
+			var button = prompt_service.confirmEx(window, UnPlug2.str("extern.cancel.title"),
+				UnPlug2.str("extern.cancel.onefile").replace("%s", rtn.file.leafName),
 				prompt_service.BUTTON_POS_0 * prompt_service.BUTTON_TITLE_IS_STRING +
 				prompt_service.BUTTON_POS_1 * prompt_service.BUTTON_TITLE_IS_STRING,
-				"Stop", "Don't stop", null,
-				"Delete partially downloaded file",
+				UnPlug2.str("extern.cancel.stop"), UnPlug2.str("extern.cancel.dontstop"), null,
+				UnPlug2.str("extern.cancel.deletefile"),
 				checkbox);
 			if (button === 0) {
 				this.do_kill(rtn, checkbox.value);
@@ -155,12 +155,12 @@ UnPlug2Extern = {
 		var prompt_service = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
 			.getService(Components.interfaces.nsIPromptService);
 		var checkbox = { "value" : true };
-		var button = prompt_service.confirmEx(window, "UnPlug: Cancel download",
-			"There are %s active downloads?".replace("%s", this.watching.length),
+		var button = prompt_service.confirmEx(window, UnPlug2.str("extern.cancel.title"),
+			UnPlug2.str("extern.cancel.manyfile").replace("%s", this.watching.length),
 			prompt_service.BUTTON_POS_0 * prompt_service.BUTTON_TITLE_IS_STRING +
 			prompt_service.BUTTON_POS_1 * prompt_service.BUTTON_TITLE_IS_STRING,
-			"Stop", "Don't stop", null,
-			"Delete partially downloaded files",
+			UnPlug2.str("extern.cancel.stop"), UnPlug2.str("extern.cancel.dontstop"), null,
+			UnPlug2.str("extern.cancel.deletefile"),
 			checkbox);
 		if (button === 0) {
 			for (var i = 0; i < this.watching.length; ++i) {

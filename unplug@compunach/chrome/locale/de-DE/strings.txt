@@ -61,3 +61,11 @@ proc.status.done=Fertig
 # external download methods
 need_to_install=You need to install %s to download this file
 location_of=Location of %s
+
+extern.cancel.title=UnPlug: Cancel download
+extern.cancel.onefile=Would you like to cancel the download of %s?
+extern.cancel.manyfile=Would you like to cancel %s active downloads?
+extern.cancel.stop=Stop
+extern.cancel.dontstop=Don't stop
+extern.cancel.deletefile=Delete partially downloaded file
+
