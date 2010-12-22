@@ -70,6 +70,16 @@ var UnPlug2DownloadMethods = {
 	button_names : (function () {
 		return this._button_names;
 	}),
+	get_extern_tool_names : (function () {
+		var out = [];
+		for (var i = 0; i < this._button_names.length; ++i) {
+			var name = this._button_names[i];
+			if (this._button_lookup[name].signal_get_argv) {
+				out.push(name);
+			}
+		}
+		return out;
+	}),
 	getinfo : (function (name) {
 		return this._button_lookup[name];
 	}),

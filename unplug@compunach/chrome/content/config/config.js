@@ -31,6 +31,7 @@ function do_load() {
 		}
 	}
 	set_text();
+	set_extern_tools();
 	detect_toolbarbutton();
 	goto_tab_requested();
 }
@@ -38,6 +39,21 @@ function do_load() {
 function set_text() {
 	document.getElementById("dmethod-saveas").setAttribute("label", UnPlug2.str("dmethod.saveas"))
 	document.getElementById("dmethod-openover").setAttribute("label", UnPlug2.str("dmethod.open-over"))
+}
+
+function set_extern_tools() {
+	var names = UnPlug2DownloadMethods.get_extern_tool_names();
+	var elem = document.getElementById("extern-tool");
+	for (var i = 0; i < names.length; ++i) {
+		elem.appendItem(UnPlug2.str("dmethod." + names[i]), names[i]);
+	}
+	elem.selectedIndex = 0;
+}
+
+function edit_extern_tool() {
+	var elem = document.getElementById("extern-tool");
+	var name = elem.selectedItem.value;
+	window.openDialog("chrome://unplug/content/config/extern.xul", "chrome,modal", "unplug_extern", name);
 }
 
 function browser_window() {
