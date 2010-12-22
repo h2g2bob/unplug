@@ -77,9 +77,40 @@ UnPlug2Extern = {
 	}),
 	
 	setup_kill_button : (function (rtn) {
+		
+		// TODO - we really want a smaller and nicer cancel button
+		
 		rtn.node.getElementsByTagName("button")[0].addEventListener("command", (function () {
-			rtn.was_killed = true;
-			rtn.process.kill();
+			// no point in killing if it's already dead
+			if (!rtn.process.isRunning) {
+				return;
+			}
+			
+			// ask it we want to delete
+			// Alt+F4 defaults to POS_1
+			var prompt_service = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+				.getService(Components.interfaces.nsIPromptService);
+			var checkbox = { "value" : true };
+			var button = prompt_service.confirmEx(window, "UnPlug: Cancel download",
+				"Would you like to cancel the download of " + rtn.file.leafName + "?",
+				prompt_service.BUTTON_POS_0 * prompt_service.BUTTON_TITLE_IS_STRING +
+				prompt_service.BUTTON_POS_1 * prompt_service.BUTTON_TITLE_IS_STRING,
+				"Stop", "Don't stop", null,
+				"Delete partially downloaded file",
+				checkbox);
+			if (button === 0) {
+				// don't delete if it's just finished.
+				if (!rtn.process.isRunning) {
+					return;
+				}
+				rtn.was_killed = true;
+				rtn.process.kill();
+				if (checkbox.value) {
+					try {
+						rtn.file.remove(false);
+					} catch (e) {} // file does not exist
+				}
+			}
 		}), false);
 	}),
 	
@@ -114,6 +145,9 @@ UnPlug2Extern = {
 	}),
 	
 	want_close : (function () {
+		// TODO: probably want to disable this button unless watching.length > 0
+		// or have a better dialog like "don't stop" / "stop all"
+		// in similar way to individual stop buttons
 		if (this.watching.length > 0) {
 			return confirm("Current downloads will no longer be listed if you close this window.");
 		}
