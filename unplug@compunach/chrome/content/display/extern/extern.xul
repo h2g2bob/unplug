@@ -4,6 +4,8 @@
 <!DOCTYPE dialog [
 	<!ENTITY % dtdcommon SYSTEM "chrome://unplug/locale/common.dtd">
 	%dtdcommon;
+	<!ENTITY % dtdextern SYSTEM "chrome://unplug/locale/extern.dtd">
+	%dtdextern;
 	]>
 <!--
 /*
@@ -33,7 +35,7 @@
  */
 -->
 <dialog id="cn_unplug2_special"
-  title="&dialog.title;"
+  title="&dialog.title;: &extern.description;"
   flex="1"
   buttons="cancel"
   defaultButton="cancel"
@@ -50,7 +52,7 @@
 	
 	<dialogheader title="&header.title;" description="&header.subtitle;"/>
 	<vbox flex="1">
-		<description>Downloading files</description>
+		<description>&extern.description;</description>
 		<spacer />
 		<vbox class="scroll-box" style="overflow: -moz-scrollbars-vertical;" flex="1">
 			<vbox id="program-container" />
@@ -60,7 +62,7 @@
 	<hbox collapsed="true" id="program-template" align="center">
 		<description value="(filename)" flex="1" crop="end" class="filename" />
 		<label value="(method)" />
-		<button label="Stop" />
+		<button label="&extern.stop;" />
 		<label value="(size)" />
 		<label value="(status)" class="status" />
 	</hbox>
