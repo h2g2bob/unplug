@@ -77,10 +77,44 @@ UnPlug2Extern = {
 	}),
 	
 	setup_kill_button : (function (rtn) {
+		
+		// TODO - we really want a smaller and nicer cancel button
+		
 		rtn.node.getElementsByTagName("button")[0].addEventListener("command", (function () {
-			rtn.was_killed = true;
-			rtn.process.kill();
+			// no point in killing if it's already dead
+			if (!rtn.process.isRunning) {
+				return;
+			}
+			
+			// ask it we want to delete
+			// Alt+F4 defaults to POS_1
+			var prompt_service = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+				.getService(Components.interfaces.nsIPromptService);
+			var checkbox = { "value" : true };
+			var button = prompt_service.confirmEx(window, UnPlug2.str("extern.cancel.title"),
+				UnPlug2.str("extern.cancel.onefile").replace("%s", rtn.file.leafName),
+				prompt_service.BUTTON_POS_0 * prompt_service.BUTTON_TITLE_IS_STRING +
+				prompt_service.BUTTON_POS_1 * prompt_service.BUTTON_TITLE_IS_STRING,
+				UnPlug2.str("extern.cancel.stop"), UnPlug2.str("extern.cancel.dontstop"), null,
+				UnPlug2.str("extern.cancel.deletefile"),
+				checkbox);
+			if (button === 0) {
+				this.do_kill(rtn, checkbox.value);
+			}
 		}), false);
+	}),
+	
+	do_kill : (function (rtn, rm_file) {
+		if (!rtn.process.isRunning) {
+			return; // don't delete if it's just finished.
+		}
+		rtn.was_killed = true;
+		rtn.process.kill();
+		if (rm_file) {
+			try {
+				rtn.file.remove(false);
+			} catch (e) {} // file does not exist
+		}
 	}),
 	
 	remove_kill_button : (function (doc) {
@@ -114,10 +148,28 @@ UnPlug2Extern = {
 	}),
 	
 	want_close : (function () {
-		if (this.watching.length > 0) {
-			return confirm("Current downloads will no longer be listed if you close this window.");
+		if (this.watching.length == 0) {
+			return true; // no reason not to exit
 		}
-		return true;
+		
+		var prompt_service = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+			.getService(Components.interfaces.nsIPromptService);
+		var checkbox = { "value" : true };
+		var button = prompt_service.confirmEx(window, UnPlug2.str("extern.cancel.title"),
+			UnPlug2.str("extern.cancel.manyfile").replace("%s", this.watching.length),
+			prompt_service.BUTTON_POS_0 * prompt_service.BUTTON_TITLE_IS_STRING +
+			prompt_service.BUTTON_POS_1 * prompt_service.BUTTON_TITLE_IS_STRING,
+			UnPlug2.str("extern.cancel.stop"), UnPlug2.str("extern.cancel.dontstop"), null,
+			UnPlug2.str("extern.cancel.deletefile"),
+			checkbox);
+		if (button === 0) {
+			for (var i = 0; i < this.watching.length; ++i) {
+				this.do_kill(this.watching[i], checkbox.value);
+			}
+			return true; // ok to exit
+		} else {
+			return false; // clicked cancel
+		}
 	})
 }
 

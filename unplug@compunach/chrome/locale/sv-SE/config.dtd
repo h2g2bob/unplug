@@ -59,6 +59,12 @@
 <!ENTITY downloader.dta "DownThemAll">
 <!ENTITY downloader.flashgot "FlashGot">
 
+<!ENTITY extern.list.header "External tools">
+<!ENTITY extern.edit "Edit">
+<!ENTITY extern.edit.a "E">
+<!ENTITY extern.browse "Browse">
+<!ENTITY extern.browse.a "B">
+
 <!-- discovery tab -->
 <!ENTITY showall.title "Visa ytterligare resultat">
 <!ENTITY showall.label "Visa resultat som inte fungerar korrekt">

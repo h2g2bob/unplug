@@ -58,7 +58,7 @@
 	<label id="location-of" />
 	<hbox>
 		<textbox value="" id="execfile" flex="1" disabled="true" />
-		<button label="Browse" oncommand="dobrowse()" disabled="true" id="browsebutton" />
+		<button label="&extern.browse;" accesskey="&extern.browse.a;" oncommand="dobrowse()" disabled="true" id="browsebutton" />
 	</hbox>
 	<spacer flex="1" />
 </dialog>
