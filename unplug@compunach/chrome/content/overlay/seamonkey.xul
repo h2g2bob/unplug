@@ -31,18 +31,16 @@
 <overlay id="unplug2_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 	<script type="application/javascript" src="chrome://unplug/content/common.js" />
 	<script type="application/javascript" src="chrome://unplug/content/overlay/all.js" />
-	<script type="application/javascript" src="chrome://unplug/content/overlay/firefox.js" />
+	<script type="application/javascript" src="chrome://unplug/content/overlay/seamonkey.js" />
 	
-	<popup id="contentAreaContextMenu">
-		<menuitem id="unplug2_contextmenu" label="&menuitem.unplug;" accesskey="&menuitem.u;" insertbefore="context-viewpartialsource-selection" oncommand="UnPlug2Overlay.run();" class="menuitem-iconic" />
-	</popup>
+	<statusbarpanel id="component-bar">
+		<toolbarbutton class="taskbutton" id="unplug2_taskbutton" oncommand="UnPlug2Overlay.run();" tooltiptext="&toolbarbutton.unplug.tip;" />
+	</statusbarpanel>
 	
-	<menupopup id="menu_ToolsPopup">
-		<menuitem id="unplug2_toolsmenu" label="&menuitem.unplug;" accesskey="&menuitem.u;" insertafter="javascriptConsole" oncommand="UnPlug2Overlay.run();" class="menuitem-iconic" />
-	</menupopup>
-	
+	<!-- this doesn't work at all
 	<toolbarpalette id="BrowserToolbarPalette">
 		<toolbarbutton id="unplug2_toolbarbutton" class="toolbarbutton" name="unplug2_toolbarbutton" tooltiptext="&toolbarbutton.unplug.tip;" oncommand="UnPlug2Overlay.run();" label="&toolbarbutton.unplug;" />
-	</toolbarpalette> 
+	</toolbarpalette>
+	-->
 </overlay>
 
