@@ -412,16 +412,29 @@ UnPlug2DownloadMethods.add_button("flashgot", {
 
 UnPlug2DownloadMethods.add_button("rtmpdump", {
 	avail : (function (res) {
-		return res.download.url && (
-			res.download.url.indexOf("rtmp://") == 0
-			|| res.download.url.indexOf("rtmpe://") == 0);
+		var url = res.download.rtmp || res.download.url;
+		return url && (
+			url.indexOf("rtmp://") == 0
+			|| url.indexOf("rtmpe://") == 0);
 	}),
 	signal_get_argv : (function (res, savefile) {
-		return [
-			"--rtmp", res.download.url,
+		var cmds = [
+			"--verbose",
+			"--rtmp", res.download.rtmp || res.download.url,
 			"--pageUrl", res.download.referer,
 			"--swfUrl", res.download.referer, // this is invalid, but good enough most of the time.
 			"--flv", savefile.file.path ];
+		if (res.download.rtmp) {
+			if (res.download.playpath) {
+				cmds.push("--playpath");
+				cmds.push(res.download.playpath);
+			}
+			if (res.download.app) {
+				cmds.push("--app");
+				cmds.push(res.download.app);
+			}
+		}
+		return cmds;
 	}),
 	exec_file_list : [
 		"/usr/bin/rtmpdump" ],
