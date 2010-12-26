@@ -1179,6 +1179,22 @@ UnPlug2Search = {
 							}
 							download_method.referer = download_method.referer || String(UnPlug2SearchPage._win.location);
 							
+							switch (node.getAttribute("method")) {
+								case "rtmp":
+									download_method.rtmp = download_method.url;
+									delete download_method["url"];
+									var attrs = ["app", "playpath"];
+									for (var aidx = 0; aidx < attrs.length; ++aidx) {
+										if (node.hasAttribute(attrs[aidx])) {
+											download_method[attrs[aidx]] = updated_variables.subst_optional(node.getAttribute(attrs[aidx]));
+										}
+									}
+									break;
+								default:
+									// pass
+									break;
+							}
+							
 							// make response
 							var result = UnPlug2Search._make_response_object_result(
 								abs_url,

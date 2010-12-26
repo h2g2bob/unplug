@@ -357,6 +357,45 @@
 		<if_re re="http://media.mtvnservices.com/(mgid:[^:]+:[^:]+:[^:]+:\d+)" ref="mgid" />
 		<rule goto="dailyshow-id" />
 	</rule>
+	<rule id="iplayer-audio">
+		<if_url host="bbc.co.uk" ref="url" />
+		<rule>
+			<if_re ref="pagetag" re="/iplayer/episode/([^/]+)/" string="${url.path}" />
+			<download url="http://www.bbc.co.uk/iplayer/playlist/${pagetag.1}/">
+				<each_re ref="item" re="(&lt;item[\s\S]+?&lt;/item&gt;)">
+					<optional_re ref="title" re="&lt;title&gt;([^&lt;]+)&lt;/title&gt;" />
+					<if_re ref="ident" re="identifier=&quot;([^&quot;]+)&quot;" />
+					<download url="http://www.bbc.co.uk/mediaselector/4/mtis/stream/${ident.1}?cb=${randomint:5}">
+						<each_re ref="m" re="(&lt;media[\s\S]+?&lt;/media&gt;)">
+							<optional_re re="bitrate=&quot;([^&quot;]+)&quot;" ref="bitrate" string="${m.1}" />
+							<optional_re re="encoding=&quot;([^&quot;]+)&quot;" ref="encoding" string="${m.1}" />
+							<optional_re re="type=&quot;([^&quot;]+)&quot;" ref="type" string="${m.1}" />
+							<rule id="iplayer-asx">
+								<if_re re="href=&quot;(http://www\.bbc\.co\.uk/mediaselector/4/asx/[^&quot;]+)&quot;" ref="asxloc" string="${m.1}" />
+								<download url="${asxloc.1}">
+									<each_re ref="wmaloc" re="href=&quot;(mms://[^&quot;]+)&quot;">
+										<media url="${wmaloc.1}" title="${title.1} ${either:title.2:origtitle.innerHTML}" description="${optional:bitrate.1} ${optional:type.1}" mediaid="${ident.1}" />
+									</each_re>
+								</download>
+							</rule>
+							<rule id="iplayer-rtmp">
+								<if_re ref="protocol" re="protocol=&quot;(rtmpe?)&quot;" string="${m.1}" />
+								<if_re ref="app" re="application=&quot;([^&quot;]+)&quot;" string="${m.1}" />
+								<if_re ref="auth" re="authString=&quot;([^&quot;]+)&quot;" string="${m.1}" />
+								<if_re ref="server" re="server=&quot;([^&quot;]+)&quot;" string="${m.1}" />
+								<if_re ref="identifier" re="identifier=&quot;([^&quot;]+)&quot;" string="${m.1}" />
+								<media method="rtmp"
+									url="${protocol.1}://${server.1}:1935/${app.1}?${htmldecode:auth.1}"
+									app="${app.1}?${htmldecode:auth.1}"
+									playpath="${identifier.1}"
+									title="${title.1} ${either:title.2:origtitle.innerHTML}" description="${optional:bitrate.1} ${optional:type.1}" mediaid="${ident.1}" />
+							</rule>
+						</each_re>
+					</download>
+				</each_re>
+			</download>
+		</rule>
+	</rule>
 	<!--
 		The current flashblock workaround is to:
 		 * re-download page
