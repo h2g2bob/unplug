@@ -14,6 +14,11 @@
 		em:homepageURL="http://unplug.dbatley.com/"
 		em:iconURL="chrome://unplug/skin/unplug-32.png"
 		em:optionsURL="chrome://unplug/content/config/config.xul" >
+		<em:translator>Ushi (de-DE)</em:translator>
+		<em:translator>DenB (fr-FR)</em:translator>
+		<em:translator>Juhász Zsolt (hu-HU)</em:translator>
+		<em:translator>Konradmb (pl-PL)</em:translator>
+		<em:translator>Mikael Hiort af Ornäs (sv-SE)</em:translator>
 		<em:targetApplication>
 			<Description>
 				<!-- Firefox -->
