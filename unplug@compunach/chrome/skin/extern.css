@@ -18,3 +18,20 @@
 .process-status-running .status {
 	color: #000000;
 }
+
+button.stop {
+	/* list-style-image: url("chrome://unplug/skin/tango-16/process-stop.png"); */
+}
+
+label.method {
+	display: none;
+}
+
+label.size {
+	width: 8em;
+}
+
+label.status {
+	width: 8em;
+}
+

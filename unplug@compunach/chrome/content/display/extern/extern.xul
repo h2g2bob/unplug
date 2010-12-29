@@ -34,15 +34,16 @@
  *
  */
 -->
-<dialog id="cn_unplug2_special"
+<dialog id="unplug_extern"
   title="&dialog.title;: &extern.description;"
   flex="1"
   buttons="cancel"
   defaultButton="cancel"
   ondialogcancel="return UnPlug2Extern.want_close();"
 
-  width="400"
+  width="650"
   height="300"
+  persist="width,height"
   
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 	
@@ -61,9 +62,9 @@
 	</vbox>
 	<hbox collapsed="true" id="program-template" align="center">
 		<description value="(filename)" flex="1" crop="end" class="filename" />
-		<label value="(method)" />
-		<button label="&extern.stop;" />
-		<label value="(size)" />
+		<label class="method" value="(method)" />
+		<button class="stop" label="&extern.stop;" />
+		<label class="size" value="(size)" />
 		<label value="(status)" class="status" />
 	</hbox>
 </dialog>

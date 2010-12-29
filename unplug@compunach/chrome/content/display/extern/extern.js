@@ -119,7 +119,7 @@ UnPlug2Extern = {
 	
 	remove_kill_button : (function (doc) {
 		var n = doc.getElementsByTagName("button")[0];
-		n.setAttribute("collapsed", true); // don't delete as has race with kill button setup
+		n.style.visibility = "hidden"; // don't delete as has race with kill button setup
 	}),
 	
 	poll : (function () {
