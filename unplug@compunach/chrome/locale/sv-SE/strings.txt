@@ -66,7 +66,7 @@ location_of=Sökväg till %s
 extern.cancel.title=UnPlug: Cancel download
 extern.cancel.onefile=Would you like to cancel the download of %s?
 extern.cancel.manyfile=Would you like to cancel %s active downloads?
-extern.cancel.stop=Stop
+extern.cancel.stop=Stopp
 extern.cancel.dontstop=Don't stop
 extern.cancel.deletefile=Delete partially downloaded file
 
