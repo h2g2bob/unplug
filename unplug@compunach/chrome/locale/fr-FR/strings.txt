@@ -19,7 +19,6 @@ search_n_results=# résultats
 search_no_results=Aucun résultat
 cannot_download_this_kind=Impossible de télécharger ce type de fichier
 
-
 # for rules.xml
 high_quality=Haute qualité
 low_quality=Basse qualité

@@ -19,7 +19,6 @@ search_n_results=# találat
 search_no_results=Nincs találat
 cannot_download_this_kind=Nem lehet letölteni ezt a típusú fájlt
 
-
 # for rules.xml
 high_quality=Magas minőség
 low_quality=Alacsony minőség
@@ -54,6 +53,7 @@ dmethod.copyurl.tip=Média címének másolása a vágólapra.
 dmethod.rtmpdump=Rtmpdump
 dmethod.rtmpdump.a=R
 dmethod.rtmpdump.tip=Eszköz (rtmpdump) beszerzése vagy futtatása.
+
 dmethod.unavailable.tip=Nem lehet letölteni ezt a fájlt.
 
 proc.status.error=Error

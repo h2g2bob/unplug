@@ -19,7 +19,6 @@ search_n_results=# resultat
 search_no_results=Inga resultat
 cannot_download_this_kind=Kan inte ladda ner den här typen av fil
 
-
 # for rules.xml
 high_quality=Hög kvalitet
 low_quality=Låg kvalitet
