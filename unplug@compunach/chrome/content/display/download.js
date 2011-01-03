@@ -198,7 +198,7 @@ var UnPlug2DownloadMethods = {
 	
 	/**
 	 * Displays save-as box
-	 * return { file : nsIFile?, fileURL : nsIFileURL? }, or null for cancel.
+	 * return an nsILocalFile, or null for cancel.
 	 */
 	_save_as_box : (function (name, ext) {
 		// make string, strip whitespace
@@ -250,7 +250,7 @@ var UnPlug2DownloadMethods = {
 		if (ret != nsIFilePicker.returnOK && ret != nsIFilePicker.returnReplace)
 			return null; // cancelled
 		UnPlug2.set_pref("savepath", filepicker.file.parent.path);
-		return { "file" : filepicker.file, "fileURL" : filepicker.fileURL };
+		return filepicker.file;
 	}),
 
 	_nsifile_if_exec : (function (fname) {
@@ -321,7 +321,7 @@ UnPlug2DownloadMethods.add_button("saveas", {
 		var persistArgs = {
 			source      : nsiurl,
 			contentType : "application/octet-stream",
-			target      : file.fileURL,
+			target      : io_service.newFileURI(file),
 			postData    : null,
 			bypassCache : false
 		};
@@ -363,8 +363,7 @@ UnPlug2DownloadMethods.add_button("dta", {
 		}
 		return true;
 	}),
-	exec_fp : (function (res, fileobj) {
-		var file = fileobj.file;
+	exec_fp : (function (res, file) {
 		if (file.leafName.indexOf("*") >= 0) {
 			// we use the renaming mask, which treats *name*, etc as special.
 			throw "Filename contains star";
@@ -438,7 +437,7 @@ UnPlug2DownloadMethods.add_button("rtmpdump", {
 			"--rtmp", res.download.rtmp || res.download.url,
 			"--pageUrl", res.download.referer,
 			"--swfUrl", res.download.referer, // this is invalid, but good enough most of the time.
-			"--flv", savefile.file.path ];
+			"--flv", savefile.path ];
 		if (res.download.rtmp) {
 			if (res.download.playpath) {
 				cmds.push("--playpath");
