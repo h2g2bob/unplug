@@ -79,7 +79,7 @@
 	</hbox>
 	<spacer height="0.5em" />
 	<hbox align="center">
-		<label value="Save all with" control="save_all_list" />
+		<label value="Save all with" accesskey="w" control="save_all_list" />
 		<menulist flex="1" id="save_all_list" />
 		<button label="Save all" accesskey="a" oncommand="UnPlug2SearchPage.do_saveall();" />
 	</hbox>

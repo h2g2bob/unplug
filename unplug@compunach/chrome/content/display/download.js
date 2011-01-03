@@ -153,16 +153,34 @@ var UnPlug2DownloadMethods = {
 	exec_multiple : (function (method, result_list) {
 		var info = this._button_lookup[method];
 		
-		const nsifilepicker = Components.interfaces.nsIFilePicker;
+		const nsIFilePicker = Components.interfaces.nsIFilePicker;
 		const nsifile = Components.interfaces.nsIFile;
 		var filepicker = Components.classes["@mozilla.org/filepicker;1"]
-			.createInstance(nsifilepicker);
-		filepicker.init(window, "Save files to", nsifilepicker.modeGetFolder); // TODO localize
-		// TODO filepicker.displayDirectory ...?
+			.createInstance(nsIFilePicker);
+		filepicker.init(window, UnPlug2.str("save_to_directory"), nsIFilePicker.modeGetFolder);
+		
+		// default directory
+		var path = UnPlug2.get_pref("savepath");
+		if (!path) {
+			path = Components.classes["@mozilla.org/download-manager;1"]
+				.getService(Components.interfaces.nsIDownloadManager)
+				.defaultDownloadsDirectory.path;
+		}
+		if (path) {
+			var f = Components.classes["@mozilla.org/file/local;1"]
+				.createInstance(Components.interfaces.nsILocalFile);
+			f.initWithPath(path);
+			if (f.exists() && f.isDirectory()) {
+				filepicker.displayDirectory = f;
+			}
+		}
+		
 		var ret = filepicker.show();
-		if (ret !== nsifilepicker.returnOK) {
+		if (ret !== nsIFilePicker.returnOK) {
 			return;
 		}
+		UnPlug2.set_pref("savepath", filepicker.file.parent.path);
+		
 		for (var i = 0; i < result_list.length; ++i) {
 			var res = result_list[i];
 			if (!info.avail(res)) {
@@ -261,7 +279,7 @@ var UnPlug2DownloadMethods = {
 		var nsIFilePicker = Components.interfaces.nsIFilePicker;
 		var filepicker = Components.classes["@mozilla.org/filepicker;1"]
 			.createInstance(nsIFilePicker);
-		filepicker.init(window, "Save as", nsIFilePicker.modeSave);
+		filepicker.init(window, UnPlug2.str("save_to_file"), nsIFilePicker.modeSave);
 		
 		// default directory
 		var path = UnPlug2.get_pref("savepath");
