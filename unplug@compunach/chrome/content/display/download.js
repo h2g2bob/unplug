@@ -74,6 +74,15 @@ var UnPlug2DownloadMethods = {
 		});
 	}),
 	
+	/* returns the names of all buttons */
+	save_all_buttons : (function () {
+		var that = this;
+		return this._button_names.filter(function (val) {
+			var info = that._button_lookup[val];
+			return (info.exec_fp || info.signal_get_argv);
+		});
+	}),
+	
 	get_extern_tool_names : (function () {
 		var out = [];
 		for (var i = 0; i < this._button_names.length; ++i) {

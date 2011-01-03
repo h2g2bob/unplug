@@ -57,6 +57,24 @@ UnPlug2SearchPage = {
 		this.playlist_id_lookup = {}; // { "youtube-uploader-1213" : [1, ...] }
 	},
 	
+	done_load : (function () {
+		// fill in the save-as box list
+		var sal = document.getElementById("save_all_list");
+		var bnl = UnPlug2DownloadMethods.save_all_buttons();
+		for (var i = 0; i < bnl.length; ++i) {
+			var name = bnl[i];
+			var info = UnPlug2DownloadMethods.getinfo(name);
+			var elem = sal.appendItem(UnPlug2.str("dmethod." + name), name);
+			elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a"))
+			elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
+			elem.className = "menuitem-iconic save-all " + info.css;
+		}
+		sal.value = "saveas";
+		
+		// now start the search automatically
+		UnPlug2SearchPage.do_search();
+	}),
+	
 	/**
 	 * search the parent window for media, returning search result objects
 	 */
@@ -71,6 +89,11 @@ UnPlug2SearchPage = {
 			UnPlug2.log(e);
 		}
 	},
+	
+	/* clicked "save all" button */
+	do_saveall : (function () {
+		alert("Not available yet");
+	}),
 	
 	/**
 	 * Callback for UnPlug2Rules.search

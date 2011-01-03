@@ -46,7 +46,7 @@
   buttonlabelextra1="&configure;"
   buttonaccesskeyextra1="&configure.a;"
   
-  onload="UnPlug2SearchPage.do_search();"
+  onload="UnPlug2SearchPage.done_load();"
   ondialogaccept=""
   ondialogextra1="window.openDialog(&quot;chrome://unplug/content/config/config.xul&quot;)"
   onbeforeunload="UnPlug2SearchPage.abort();"
@@ -66,7 +66,7 @@
 	
 	<dialogheader title="&header.title;" description="&header.subtitle;"/>
 	<vbox id="results" style="overflow: -moz-scrollbars-vertical; border: 1px #666666 solid;" flex="1" />
-	<spacer height="0.5em;" />
+	<spacer height="0.5em" />
 	<hbox>
 		<label id="dynamic_download" value="" />
 		<spacer flex="1" />
@@ -77,12 +77,19 @@
 		<spacer flex="1" />
 		<button oncommand="UnPlug2SearchPage.send_nothing_found_msg();" id="notfound_button" label="&notfound.label;"  accesskey="&notfound.accesskey;" />
 	</hbox>
-	<spacer height="0.5em;" />
+	<spacer height="0.5em" />
+	<hbox align="center">
+		<label value="Save all with" control="save_all_list" />
+		<menulist flex="1" id="save_all_list" />
+		<button label="Save all" accesskey="a" oncommand="UnPlug2SearchPage.do_saveall();" />
+	</hbox>
+	<spacer height="0.5em" />
 	<progressmeter id="search_progress" mode="determined" value="0"/>
 	
 	<!-- this is the form of the result itself. We'll clone this to use in our display -->
 	<vbox id="unplug_result_template" flex="0" collapsed="true">
 		<toolbar flex="1">
+			<checkbox checked="true" disabled="true" />
 			<image class="ur-thumbnail" />
 			<vbox flex="1" style="overflow: hidden;">
 				<label class="ur-name" />
