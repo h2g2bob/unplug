@@ -89,7 +89,7 @@
 	<!-- this is the form of the result itself. We'll clone this to use in our display -->
 	<vbox id="unplug_result_template" flex="0" collapsed="true">
 		<toolbar flex="1">
-			<checkbox checked="true" disabled="true" />
+			<checkbox checked="true" />
 			<image class="ur-thumbnail" />
 			<vbox flex="1" style="overflow: hidden;">
 				<label class="ur-name" />

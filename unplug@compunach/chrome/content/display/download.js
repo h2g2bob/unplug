@@ -74,7 +74,7 @@ var UnPlug2DownloadMethods = {
 		});
 	}),
 	
-	/* returns the names of all buttons */
+	/* returns the names of all buttons available for exec_multiple */
 	save_all_buttons : (function () {
 		var that = this;
 		return this._button_names.filter(function (val) {
@@ -147,6 +147,43 @@ var UnPlug2DownloadMethods = {
 			data.exec_fp(result, file);
 		} else {
 			data.exec(result);
+		}
+	}),
+	
+	exec_multiple : (function (method, result_list) {
+		var info = this._button_lookup[method];
+		
+		const nsifilepicker = Components.interfaces.nsIFilePicker;
+		const nsifile = Components.interfaces.nsIFile;
+		var filepicker = Components.classes["@mozilla.org/filepicker;1"]
+			.createInstance(nsifilepicker);
+		filepicker.init(window, "Save files to", nsifilepicker.modeGetFolder); // TODO localize
+		// TODO filepicker.displayDirectory ...?
+		var ret = filepicker.show();
+		if (ret !== nsifilepicker.returnOK) {
+			return;
+		}
+		for (var i = 0; i < result_list.length; ++i) {
+			var res = result_list[i];
+			if (!info.avail(res)) {
+				UnPlug2.log("Not doing save-all (is unavailable) for " + method + " result " + res.toSource());
+				continue;
+			}
+			/* we create the file, then over-write it
+			 * because calling exec() does not always create the
+			 * file immediately (so testing file.exists() is not
+			 * sufficient).
+			 */
+			var filename = filepicker.file.clone();
+			filename.append(res.details.name);
+			filename.createUnique(nsifile.NORMAL_FILE_TYPE, 0600);
+			if (info.exec_fp) {
+				info.exec_fp(res, filename);
+			} else if (info.signal_get_argv) {
+				alert("info.signal_get_argv() for exec_multiple() is not implemented") // TODO
+			} else {
+				alert("Unable to download file with method " + method);
+			}
 		}
 	}),
 	

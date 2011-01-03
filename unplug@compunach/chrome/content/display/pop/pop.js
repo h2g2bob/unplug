@@ -92,7 +92,12 @@ UnPlug2SearchPage = {
 	
 	/* clicked "save all" button */
 	do_saveall : (function () {
-		alert("Not available yet");
+		var method = document.getElementById("save_all_list").value;
+		var result_list = this.results.filter(function (res) {
+			var reselem = document.getElementById("result_" + res.uid);
+			return (reselem && reselem.getElementsByTagName("checkbox")[0].checked);
+		});
+		UnPlug2DownloadMethods.exec_multiple(method, result_list);
 	}),
 	
 	/**
