@@ -499,5 +499,30 @@ UnPlug2DownloadMethods.add_button("copyurl", {
 	group : "copy"
 });
 
+UnPlug2DownloadMethods.add_button("vlc", {
+	avail : (function (res) {
+		var url = res.download.url;
+		var proto = url.substring(0, url.indexOf(":"))
+		return (["mms", "http", "https", "rtsp"].indexOf(proto) != -1);
+	}),
+	signal_get_argv : (function (res, savefile) {
+		return [
+			"--no-one-instance",
+			"-Isignals", // no gui
+			res.download.url,
+			":demux=dump",
+            		":demuxdump-file=" + savefile.file.path,
+			":sout-all",
+			"vlc://quit" ];
+	}),
+	exec_file_list : [
+		"/usr/bin/vlc" ],
+	weblinks : [
+		{ url : "http://videolan.org/vlc", label : "videolan.org" }],
+	obscurity : 90,
+	css : "extern vlc",
+	group : "special"
+});
+
 UnPlug2DownloadMethods.finish();
 

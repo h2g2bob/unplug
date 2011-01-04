@@ -51,6 +51,9 @@ dmethod.copyurl.tip=
 dmethod.rtmpdump=Rtmpdump
 dmethod.rtmpdump.a=R
 dmethod.rtmpdump.tip=
+dmethod.vlc=VLC
+dmethod.vlc.a=V
+dmethod.vlc.tip=
 
 dmethod.unavailable.tip=No downloader
 

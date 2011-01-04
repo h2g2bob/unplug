@@ -52,6 +52,9 @@ dmethod.copyurl.tip=Copy media location to the clipboard.
 dmethod.rtmpdump=Rtmpdump
 dmethod.rtmpdump.a=R
 dmethod.rtmpdump.tip=Get or run rtmpdump.
+dmethod.vlc=VLC
+dmethod.vlc.a=V
+dmethod.vlc.tip=Download with VLC media player
 
 dmethod.unavailable.tip=Cannot download this file.
 

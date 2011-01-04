@@ -52,6 +52,9 @@ dmethod.copyurl.tip=Kopiera mediefilens adress till Urklipp.
 dmethod.rtmpdump=RTMPDump
 dmethod.rtmpdump.a=R
 dmethod.rtmpdump.tip=Hämta eller kör RTMPDump.
+dmethod.vlc=VLC
+dmethod.vlc.a=V
+dmethod.vlc.tip=Hämta eller kör VLC
 
 dmethod.unavailable.tip=Kan inte ladda ner den här filen.
 

@@ -136,6 +136,9 @@ UnPlug2Extern = {
 			} else {
 				if (item.was_killed || item.process.exitValue) {
 					extern.set_program_box_status(item.node, file_size, "error");
+				} else if (file_size == 0) {
+					// EXIT_SUCCESS + no file is error from vlc
+					extern.set_program_box_status(item.node, file_size, "error");
 				} else {
 					extern.set_program_box_status(item.node, file_size, "done");
 				}
