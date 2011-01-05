@@ -53,6 +53,9 @@ dmethod.copyurl.tip=Copier l'emplacement du média dans le presse-papiers.
 dmethod.rtmpdump=Rtmpdump
 dmethod.rtmpdump.a=R
 dmethod.rtmpdump.tip=Obtenir ou exécuter rtmpdump.
+dmethod.vlc=VLC
+dmethod.vlc.a=V
+dmethod.vlc.tip=Obtenir ou exécuter VLC
 
 dmethod.unavailable.tip=Impossible de télécharger ce fichier.
 
