@@ -1183,7 +1183,7 @@ UnPlug2Search = {
 								case "rtmp":
 									download_method.rtmp = download_method.url;
 									delete download_method["url"];
-									var attrs = ["app", "playpath"];
+									var attrs = ["app", "playpath", "swfurl"];
 									for (var aidx = 0; aidx < attrs.length; ++aidx) {
 										if (node.hasAttribute(attrs[aidx])) {
 											download_method[attrs[aidx]] = updated_variables.subst_optional(node.getAttribute(attrs[aidx]));
