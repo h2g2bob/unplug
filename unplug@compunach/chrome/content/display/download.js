@@ -502,6 +502,9 @@ UnPlug2DownloadMethods.add_button("copyurl", {
 UnPlug2DownloadMethods.add_button("vlc", {
 	avail : (function (res) {
 		var url = res.download.url;
+		if (!url) {
+			return false;
+		}
 		var proto = url.substring(0, url.indexOf(":"))
 		return (["mms", "http", "https", "rtsp"].indexOf(proto) != -1);
 	}),
