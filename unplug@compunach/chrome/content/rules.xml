@@ -694,6 +694,7 @@
 						</rule>
 					</rule>
 					<rule id="youtube-rtmp">
+						<if_false /><!-- TODO - this doesn't work very well at the moment, because we're not able to use rtmpdump resume option -->
 						<if_re ref="fmt_url" re="^(\d+)\|([^\|]+)\|(rtmp[^\|]+)$" string="${fmt_part.1}" />
 						<rule>
 							<if_re string="${fmt_url.1}" re="^(34)$" />
