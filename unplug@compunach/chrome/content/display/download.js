@@ -89,7 +89,7 @@ var UnPlug2DownloadMethods = {
 			try {
 				that.exec(name, result);
 			} catch (e) {
-				UnPlug2.log("Error in UnPlug2DownloadMethods for " + name + " " + result.toSource() + " with error " + e);
+				UnPlug2.log("Error in UnPlug2DownloadMethods for " + name + " " + result.toSource() + " with error " + e.toSource());
 			}
 			evt.stopPropagation();
 		});

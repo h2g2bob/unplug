@@ -54,7 +54,7 @@ UnPlug2Overlay = {
 			UnPlug2Overlay._popup_win_ref = window.openDialog("chrome://unplug/content/display/pop/pop.xul", "unplug_window", "chrome,centerscreen", data );
 			UnPlug2Overlay._popup_win_ref.focus();
 		} catch (e) {
-			UnPlug2.log(e);
+			UnPlug2.log(e.toSource());
 		}
 	},
 	
@@ -72,7 +72,7 @@ UnPlug2Overlay = {
 					el.parentNode.removeChild(el);
 				}
 			} catch(e) {
-				UnPlug2.log("Error removing " + name + " because " + e);
+				UnPlug2.log("Error removing " + name + " because " + e.toSource());
 			}
 		}
 		
