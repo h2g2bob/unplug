@@ -47,18 +47,19 @@ UnPlug2Rules = {
 		var response = UnPlug2Rules.exec_statement(rule, node, variables, url, text, doc);
 		
 		// valid responses: true, false, object_of_new_variables_without_prefixes
-		if (response == false)
+		if (response === false) {
 			// throw statement_name + " returned false";
 			return false;
-		if (response == true)
+		}
+		if (response === true) {
 			return {};
+		}
 		if (rule.apply_ref) {
 			var ref = node.getAttribute("ref");
 			return UnPlug2Rules._prefix_variables(ref, response);
 		}
-		// without apply_ref set this responds by exporting variables without the prefix!
-		// TODO - is this right behaviour?
-		return response;
+		UnPlug2.log("if_" + statement_name + " did not return true or false, it returned " + response.toSource());
+		return false;
 	},
 	
 	/*
