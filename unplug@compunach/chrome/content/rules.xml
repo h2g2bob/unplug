@@ -361,6 +361,7 @@
 		<if_url host="bbc.co.uk" ref="url" />
 		<rule>
 			<if_re ref="pagetag" re="/iplayer/episode/([^/]+)/" string="${url.path}" />
+			<if_re ref="thumb" re="src=&quot;(http://[^&quot;/]+\.bbcimg\.co\.uk/iplayer/images/episode/[^&quot;]+\.jpg)&quot;" />
 			<download url="http://www.bbc.co.uk/iplayer/playlist/${pagetag.1}/">
 				<optional_re ref="title" re="&lt;title&gt;([^&lt;]+)&lt;/title&gt;" />
 				<each_re ref="item" re="(&lt;item[\s\S]+?&lt;/item&gt;)">
@@ -370,28 +371,41 @@
 							<optional_re re="bitrate=&quot;([^&quot;]+)&quot;" ref="bitrate" string="${m.1}" />
 							<optional_re re="encoding=&quot;([^&quot;]+)&quot;" ref="encoding" string="${m.1}" />
 							<optional_re re="type=&quot;([^&quot;]+)&quot;" ref="type" string="${m.1}" />
-							<rule id="iplayer-asx">
-								<if_re re="href=&quot;(http://www\.bbc\.co\.uk/mediaselector/4/asx/[^&quot;]+)&quot;" ref="asxloc" string="${m.1}" />
-								<download url="${asxloc.1}">
-									<each_re ref="wmaloc" re="href=&quot;(mms://[^&quot;]+)&quot;">
-										<media url="${wmaloc.1}" title="${either:title.1:origtitle.innerHTML}" description="${optional:bitrate.1} ${optional:type.1}" mediaid="${ident.1}" />
+							<rule>
+								<optional_switch ref="quality" input="${bitrate.1}_${type.1}"
+									k1="48_audio/wma" v1="very-low"
+									k2="48_audio/mp4" v2="low"
+									k3="128_audio/wma" v3="low"
+									k4="128_audio/mp4" v4="mid"
+								/>
+								<rule id="iplayer-asx">
+									<if_re re="href=&quot;(http://www\.bbc\.co\.uk/mediaselector/4/asx/[^&quot;]+)&quot;" ref="asxloc" string="${m.1}" />
+									<download url="${asxloc.1}">
+										<each_re ref="wmaloc" re="href=&quot;(mms://[^&quot;]+)&quot;">
+											<media
+												url="${wmaloc.1}"
+												title="${either:title.1:origtitle.innerHTML}" description="${optional:bitrate.1} ${optional:type.1}"
+												thumbnail="${thumb.1}" mediaid="${ident.1}" quality="${quality.1}" />
+										</each_re>
+									</download>
+								</rule>
+								<rule id="iplayer-rtmp">
+									<if_re string="${type.1}" re="audio/" /><!-- TODO: video doesn't work, audio appears to be ok -->
+									<each_re re="(&lt;connection[^&gt;]+&gt;)" string="${m.1}" ref="c">
+										<if_re ref="protocol" re="protocol=&quot;(rtmpe?)&quot;" string="${c.1}" />
+										<if_re ref="app" re="application=&quot;([^&quot;]+)&quot;" string="${c.1}" />
+										<if_re ref="auth" re="authString=&quot;([^&quot;]+)&quot;" string="${c.1}" />
+										<if_re ref="server" re="server=&quot;([^&quot;]+)&quot;" string="${c.1}" />
+										<if_re ref="identifier" re="identifier=&quot;([^&quot;]+)&quot;" string="${c.1}" />
+										
+										<media method="rtmp"
+											url="${protocol.1}://${server.1}:1935/${app.1}?${htmldecode:auth.1}"
+											app="${app.1}?${htmldecode:auth.1}"
+											playpath="${identifier.1}"
+											title="${either:title.1:origtitle.innerHTML}" description="${optional:bitrate.1} ${optional:type.1}"
+											thumbnail="${thumb.1}" mediaid="${ident.1}" quality="${quality.1}" />
 									</each_re>
-								</download>
-							</rule>
-							<rule id="iplayer-rtmp">
-								<if_re string="${type.1}" re="audio/" /><!-- TODO: video doesn't work, audio appears to be ok -->
-								<each_re re="(&lt;connection[^&gt;]+&gt;)" string="${m.1}" ref="c">
-									<if_re ref="protocol" re="protocol=&quot;(rtmpe?)&quot;" string="${c.1}" />
-									<if_re ref="app" re="application=&quot;([^&quot;]+)&quot;" string="${c.1}" />
-									<if_re ref="auth" re="authString=&quot;([^&quot;]+)&quot;" string="${c.1}" />
-									<if_re ref="server" re="server=&quot;([^&quot;]+)&quot;" string="${c.1}" />
-									<if_re ref="identifier" re="identifier=&quot;([^&quot;]+)&quot;" string="${c.1}" />
-									<media method="rtmp"
-										url="${protocol.1}://${server.1}:1935/${app.1}?${htmldecode:auth.1}"
-										app="${app.1}?${htmldecode:auth.1}"
-										playpath="${identifier.1}"
-										title="${either:title.1:origtitle.innerHTML}" description="${optional:bitrate.1} ${optional:type.1}" mediaid="${ident.1}" />
-								</each_re>
+								</rule>
 							</rule>
 						</each_re>
 					</download>
