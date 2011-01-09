@@ -366,6 +366,46 @@ UnPlug2Rules = {
 	},
 	
 	/*
+	 * Is a switch statement
+	 */
+	if_switch : {
+		order     : 10,
+		required  : ["input"],
+		optional : ["k1", "v1", "k2", "v2", "k3", "v3", "k4", "v4",
+			"k5", "v5", "k6", "v6", "k7", "v7", "k8", "v8", "k9", "v9",
+			"k10", "v10", "k11", "v11", "k12", "v12", "k13", "v13", "k14", "v14",
+			"k15", "v15", "k16", "v16", "k17", "v17", "k18", "v18", "k19", "v19",
+			"k20", "v20"],
+		apply_ref : true,
+		execute   : function (data, url, text, doc) {
+			if (!data.input) { return false; }
+			switch (data.input) {
+				case data.k1: return {1: data.v1};
+				case data.k2: return {1: data.v2};
+				case data.k3: return {1: data.v3};
+				case data.k4: return {1: data.v4};
+				case data.k5: return {1: data.v5};
+				case data.k6: return {1: data.v6};
+				case data.k7: return {1: data.v7};
+				case data.k8: return {1: data.v8};
+				case data.k9: return {1: data.v9};
+				case data.k10: return {1: data.v10};
+				case data.k11: return {1: data.v11};
+				case data.k12: return {1: data.v12};
+				case data.k13: return {1: data.v13};
+				case data.k14: return {1: data.v14};
+				case data.k15: return {1: data.v15};
+				case data.k16: return {1: data.v16};
+				case data.k17: return {1: data.v17};
+				case data.k18: return {1: data.v18};
+				case data.k19: return {1: data.v19};
+				case data.k20: return {1: data.v20};
+				default: return false;
+			}
+		}
+	},
+	
+	/*
 	 * Checks the url.
 	 */
 	if_url : {
