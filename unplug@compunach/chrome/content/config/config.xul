@@ -74,11 +74,13 @@
 		<preferences>
 			<preference id="add_to_toolsmenu" name="extensions.unplug2.add_to_toolsmenu" type="bool"/>
 			<preference id="add_to_contextmenu" name="extensions.unplug2.add_to_contextmenu" type="bool"/>
+			<preference id="add_to_addonsbar" name="extensions.unplug2.add_to_addonsbar" type="bool"/>
 		</preferences>
 		<groupbox>
 			<caption label="&interface.title;" />
 			<checkbox label="&interface.toolsmenu;" accesskey="&interface.toolsmenu.a;" preference="add_to_toolsmenu" />
 			<checkbox label="&interface.contextmenu;" accesskey="&interface.contextmenu.a;" preference="add_to_contextmenu" />
+			<checkbox label="&interface.addonsbar;" accesskey="&interface.addonsbar.a;" preference="add_to_addonsbar" />
 			<checkbox id="add_toolbar_button" label="&interface.toolbarbtn;" accesskey="&interface.toolbarbtn.a;" disabled="true" oncommand="toggle_toolbarbutton();" />
 		</groupbox>
 		<spacer flex="1" />

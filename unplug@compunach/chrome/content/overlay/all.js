@@ -63,13 +63,13 @@ UnPlug2Overlay = {
 	 * This removes the items from menus which we don't care about.
 	 */
 	browser_loaded : function () {
-		var menus = [ "toolsmenu", "contextmenu" ];
+		var menus = [ "toolsmenu", "contextmenu", "addonsbar" ];
 		for (var i = 0 ; i < menus.length; i++) {
 			var name = menus[i];
 			try {
 				if ( ! UnPlug2.get_pref("add_to_" + name, true) ) {
 					var el = window.document.getElementById("unplug2_" + name)
-					el.parentNode.removeChild(el);
+					el.collapsed = true;
 				}
 			} catch(e) {
 				UnPlug2.log("Error removing " + name + " because " + e);
