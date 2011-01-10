@@ -146,8 +146,11 @@ function setup_unplug() {
 	// check if we've set up everthing we need to (eg: installed toolbar button, etc)
 	switch (UnPlug2.get_pref("setup_number", 0)) {
 		case 0:
+			/* We're adding ourselves to the add-ons bar,
+			 * so this is less important. We'll skip it by default:
 			if (!detect_toolbarbutton())
 				toggle_toolbarbutton();
+			*/
 			UnPlug2.set_pref("setup_number", 1);
 			break;
 		default:
