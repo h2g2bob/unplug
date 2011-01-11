@@ -34,6 +34,7 @@ function do_load() {
 	set_extern_tools();
 	detect_toolbarbutton();
 	goto_tab_requested();
+	setup_restart_notices();
 }
 
 function set_text() {
@@ -137,6 +138,25 @@ function goto_tab(tabname) {
 			break;
 	}
 	pwin.showPane(p);
+}
+
+function setup_restart_notices() {
+	var showpopup = (function () {
+		var box = document.getElementById("integration_notification");
+		var notification = box.getNotificationWithValue("restart-needed");
+		if (!notification) {
+			box.appendNotification(
+				"Restart firefox to apply these changes",
+				"restart-needed",
+				"chrome://browser/skin/Info.png",
+				box.PRIORITY_WARNING_MEDIUM,
+				null); // buttons
+		}
+	});
+	var el = document.getElementsByClassName("needs_restart");
+	for (var i = 0; i < el.length; ++i) {
+		el[i].addEventListener("command", showpopup, false);
+	};
 }
 
 /*
