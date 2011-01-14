@@ -312,6 +312,15 @@ UnPlug2Variables.prototype = {
 			case "urlencode":
 				return escape(this._subst_apply_functions(parts));
 			/**
+			 * Regular expression escape
+			 */
+			case "reescape":
+				var specials = RegExp("[\\" + ("\\.*+{}()[]$^-".split("").join("\\")) + "]", "g");
+				var x = this._subst_apply_functions(parts).replace(specials, (function (substr) {
+					return "\\" + substr;
+				}));
+				return x
+			/**
 			 * decode html entities TODO
 			 */
 			case "htmldecode":
