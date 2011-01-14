@@ -82,7 +82,7 @@
 				<checkbox label="&interface.toolsmenu;" accesskey="&interface.toolsmenu.a;" preference="add_to_toolsmenu" class="needs_restart" />
 				<checkbox label="&interface.contextmenu;" accesskey="&interface.contextmenu.a;" preference="add_to_contextmenu" class="needs_restart" />
 				<checkbox label="&interface.addonsbar;" accesskey="&interface.addonsbar.a;" preference="add_to_addonsbar" class="needs_restart" />
-				<checkbox id="add_toolbar_button" label="&interface.toolbarbtn;" accesskey="&interface.toolbarbtn.a;" disabled="true" oncommand="toggle_toolbarbutton();" />
+				<checkbox id="add_toolbar_button" label="&interface.toolbarbtn;" accesskey="&interface.toolbarbtn.a;" disabled="true" oncommand="toggle_toolbarbutton();" class="needs_restart" />
 			</groupbox>
 			<spacer flex="1" />
 		</notificationbox>

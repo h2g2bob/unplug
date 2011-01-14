@@ -68,9 +68,16 @@ function detect_toolbarbutton() {
 	var w = browser_window()
 	if (!w)
 		return;
-	var toolbarbutton = w.document.getElementById("unplug2_toolbarbutton");
+	var tbl = w.document.getElementsByTagName("toolbar");
+	var have_btn = false;
+	for (var i = 0; i < tbl.length; ++i) {
+		if (tbl[i].currentSet.split(",").indexOf("unplug2_toolbarbutton") >= 0) {
+			have_btn = true;
+			break;
+		}
+	}
 	var checkbox = document.getElementById("add_toolbar_button");
-	checkbox.checked = (toolbarbutton != null) ? true : false;
+	checkbox.checked = have_btn;
 	checkbox.disabled = false;
 }
 
@@ -78,40 +85,28 @@ function toggle_toolbarbutton() {
 	var w = browser_window()
 	if (!w)
 		return;
-	var toolbarbutton = w.document.getElementById("unplug2_toolbarbutton");
-	if (toolbarbutton) {
-		var navtoolbar = w.document.getElementById("nav-bar");
-		// do persist thing (applies next restart)
-		var curSet = navtoolbar.currentSet;
-		if (curSet) {
-			if (curSet.indexOf("urlbar-container") < 0 && curSet.indexOf("search-container") < 0) {
-				alert("There's a problem removing the toolbar button\n\n" + curSet);
-			} else {
-				navtoolbar.setAttribute("currentset", curSet.replace(",unplug2_toolbarbutton", ""));
-				w.document.persist("nav-bar","currentset");
-			}
-		} else {
-			alert("Persist failed - cannot remove toolbar button");
+	var tbl = w.document.getElementsByTagName("toolbar");
+	var have_btn = false;
+	for (var i = 0; i < tbl.length; ++i) {
+		if (tbl[i].currentSet.split(",").indexOf("unplug2_toolbarbutton") >= 0) {
+			// remove button
+			var updatedset = tbl[i].currentSet.split(",").filter(function (x) {
+				return x != "unplug2_toolbarbutton";
+			}).join(",");
+			tbl[i].setAttribute("currentset", updatedset);
+			w.document.persist(tbl[i].getAttribute("id"),"currentset");
+			return;
 		}
-		// remove button (applies this session)
-		navtoolbar.removeChild(toolbarbutton);
-	} else {
-		var navtoolbar = w.document.getElementById("nav-bar");
-		// do persist thing (applies next restart)
-		var curSet = navtoolbar.currentSet;
-		if (curSet) {
-			if (curSet.indexOf("urlbar-container") < 0 && curSet.indexOf("search-container") < 0) {
-				alert("There's a problem adding the toolbar button\n\n" + curSet);
-			} else {
-				navtoolbar.setAttribute("currentset", curSet + ",unplug2_toolbarbutton");
-				w.document.persist("nav-bar","currentset");
-			}
-		} else {
-			alert("Persist failed - cannot add toolbar button");
-		}
-		// add button (applies this session)
-		navtoolbar.insertItem("unplug2_toolbarbutton", null, null, false);
 	}
+	
+	var navtoolbar = w.document.getElementById("nav-bar");
+	if (!navtoolbar || navtoolbar.currentSet.indexOf(",") < 0) {
+		alert("Cannot add - where's nav-bar?");
+		return;
+	}
+	// add button
+	navtoolbar.setAttribute("currentset", navtoolbar.currentSet + ",unplug2_toolbarbutton");
+	w.document.persist(navtoolbar.getAttribute("id"),"currentset");
 }
 
 function goto_tab_requested() {
