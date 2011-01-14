@@ -758,7 +758,7 @@
 							<!-- not same video -->
 							<ifnot_equal a="${elements.1}" b="${vidid.1}" />
 							<!-- title matches -->
-							<if_re string="${elements.2}" re="^${reescape:titlehalf.1}\d+${reescape:titlehalf.2}$" />
+							<if_re string="${elements.2}" re="^${optional:reescape:titlehalf.1}\d+${optional:reescape:titlehalf.2}$" flags="i" />
 							<download url="http://www.youtube.com/watch?v=${elements.1}">
 								<rule goto="youtube-single" />
 							</download>
