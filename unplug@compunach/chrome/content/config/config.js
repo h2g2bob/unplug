@@ -58,12 +58,9 @@ function edit_extern_tool() {
 }
 
 function browser_window() {
-	var w = window;
-	while (!w.getBrowser) {
-		w = w.opener;
-		if (!w)
-			return null;
-	}
+	var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+		.getService(Components.interfaces.nsIWindowMediator);
+	var w = wm.getMostRecentWindow("navigator:browser");
 	return w;
 }
 
