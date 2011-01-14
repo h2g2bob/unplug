@@ -137,18 +137,31 @@ function setup_restart_notices() {
 		var box = document.getElementById("integration_notification");
 		var notification = box.getNotificationWithValue("restart-needed");
 		if (!notification) {
+			var buttons = [{
+				accessKey : "R",
+				callback : restart_firefox,
+				label : "Restart",
+				popup : null }];
 			box.appendNotification(
 				"Restart firefox to apply these changes",
 				"restart-needed",
 				"chrome://browser/skin/Info.png",
 				box.PRIORITY_WARNING_MEDIUM,
-				null); // buttons
+				buttons);
 		}
 	});
 	var el = document.getElementsByClassName("needs_restart");
 	for (var i = 0; i < el.length; ++i) {
 		el[i].addEventListener("command", showpopup, false);
 	};
+}
+
+function restart_firefox() {
+	// Like chrome://mozapps/content/extensions/extensions.js
+	const nsIAppStartup = Components.interfaces.nsIAppStartup;
+	Components.classes["@mozilla.org/toolkit/app-startup;1"]
+		.getService(nsIAppStartup)
+		.quit(nsIAppStartup.eRestart | nsIAppStartup.eAttemptQuit);
 }
 
 /*
