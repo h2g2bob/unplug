@@ -747,6 +747,25 @@
 					</each_re>
 				</download>
 			</rule>
+			<rule id="youtube-walk">
+				<if_re ref="vidid" re="'VIDEO_ID':\s*'([^']+)'," />
+				<if_re ref="user" re="'VIDEO_USERNAME':\s*'([^']+)'," />
+				<download url="http://www.youtube.com/watch_ajax?user=${user.1}&amp;video_id=${vidid.1}&amp;action_channel_videos=1">
+					<if_re ref="primary" re="class=&quot;video-list-item-link selected&quot;&gt;[\s\S]*?&lt;span [^&gt;]*class=&quot;title&quot;[^&gt;]*&gt;([^&lt;]+)&lt;/span&gt;" />
+					<rule>
+						<if_re ref="titlehalf" re="^(.*)\b1\b(.*?)$" string="${primary.1}" />
+						<each_re ref="elements" re="&lt;span [^&gt;]*data-video-ids=&quot;([^&quot;]+)&quot;[\s\S]+?&lt;span [^&gt;]*class=&quot;title&quot;[^&gt;]*&gt;([^&lt;]+)&lt;/span&gt;">
+							<!-- not same video -->
+							<ifnot_equal a="${elements.1}" b="${vidid.1}" />
+							<!-- title matches -->
+							<if_re string="${elements.2}" re="^${reescape:titlehalf.1}\d+${reescape:titlehalf.2}$" />
+							<download url="http://www.youtube.com/watch?v=${elements.1}">
+								<rule goto="youtube-single" />
+							</download>
+						</each_re>
+					</rule>
+				</download>
+			</rule>
 		</rule>
 		<rule id="embed-youtube-2010">
 			<each_re ref="video_id" re="http://(?:www\.)?youtube\.com/v/([a-zA-Z0-9_\-]+)">
