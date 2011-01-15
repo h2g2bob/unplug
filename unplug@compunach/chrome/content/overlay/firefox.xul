@@ -33,16 +33,26 @@
 	<script type="application/javascript" src="chrome://unplug/content/overlay/all.js" />
 	<script type="application/javascript" src="chrome://unplug/content/overlay/firefox.js" />
 	
+	<!-- firefox content menu -->
 	<popup id="contentAreaContextMenu">
 		<menuitem id="unplug2_contextmenu" label="&menuitem.unplug;" accesskey="&menuitem.u;" insertbefore="context-viewpartialsource-selection" oncommand="UnPlug2Overlay.run();" class="menuitem-iconic" />
 	</popup>
 	
+	<!-- firefox tools menu -->
 	<menupopup id="menu_ToolsPopup">
 		<menuitem id="unplug2_toolsmenu" label="&menuitem.unplug;" accesskey="&menuitem.u;" insertafter="javascriptConsole" oncommand="UnPlug2Overlay.run();" class="menuitem-iconic" />
 	</menupopup>
 	
+	<!-- firefox toolbar palette -->
 	<toolbarpalette id="BrowserToolbarPalette">
 		<toolbarbutton id="unplug2_toolbarbutton" class="toolbarbutton" name="unplug2_toolbarbutton" tooltiptext="&toolbarbutton.unplug.tip;" oncommand="UnPlug2Overlay.run();" label="&toolbarbutton.unplug;" />
 	</toolbarpalette> 
+	
+	<!-- firefox add-ons bar (status-bar will also match seamonkey task buttons) -->
+	<statusbar id="status-bar">
+		<statusbarpanel id="unplug2_addonsbar" role="button" onclick="UnPlug2Overlay.run();" tooltiptext="&toolbarbutton.unplug.tip;">
+			<image src="chrome://unplug/skin/unplug-16.png" style="height: 16px; width: 16px;" />
+		</statusbarpanel>
+	</statusbar>
 </overlay>
 

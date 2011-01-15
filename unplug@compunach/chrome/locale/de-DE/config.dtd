@@ -42,6 +42,8 @@
 <!ENTITY interface.contextmenu.a "x">
 <!ENTITY interface.toolbarbtn "UnPlug in der Symbolleiste anzeigen">
 <!ENTITY interface.toolbarbtn.a "S">
+<!ENTITY interface.addonsbar "Add to Add-Ons bar (status bar)">
+<!ENTITY interface.addonsbar.a "A">
 <!ENTITY privacy.title "Privatsph&#228;re">
 <!ENTITY privacy.popcontest "&#220;bermittle Informationen, auf welchen Webseiten Sie UnPlug benutzen">
 <!ENTITY privacy.popcontest.a "I">

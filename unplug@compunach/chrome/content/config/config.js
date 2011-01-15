@@ -34,6 +34,7 @@ function do_load() {
 	set_extern_tools();
 	detect_toolbarbutton();
 	goto_tab_requested();
+	setup_restart_notices();
 }
 
 function set_text() {
@@ -57,12 +58,9 @@ function edit_extern_tool() {
 }
 
 function browser_window() {
-	var w = window;
-	while (!w.getBrowser) {
-		w = w.opener;
-		if (!w)
-			return null;
-	}
+	var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+		.getService(Components.interfaces.nsIWindowMediator);
+	var w = wm.getMostRecentWindow("navigator:browser");
 	return w;
 }
 
@@ -70,9 +68,16 @@ function detect_toolbarbutton() {
 	var w = browser_window()
 	if (!w)
 		return;
-	var toolbarbutton = w.document.getElementById("unplug2_toolbarbutton");
+	var tbl = w.document.getElementsByTagName("toolbar");
+	var have_btn = false;
+	for (var i = 0; i < tbl.length; ++i) {
+		if (tbl[i].currentSet.split(",").indexOf("unplug2_toolbarbutton") >= 0) {
+			have_btn = true;
+			break;
+		}
+	}
 	var checkbox = document.getElementById("add_toolbar_button");
-	checkbox.checked = (toolbarbutton != null) ? true : false;
+	checkbox.checked = have_btn;
 	checkbox.disabled = false;
 }
 
@@ -80,40 +85,28 @@ function toggle_toolbarbutton() {
 	var w = browser_window()
 	if (!w)
 		return;
-	var toolbarbutton = w.document.getElementById("unplug2_toolbarbutton");
-	if (toolbarbutton) {
-		var navtoolbar = w.document.getElementById("nav-bar");
-		// do persist thing (applies next restart)
-		var curSet = navtoolbar.currentSet;
-		if (curSet) {
-			if (curSet.indexOf("urlbar-container") < 0 && curSet.indexOf("search-container") < 0) {
-				alert("There's a problem removing the toolbar button\n\n" + curSet);
-			} else {
-				navtoolbar.setAttribute("currentset", curSet.replace(",unplug2_toolbarbutton", ""));
-				w.document.persist("nav-bar","currentset");
-			}
-		} else {
-			alert("Persist failed - cannot remove toolbar button");
+	var tbl = w.document.getElementsByTagName("toolbar");
+	var have_btn = false;
+	for (var i = 0; i < tbl.length; ++i) {
+		if (tbl[i].currentSet.split(",").indexOf("unplug2_toolbarbutton") >= 0) {
+			// remove button
+			var updatedset = tbl[i].currentSet.split(",").filter(function (x) {
+				return x != "unplug2_toolbarbutton";
+			}).join(",");
+			tbl[i].setAttribute("currentset", updatedset);
+			w.document.persist(tbl[i].getAttribute("id"),"currentset");
+			return;
 		}
-		// remove button (applies this session)
-		navtoolbar.removeChild(toolbarbutton);
-	} else {
-		var navtoolbar = w.document.getElementById("nav-bar");
-		// do persist thing (applies next restart)
-		var curSet = navtoolbar.currentSet;
-		if (curSet) {
-			if (curSet.indexOf("urlbar-container") < 0 && curSet.indexOf("search-container") < 0) {
-				alert("There's a problem adding the toolbar button\n\n" + curSet);
-			} else {
-				navtoolbar.setAttribute("currentset", curSet + ",unplug2_toolbarbutton");
-				w.document.persist("nav-bar","currentset");
-			}
-		} else {
-			alert("Persist failed - cannot add toolbar button");
-		}
-		// add button (applies this session)
-		navtoolbar.insertItem("unplug2_toolbarbutton", null, null, false);
 	}
+	
+	var navtoolbar = w.document.getElementById("nav-bar");
+	if (!navtoolbar || navtoolbar.currentSet.indexOf(",") < 0) {
+		alert("Cannot add - where's nav-bar?");
+		return;
+	}
+	// add button
+	navtoolbar.setAttribute("currentset", navtoolbar.currentSet + ",unplug2_toolbarbutton");
+	w.document.persist(navtoolbar.getAttribute("id"),"currentset");
 }
 
 function goto_tab_requested() {
@@ -139,6 +132,38 @@ function goto_tab(tabname) {
 	pwin.showPane(p);
 }
 
+function setup_restart_notices() {
+	var showpopup = (function () {
+		var box = document.getElementById("integration_notification");
+		var notification = box.getNotificationWithValue("restart-needed");
+		if (!notification) {
+			var buttons = [{
+				accessKey : "R",
+				callback : restart_firefox,
+				label : "Restart",
+				popup : null }];
+			box.appendNotification(
+				"Restart firefox to apply these changes",
+				"restart-needed",
+				"chrome://browser/skin/Info.png",
+				box.PRIORITY_WARNING_MEDIUM,
+				buttons);
+		}
+	});
+	var el = document.getElementsByClassName("needs_restart");
+	for (var i = 0; i < el.length; ++i) {
+		el[i].addEventListener("command", showpopup, false);
+	};
+}
+
+function restart_firefox() {
+	// Like chrome://mozapps/content/extensions/extensions.js
+	const nsIAppStartup = Components.interfaces.nsIAppStartup;
+	Components.classes["@mozilla.org/toolkit/app-startup;1"]
+		.getService(nsIAppStartup)
+		.quit(nsIAppStartup.eRestart | nsIAppStartup.eAttemptQuit);
+}
+
 /*
  * This function is called once, to set up unplug
  */
@@ -146,8 +171,11 @@ function setup_unplug() {
 	// check if we've set up everthing we need to (eg: installed toolbar button, etc)
 	switch (UnPlug2.get_pref("setup_number", 0)) {
 		case 0:
+			/* We're adding ourselves to the add-ons bar,
+			 * so this is less important. We'll skip it by default:
 			if (!detect_toolbarbutton())
 				toggle_toolbarbutton();
+			*/
 			UnPlug2.set_pref("setup_number", 1);
 			break;
 		default:
