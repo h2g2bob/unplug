@@ -42,6 +42,8 @@
 <!ENTITY interface.contextmenu.a "h">
 <!ENTITY interface.toolbarbtn "Eszköztárgomb hozzáadása">
 <!ENTITY interface.toolbarbtn.a "g">
+<!ENTITY interface.addonsbar "Add to Add-Ons bar (status bar)">
+<!ENTITY interface.addonsbar.a "A">
 <!ENTITY privacy.title "Személyes szféra">
 <!ENTITY privacy.popcontest "Weboldalcímek küldése az UnPlug használatáról">
 <!ENTITY privacy.popcontest.a "c">

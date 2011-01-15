@@ -361,6 +361,7 @@
 		<if_url host="bbc.co.uk" ref="url" />
 		<rule>
 			<if_re ref="pagetag" re="/iplayer/episode/([^/]+)/" string="${url.path}" />
+			<if_re ref="thumb" re="src=&quot;(http://[^&quot;/]+\.bbcimg\.co\.uk/iplayer/images/episode/[^&quot;]+\.jpg)&quot;" />
 			<download url="http://www.bbc.co.uk/iplayer/playlist/${pagetag.1}/">
 				<optional_re ref="title" re="&lt;title&gt;([^&lt;]+)&lt;/title&gt;" />
 				<each_re ref="item" re="(&lt;item[\s\S]+?&lt;/item&gt;)">
@@ -370,28 +371,41 @@
 							<optional_re re="bitrate=&quot;([^&quot;]+)&quot;" ref="bitrate" string="${m.1}" />
 							<optional_re re="encoding=&quot;([^&quot;]+)&quot;" ref="encoding" string="${m.1}" />
 							<optional_re re="type=&quot;([^&quot;]+)&quot;" ref="type" string="${m.1}" />
-							<rule id="iplayer-asx">
-								<if_re re="href=&quot;(http://www\.bbc\.co\.uk/mediaselector/4/asx/[^&quot;]+)&quot;" ref="asxloc" string="${m.1}" />
-								<download url="${asxloc.1}">
-									<each_re ref="wmaloc" re="href=&quot;(mms://[^&quot;]+)&quot;">
-										<media url="${wmaloc.1}" title="${either:title.1:origtitle.innerHTML}" description="${optional:bitrate.1} ${optional:type.1}" mediaid="${ident.1}" />
+							<rule>
+								<optional_switch ref="quality" input="${bitrate.1}_${type.1}"
+									k1="48_audio/wma" v1="very-low"
+									k2="48_audio/mp4" v2="low"
+									k3="128_audio/wma" v3="low"
+									k4="128_audio/mp4" v4="mid"
+								/>
+								<rule id="iplayer-asx">
+									<if_re re="href=&quot;(http://www\.bbc\.co\.uk/mediaselector/4/asx/[^&quot;]+)&quot;" ref="asxloc" string="${m.1}" />
+									<download url="${asxloc.1}">
+										<each_re ref="wmaloc" re="href=&quot;(mms://[^&quot;]+)&quot;">
+											<media
+												url="${wmaloc.1}"
+												title="${either:title.1:origtitle.innerHTML}" description="${optional:bitrate.1} ${optional:type.1}"
+												thumbnail="${thumb.1}" mediaid="${ident.1}" quality="${quality.1}" />
+										</each_re>
+									</download>
+								</rule>
+								<rule id="iplayer-rtmp">
+									<if_re string="${type.1}" re="audio/" /><!-- TODO: video doesn't work, audio appears to be ok -->
+									<each_re re="(&lt;connection[^&gt;]+&gt;)" string="${m.1}" ref="c">
+										<if_re ref="protocol" re="protocol=&quot;(rtmpe?)&quot;" string="${c.1}" />
+										<if_re ref="app" re="application=&quot;([^&quot;]+)&quot;" string="${c.1}" />
+										<if_re ref="auth" re="authString=&quot;([^&quot;]+)&quot;" string="${c.1}" />
+										<if_re ref="server" re="server=&quot;([^&quot;]+)&quot;" string="${c.1}" />
+										<if_re ref="identifier" re="identifier=&quot;([^&quot;]+)&quot;" string="${c.1}" />
+										
+										<media method="rtmp"
+											url="${protocol.1}://${server.1}:1935/${app.1}?${htmldecode:auth.1}"
+											app="${app.1}?${htmldecode:auth.1}"
+											playpath="${identifier.1}"
+											title="${either:title.1:origtitle.innerHTML}" description="${optional:bitrate.1} ${optional:type.1}"
+											thumbnail="${thumb.1}" mediaid="${ident.1}" quality="${quality.1}" />
 									</each_re>
-								</download>
-							</rule>
-							<rule id="iplayer-rtmp">
-								<if_re string="${type.1}" re="audio/" /><!-- TODO: video doesn't work, audio appears to be ok -->
-								<each_re re="(&lt;connection[^&gt;]+&gt;)" string="${m.1}" ref="c">
-									<if_re ref="protocol" re="protocol=&quot;(rtmpe?)&quot;" string="${c.1}" />
-									<if_re ref="app" re="application=&quot;([^&quot;]+)&quot;" string="${c.1}" />
-									<if_re ref="auth" re="authString=&quot;([^&quot;]+)&quot;" string="${c.1}" />
-									<if_re ref="server" re="server=&quot;([^&quot;]+)&quot;" string="${c.1}" />
-									<if_re ref="identifier" re="identifier=&quot;([^&quot;]+)&quot;" string="${c.1}" />
-									<media method="rtmp"
-										url="${protocol.1}://${server.1}:1935/${app.1}?${htmldecode:auth.1}"
-										app="${app.1}?${htmldecode:auth.1}"
-										playpath="${identifier.1}"
-										title="${either:title.1:origtitle.innerHTML}" description="${optional:bitrate.1} ${optional:type.1}" mediaid="${ident.1}" />
-								</each_re>
+								</rule>
 							</rule>
 						</each_re>
 					</download>
@@ -648,48 +662,70 @@
 				<media url="${loc.1}" type="${loc.2}" title="${either:title.1:origtitle.innerHTML}" thumbnail="${thumb.1}" />
 			</rule>
 		</rule>
-		<rule id="youtube.com">
+		<rule id="youtube.com" target="youtube.com">
 			<if_url ref="url" host="youtube.com" />
 			<rule id="youtube-single" target="youtube-single">
 				<if_re ref="fmt_stream_map" re="&amp;fmt_stream_map=([^&amp;]+)" />
 				<optional_re ref="title" re="&lt;title&gt;\s*YouTube\s+\-\s+(.*)\s*&lt;/title&gt;" />
 				<optional_re ref="video_id" re="&lt;input type=&quot;hidden&quot; name=&quot;video_id&quot; value=&quot;([^&quot;]+)&quot; /&gt;" />
 				<each_re ref="fmt_part" string="${urldecode:fmt_stream_map.1}" re="([^,]+)">
-					<if_re ref="fmt_url" re="^(\d+)\|(http[^\|]+)(?:\|.*)?$" string="${fmt_part.1}" />
-					<rule>
-						<if_re string="${fmt_url.1}" re="^(22)$" />
-						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-							quality="very-high" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
-							description="${translate:hd_quality} - ${optional:title.1}" type="mp4" />
+					<rule id="youtube-http">
+						<if_re ref="fmt_url" re="^(\d+)\|(http[^\|]+)(?:\|.*)?$" string="${fmt_part.1}" />
+						<rule>
+							<if_re string="${fmt_url.1}" re="^(22)$" />
+							<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+								quality="very-high" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
+								description="${translate:hd_quality} - ${optional:title.1}" type="mp4" />
+						</rule>
+						<rule>
+							<if_re string="${fmt_url.1}" re="^(5)$" />
+							<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+								quality="low" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
+								description="${translate:low_quality} - ${optional:title.1}" type="flv" />
+						</rule>
+						<rule>
+							<if_re string="${fmt_url.1}" re="^(34|4)$" />
+							<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+								quality="mid" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
+								description="${translate:mid_quality} - ${optional:title.1}" type="flv" />
+						</rule>
+						<rule>
+							<if_re string="${fmt_url.1}" re="^(18)$" />
+							<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+								quality="mid" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
+								description="${translate:mid_quality} (mp4) - ${optional:title.1}" type="mp4" />
+						</rule>
+						<rule>
+							<if_re string="${fmt_url.1}" re="^(35)$" />
+							<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+								quality="mid" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
+								description="${translate:high_quality} - ${optional:title.1}" type="flv" />
+						</rule>
+						<rule>
+							<ifnot_re string="${fmt_url.1}" re="^(4|5|18|22|34|35)$" />
+							<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+								description="Unknown quality code ${fmt_url.1} - ${optional:title.1}" type="flv" />
+						</rule>
 					</rule>
-					<rule>
-						<if_re string="${fmt_url.1}" re="^(5)$" />
-						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-							quality="low" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
-							description="${translate:low_quality} - ${optional:title.1}" type="flv" />
-					</rule>
-					<rule>
-						<if_re string="${fmt_url.1}" re="^(34|4)$" />
-						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-							quality="mid" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
-							description="${translate:mid_quality} - ${optional:title.1}" type="flv" />
-					</rule>
-					<rule>
-						<if_re string="${fmt_url.1}" re="^(18)$" />
-						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-							quality="mid" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
-							description="${translate:mid_quality} (mp4) - ${optional:title.1}" type="mp4" />
-					</rule>
-					<rule>
-						<if_re string="${fmt_url.1}" re="^(35)$" />
-						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-							quality="mid" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
-							description="${translate:high_quality} - ${optional:title.1}" type="flv" />
-					</rule>
-					<rule>
-						<ifnot_re string="${fmt_url.1}" re="^(4|5|18|22|34|35)$" />
-						<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-							description="Unknown quality code ${fmt_url.1} - ${optional:title.1}" type="flv" />
+					<rule id="youtube-rtmp">
+						<if_false /><!-- TODO - this doesn't work very well at the moment, because we're not able to use rtmpdump resume option -->
+						<if_re ref="fmt_url" re="^(\d+)\|([^\|]+)\|(rtmp[^\|]+)$" string="${fmt_part.1}" />
+						<rule>
+							<if_re string="${fmt_url.1}" re="^(34)$" />
+							<media method="rtmp" url="${fmt_url.3}" quality="mid"
+								title="${either:title.1:origtitle.innerHTML}" type="flv"
+								description="${translate:mid_quality}"
+								thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+								mediaid="${video_id.1}" />
+						</rule>
+						<rule>
+							<ifnot_re string="${fmt_url.1}" re="^(34)$" />
+							<media method="rtmp" url="${fmt_url.3}" quality="low"
+								title="${either:title.1:origtitle.innerHTML}" type="flv"
+								description="Unknown quality code ${fmt_url.1} - ${optional:title.1}"
+								thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+								mediaid="${video_id.1}" />
+						</rule>
 					</rule>
 				</each_re>
 			</rule>
@@ -709,6 +745,25 @@
 							</each_re>
 						</download>
 					</each_re>
+				</download>
+			</rule>
+			<rule id="youtube-walk">
+				<if_re ref="vidid" re="'VIDEO_ID':\s*'([^']+)'," />
+				<if_re ref="user" re="'VIDEO_USERNAME':\s*'([^']+)'," />
+				<download url="http://www.youtube.com/watch_ajax?user=${user.1}&amp;video_id=${vidid.1}&amp;action_channel_videos=1">
+					<if_re ref="primary" re="class=&quot;video-list-item-link selected&quot;&gt;[\s\S]*?&lt;span [^&gt;]*class=&quot;title&quot;[^&gt;]*&gt;([^&lt;]+)&lt;/span&gt;" />
+					<rule>
+						<if_re ref="titlehalf" re="^(.*)\b1\b(.*?)$" string="${primary.1}" />
+						<each_re ref="elements" re="&lt;span [^&gt;]*data-video-ids=&quot;([^&quot;]+)&quot;[\s\S]+?&lt;span [^&gt;]*class=&quot;title&quot;[^&gt;]*&gt;([^&lt;]+)&lt;/span&gt;">
+							<!-- not same video -->
+							<ifnot_equal a="${elements.1}" b="${vidid.1}" />
+							<!-- title matches -->
+							<if_re string="${elements.2}" re="^${optional:reescape:titlehalf.1}\d+${optional:reescape:titlehalf.2}$" flags="i" />
+							<download url="http://www.youtube.com/watch?v=${elements.1}">
+								<rule goto="youtube-single" />
+							</download>
+						</each_re>
+					</rule>
 				</download>
 			</rule>
 		</rule>

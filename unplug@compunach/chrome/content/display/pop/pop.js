@@ -86,7 +86,7 @@ UnPlug2SearchPage = {
 			UnPlug2Search._reset(); // this may not be needed because we always start from a fresh window
 			UnPlug2Search.search(this._win, this._search_callback)
 		} catch (e) {
-			UnPlug2.log(e);
+			UnPlug2.log(e.toSource());
 		}
 	},
 	
@@ -152,7 +152,7 @@ UnPlug2SearchPage = {
 				}
 			}
 		} catch (e) {
-			UnPlug2.log(e);
+			UnPlug2.log(e.toSource());
 			var e = document.getElementById("dynamic_results");
 			e.value = "Have errors";
 		}
@@ -190,7 +190,7 @@ UnPlug2SearchPage = {
 				UnPlug2SearchPage.set_container(uid, reselem, result.details);
 				
 			} catch(e) {
-				UnPlug2.log("ERROR displaying result " + e);
+				UnPlug2.log("ERROR displaying result " + e.toSource());
 			}
 		} else {
 			var reselem = document.getElementById("result_" + uid);
@@ -373,7 +373,7 @@ UnPlug2SearchPage = {
 		try {
 			UnPlug2SearchPage.send_nothing_found_msg_noask();
 		} catch (e) {
-			UnPlug2.log("Error sending nothing found msg " + e);
+			UnPlug2.log("Error sending nothing found msg " + e.toSource());
 		}
 	},
 	

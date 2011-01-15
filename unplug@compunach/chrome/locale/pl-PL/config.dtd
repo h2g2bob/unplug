@@ -42,6 +42,8 @@
 <!ENTITY interface.contextmenu.a "k">
 <!ENTITY interface.toolbarbtn "Dodaj przycisk do paska narzêdzi">
 <!ENTITY interface.toolbarbtn.a "p">
+<!ENTITY interface.addonsbar "Add to Add-Ons bar (status bar)">
+<!ENTITY interface.addonsbar.a "A">
 <!ENTITY privacy.title "Prywatnoæ">
 <!ENTITY privacy.popcontest "Wysy³aj informacje na jakich stronach u¿ywasz UnPlug">
 <!ENTITY privacy.popcontest.a "W">

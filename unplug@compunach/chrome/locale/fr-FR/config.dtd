@@ -42,6 +42,8 @@
 <!ENTITY interface.contextmenu.a "x">
 <!ENTITY interface.toolbarbtn "Ajouter un bouton dans la barre d'outils">
 <!ENTITY interface.toolbarbtn.a "b">
+<!ENTITY interface.addonsbar "Add to Add-Ons bar (status bar)">
+<!ENTITY interface.addonsbar.a "A">
 <!ENTITY privacy.title "Protection de la vie privée">
 <!ENTITY privacy.popcontest "Indiquer sur quels sites vous utilisez UnPlug">
 <!ENTITY privacy.popcontest.a "S">

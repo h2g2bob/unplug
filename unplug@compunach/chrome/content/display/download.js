@@ -104,7 +104,7 @@ var UnPlug2DownloadMethods = {
 			try {
 				that.exec(name, result);
 			} catch (e) {
-				UnPlug2.log("Error in UnPlug2DownloadMethods for " + name + " " + result.toSource() + " with error " + e);
+				UnPlug2.log("Error in UnPlug2DownloadMethods for " + name + " " + result.toSource() + " with error " + e.toSource());
 			}
 			evt.stopPropagation();
 		});
@@ -248,7 +248,7 @@ var UnPlug2DownloadMethods = {
 			false );
 		return {
 			process : process,
-			file : file.file }
+			file : file }
 	}),
 	
 	/**
@@ -491,7 +491,7 @@ UnPlug2DownloadMethods.add_button("rtmpdump", {
 			"--verbose",
 			"--rtmp", res.download.rtmp || res.download.url,
 			"--pageUrl", res.download.referer,
-			"--swfUrl", res.download.referer, // this is invalid, but good enough most of the time.
+			"--swfUrl", res.download.swfurl || res.download.referer, // this is invalid, but good enough most of the time.
 			"--flv", savefile.path ];
 		if (res.download.rtmp) {
 			if (res.download.playpath) {

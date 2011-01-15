@@ -135,7 +135,7 @@ UnPlug2Download.prototype = {
 		try {
 			this._xmlhttp.abort();
 		} catch (e) {
-			UnPlug2.log("Cancel download error " + e);
+			UnPlug2.log("Cancel download error " + e.toSource());
 		}
 		if (!this._done) {
 			this._internal_callback_fail();
@@ -311,6 +311,15 @@ UnPlug2Variables.prototype = {
 			 */
 			case "urlencode":
 				return escape(this._subst_apply_functions(parts));
+			/**
+			 * Regular expression escape
+			 */
+			case "reescape":
+				var specials = RegExp("[\\" + ("\\.*+{}()[]$^-".split("").join("\\")) + "]", "g");
+				var x = this._subst_apply_functions(parts).replace(specials, (function (substr) {
+					return "\\" + substr;
+				}));
+				return x
 			/**
 			 * decode html entities TODO
 			 */
@@ -710,7 +719,7 @@ UnPlug2Search = {
 				timeout);
 			UnPlug2.log("Download queued " + UnPlug2Search._downloads[dl_id].download + " priority " + UnPlug2Search._downloads[dl_id].priority);
 		} catch (e) {
-			UnPlug2.log("Download failed to be queued for " + UnPlug2Search._downloads[dl_id].download + " because " + e);
+			UnPlug2.log("Download failed to be queued for " + UnPlug2Search._downloads[dl_id].download + " because " + e.toSource());
 			// .download not assigned
 			UnPlug2Search._downloads[dl_id].download = null;
 		}
@@ -776,7 +785,7 @@ UnPlug2Search = {
 				UnPlug2Search._downloads[dl_id].download.start(100);
 				UnPlug2.log("Starting download id = " + dl_id);
 			} catch (e) {
-				UnPlug2.log("Starting Download failed for " + dl_id + " / " + UnPlug2Search._downloads[dl_id].download + " because " + e);
+				UnPlug2.log("Starting Download failed for " + dl_id + " / " + UnPlug2Search._downloads[dl_id].download + " because " + e.toSource());
 				UnPlug2Search._downloads[dl_id].download = null;
 			}
 		}
@@ -1004,7 +1013,7 @@ UnPlug2Search = {
 			try {
 				result = UnPlug2Rules["exec_" + exectype](funcname, node, variables, url, text, doc);
 			} catch (e) {
-				UnPlug2.log("Error in " + nodetagname + " because " + e + " " + variables.trace());
+				UnPlug2.log("Error in " + nodetagname + " because " + e.toSource() + " " + variables.trace());
 			}
 			
 			if (result) {
@@ -1035,7 +1044,7 @@ UnPlug2Search = {
 				try {
 					result_list = UnPlug2Rules.exec_each(nodetagname.substring(5), node, updated_variables, url, text, doc);
 				} catch (e) {
-					UnPlug2.log("Error in " + nodetagname + " because " + e + " " + variables.trace());
+					UnPlug2.log("Error in " + nodetagname + " because " + e.toSource() + " " + variables.trace());
 				}
 				if (result_list) {
 					for (var j = 0; j < result_list.length; j++) {
@@ -1183,7 +1192,7 @@ UnPlug2Search = {
 								case "rtmp":
 									download_method.rtmp = download_method.url;
 									delete download_method["url"];
-									var attrs = ["app", "playpath"];
+									var attrs = ["app", "playpath", "swfurl"];
 									for (var aidx = 0; aidx < attrs.length; ++aidx) {
 										if (node.hasAttribute(attrs[aidx])) {
 											download_method[attrs[aidx]] = updated_variables.subst_optional(node.getAttribute(attrs[aidx]));
@@ -1210,7 +1219,7 @@ UnPlug2Search = {
 							throw "Not implemented";
 					} 
 				} catch(e) {
-					UnPlug2.log("Failed to action " + nodetagname + " because " + e + " " + variables.trace());
+					UnPlug2.log("Failed to action " + nodetagname + " because " + e.toSource() + " " + variables.trace());
 				}
 			}
 		}

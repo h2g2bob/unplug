@@ -42,6 +42,8 @@
 <!ENTITY interface.contextmenu.a "y">
 <!ENTITY interface.toolbarbtn "Lägg till verktygsfältsknapp">
 <!ENTITY interface.toolbarbtn.a "f">
+<!ENTITY interface.addonsbar "Add to Add-Ons bar (status bar)">
+<!ENTITY interface.addonsbar.a "A">
 <!ENTITY privacy.title "Sekretess">
 <!ENTITY privacy.popcontest "Skicka in information om vilka webbplatser du använder UnPlug på">
 <!ENTITY privacy.popcontest.a "S">
