@@ -79,6 +79,7 @@ UnPlug2Extern = {
 	setup_kill_button : (function (rtn) {
 		
 		// TODO - we really want a smaller and nicer cancel button
+		var that = this;
 		
 		rtn.node.getElementsByTagName("button")[0].addEventListener("command", (function () {
 			// no point in killing if it's already dead
@@ -99,7 +100,7 @@ UnPlug2Extern = {
 				UnPlug2.str("extern.cancel.deletefile"),
 				checkbox);
 			if (button === 0) {
-				this.do_kill(rtn, checkbox.value);
+				that.do_kill(rtn, checkbox.value);
 			}
 		}), false);
 	}),
