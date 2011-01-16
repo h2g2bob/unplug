@@ -629,6 +629,21 @@
 						<rule goto="bbc-playlist" />
 					</download>
 				</rule>
+				<rule id="silverlight-ukparl">
+					<!-- silverlight video page on parliament.uk -->
+					<if_re re="&lt;Playlist" flags="i" string="${urldecode:p.value}" />
+					<each_re ref="loci" re="&gt;\s*((?:https?|rtmpt?e?|mms)://[^&lt;]+)\s*&lt;" string="${urldecode:p.value}">
+						<media url="${loci.1}" certainty="low" />
+						<rule id="silverlight-ukparl-asx">
+							<if_re re="^https?://.*\basx\b" string="${loci.1}" />
+							<download url="${loci.1}">
+								<each_re ref="asxentry" re="&lt;ref[^&gt;]+href=&quot;([^&quot;]+)&quot;" flags="i">
+									<media url="${asxentry.1}" title="${origtitle.innerHTML}" />
+								</each_re>
+							</download>
+						</rule>
+					</each_re>
+				</rule>
 			</each_element>
 		</rule><!-- each param -->
 		<!-- other rules which need re-download -->
