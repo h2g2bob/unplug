@@ -6,7 +6,7 @@
 	<RDF:Description
 		RDF:about="urn:mozilla:install-manifest"
 		em:id="unplug@compunach"
-		em:version="2.040"
+		em:version="2.041"
 		em:type="2"
 		em:name="UnPlug"
 		em:description="Find and download media from websites"
