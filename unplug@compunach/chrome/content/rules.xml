@@ -781,6 +781,14 @@
 					</rule>
 				</download>
 			</rule>
+			<rule id="youtube-playlist">
+				<if_url inpath="view_play_list" />
+				<each_re ref="vidid" re="&lt;a href=&quot;/watch\?v=([^&quot;&amp;]+)&amp;amp;p=[^&quot;&amp;]+&quot; class=&quot;ux-thumb-wrap contains-addto&quot;">
+					<download url="http://www.youtube.com/watch?v=${vidid.1}">
+						<rule goto="youtube-single" />
+					</download>
+				</each_re>
+			</rule>
 		</rule>
 		<rule id="embed-youtube-2010">
 			<each_re ref="video_id" re="http://(?:www\.)?youtube\.com/v/([a-zA-Z0-9_\-]+)">
