@@ -926,10 +926,11 @@
 		<rule id="spankwire.com">
 			<if_url host="spankwire.com" ref="loc" />
 			<rule>
-				<if_re ref="playlist" re="videoPath: &quot;\.\./(PlaylistXml\.aspx%3Fid=[^&quot;]+)&quot;" />
-				<download url="http://static.spankwire.com/Controls/UserControls/Players/v3/${urldecode:playlist.1}">
+				<if_re ref="playlist" re="&quot;\.\./(PlaylistXml\.aspx\?[^&quot;]+)&quot;" />
+				<optional_re ref="title" re="&lt;h1&gt;([^&lt;]+)&lt;/h1&gt;" />
+				<download url="http://cdn1.static.spankwire.com/Controls/UserControls/Players/v3/${playlist.1}">
 					<each_element ref="xmlurl" tagname="url" require_attrs="innerHTML">
-						<media url="${xmlurl.innerHTML}" title="${origtitle.1}" />
+						<media url="${htmldecode:xmlurl.innerHTML}" title="${either:title.1:origtitle.2}" />
 					</each_element>
 				</download>
 			</rule>
