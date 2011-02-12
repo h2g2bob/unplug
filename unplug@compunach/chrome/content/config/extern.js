@@ -29,10 +29,15 @@ var get_config_name = (function () {
 });
 
 var is_valid_file = (function (fname) {
-	var f = Components.classes["@mozilla.org/file/local;1"]
-		.createInstance(Components.interfaces.nsILocalFile);
-	f.initWithPath(fname);
-	return (f.exists() && f.isExecutable());
+	try {
+		var f = Components.classes["@mozilla.org/file/local;1"]
+			.createInstance(Components.interfaces.nsILocalFile);
+		f.initWithPath(fname);
+		return (f.exists() && f.isExecutable());
+	} catch (e) {
+		// initWithPath on windows for "/usr/bin/..." raises error
+		return false;
+	}
 });
 
 var onload = (function () {
