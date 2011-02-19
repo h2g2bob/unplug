@@ -26,5 +26,5 @@
  */
 -->
 
-<!ENTITY extern.description "Downloading files">
-<!ENTITY extern.stop "Stop">
+<!ENTITY extern.description "Téléchargement de fichiers">
+<!ENTITY extern.stop "Arrêter">

@@ -26,13 +26,13 @@
  */
 -->
 
-<!ENTITY notfound.label       "Rien trouvé ?">
+<!ENTITY notfound.label       " Rien trouvé ?">
 <!ENTITY notfound.accesskey   "R">
-<!ENTITY stop.label           "Stop">
-<!ENTITY stop.accesskey       "S">
+<!ENTITY stop.label           " Arrêter">
+<!ENTITY stop.accesskey       "A">
 <!ENTITY config.label         "Configurer">
 <!ENTITY config.accesskey     "C">
-<!ENTITY config.tooltip       "Modifier les paramètres d'UnPlug.">
-<!ENTITY dl.label             "Télécharger">
+<!ENTITY config.tooltip       "Modifier les réglages d'UnPlug.">
+<!ENTITY dl.label             " Télécharger">
 <!ENTITY dl.accesskey         "T">
 
