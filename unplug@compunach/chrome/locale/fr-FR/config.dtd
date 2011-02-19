@@ -26,13 +26,13 @@
  */
 -->
 
-<!ENTITY configheader.subtitle "Modifier les paramètres">
+<!ENTITY configheader.subtitle "Configurer">
 
 <!-- tab headings -->
 <!ENTITY tab.title.about "À propos d'UnPlug">
 <!ENTITY tab.title.integration "Intégration">
-<!ENTITY tab.title.discovery "Découverte de médias">
-<!ENTITY tab.title.downloads "Téléchargements">
+<!ENTITY tab.title.discovery "Recherche de médias">
+<!ENTITY tab.title.downloads "Téléchargement">
 
 <!-- general options -->
 <!ENTITY interface.title "Accès à UnPlug">
@@ -42,42 +42,42 @@
 <!ENTITY interface.contextmenu.a "x">
 <!ENTITY interface.toolbarbtn "Ajouter un bouton dans la barre d'outils">
 <!ENTITY interface.toolbarbtn.a "b">
-<!ENTITY interface.addonsbar "Add to Add-Ons bar (status bar)">
+<!ENTITY interface.addonsbar "Ajouter une icône dans la barre d'état">
 <!ENTITY interface.addonsbar.a "A">
-<!ENTITY privacy.title "Protection de la vie privée">
-<!ENTITY privacy.popcontest "Indiquer sur quels sites vous utilisez UnPlug">
+<!ENTITY privacy.title "Vie privée">
+<!ENTITY privacy.popcontest "Informer des sites avec lesquels UnPlug est utilisé">
 <!ENTITY privacy.popcontest.a "S">
-<!ENTITY privacy.infolink "À propos">
+<!ENTITY privacy.infolink "À propos de ceci">
 <!ENTITY privacy.infolink.a "p">
 <!ENTITY rulesxml.title "Fichier rules.xml">
-<!ENTITY rulesxml.description "Le fichier rules.xml contient des informations sur la façon de rechercher des médias dans les pages web.">
+<!ENTITY rulesxml.description "Le fichier rules.xml contient les règles de recherche des médias dans les pages web.">
 <!ENTITY rulesxml.default "Défaut">
 <!ENTITY rulesxml.default.a "D">
 
 <!-- downloader tab -->
 <!ENTITY downloader.title "Méthode de téléchargement préférée">
-<!ENTITY downloader.auto "Utiliser les modules">
+<!ENTITY downloader.auto "Utiliser un module">
 <!ENTITY downloader.addons "Modules supportés">
 <!ENTITY downloader.dta "DownThemAll">
 <!ENTITY downloader.flashgot "FlashGot">
 
-<!ENTITY extern.list.header "External tools">
-<!ENTITY extern.edit "Edit">
-<!ENTITY extern.edit.a "E">
-<!ENTITY extern.browse "Browse">
-<!ENTITY extern.browse.a "B">
+<!ENTITY extern.list.header "Outils externes">
+<!ENTITY extern.edit "Éditer">
+<!ENTITY extern.edit.a "d">
+<!ENTITY extern.browse "Parcourir">
+<!ENTITY extern.browse.a "P">
 
 <!-- discovery tab -->
-<!ENTITY showall.title "Afficher les résultats supplémentaires">
+<!ENTITY showall.title "Résultats supplémentaires">
 <!ENTITY showall.label "Afficher les résultats qui ne fonctionnent pas correctement">
 <!ENTITY showall.label.a "A">
 
 <!-- about tab -->
-<!ENTITY about.title "Merci d'avoir installé UnPlug">
-<!ENTITY about.description "UnPlug est gratuit et open source.">
+<!ENTITY about.title "Merci d'avoir installé UnPlug !">
+<!ENTITY about.description "UnPlug est gratuit et en source ouverte.">
 <!ENTITY about.gpl "Licence Publique Générale GNU">
 <!ENTITY about.agpl "Licence Publique Générale Affero GNU, version 3">
-<!ENTITY about.updated "Les paramètres d'UnPlug ont été mis à jour.">
+<!ENTITY about.updated "La configuration d'UnPlug a été mise à jour.">
 
 
 

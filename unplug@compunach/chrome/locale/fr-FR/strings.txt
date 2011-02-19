@@ -34,7 +34,7 @@ dmethod.open-tab.tip=Ouvrir dans un nouvel onglet.
 dmethod.open-new=Ouvrir dans une nouvelle fenêtre
 dmethod.open-new.a=f
 dmethod.open-new.tip=Ouvrir dans une nouvelle fenêtre.
-dmethod.open-over=Ouvrir au-dessus de la fenêtre courante
+dmethod.open-over=Ouvrir dans la fenêtre courante
 dmethod.open-over.a=c
 dmethod.open-over.tip=Équivaut à cliquer sur un lien vers le média dans la page.
 dmethod.saveas=Enregistrer sous
@@ -56,20 +56,20 @@ dmethod.vlc=VLC
 dmethod.vlc.a=V
 dmethod.vlc.tip=Obtenir ou exécuter VLC
 
-dmethod.unavailable.tip=Impossible de télécharger ce fichier.
+dmethod.unavailable.tip=Impossible de télécharger le fichier.
 
 proc.status.error=Erreur
 proc.status.running=En cours
 proc.status.done=Terminé
 
 # external download methods
-need_to_install=Vous devez installer %s pour télécharger ce fichier
+need_to_install=Vous devez installer %s pour télécharger le fichier.
 location_of=Emplacement de %s
 
-extern.cancel.title=UnPlug: Cancel download
-extern.cancel.onefile=Would you like to cancel the download of %s?
-extern.cancel.manyfile=Would you like to cancel %s active downloads?
-extern.cancel.stop=Stop
-extern.cancel.dontstop=Don't stop
-extern.cancel.deletefile=Delete partially downloaded file
+extern.cancel.title=UnPlug : arrêt du téléchargement
+extern.cancel.onefile=Voulez-vous interrompre le téléchargement de %s ?
+extern.cancel.manyfile=Voulez-vous interrompre %s tééchargements en cours ?
+extern.cancel.stop=Arrêter
+extern.cancel.dontstop=Ne pas arrêter
+extern.cancel.deletefile=Supprimer le fichier partiellement téléchargé
 
