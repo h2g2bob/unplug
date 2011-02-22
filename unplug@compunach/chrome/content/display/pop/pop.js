@@ -138,12 +138,13 @@ UnPlug2SearchPage = {
 		 *  So convert to source strings and compare to give the correct answer!
 		*/
 		try {
-			var download_tosource = result.download.toSource();
-			var existing_mediaresult = UnPlug2SearchPage.results_lookup[download_tosource];
+			result.download_tosource = result.download.toSource();
+			var existing_mediaresult = UnPlug2SearchPage.results_lookup[result.download_tosource];
 			if (existing_mediaresult === undefined) {
-				UnPlug2SearchPage.main_group.update(result);
+				// XXX add to UnPlug2SearchPage.results_lookup
+				UnPlug2SearchPage.main_group.add_result(result);
 			} else {
-				existing_mediaresult.update(result);
+				existing_mediaresult.add_result(result);
 			}
 		} catch(e) {
 			UnPlug2.log("ERROR displaying result " + e.toSource());
@@ -350,7 +351,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 	/*
 	 * update this item with more data
 	 */
-	update : (function (result) {
+	add_result : (function (result) {
 		// should assert that result.download is the same
 		this.history.push(result.details);
 		if (result.details.certainty > this.result.details.certainty) {
@@ -362,8 +363,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 	})
 }
 
-UnPlug2SearchPage.MediaResultGroup = (function (parent, subgroupkey) {
-	this.parent = parent;
+UnPlug2SearchPage.MediaResultGroup = (function (subgroupkey) {
 	this.subgroupkey = subgroupkey;
 	this.children = [];
 	this.lookup = {};
@@ -375,6 +375,9 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 	 */
 	_create : (function () {
 		this.element = document.createElement("vbox");
+		this.element.style.margin = "3px"; // XXX
+		this.element.style.padding = "3px"; // XXX
+		this.element.style.border = "2px red solid"; // XXX
 		this.element.className = "container";
 	}),
 	
@@ -395,25 +398,25 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 	/*
 	 * Update this element (in which case we'd need to reference parent and call this.parent.sort() if quality/whatever changed!?
 	 */
-	update : (function (result) {
-		UnPlug2.log("update: " + this.subgroupkey + " " + key); // XXX
-		var key = result.details[this.subgroupkey];
-		var child = this.lookup[key];
+	add_result : (function (result) {
+		var key = result.details[this.subgroupkey] || "download_tosource";
+		var child = key ? this.lookup[key] : null;
 		if (child) {
 			UnPlug2.log("have-child"); // XXX
-			child.update(result);
+			child.add_result(result); // updates
 		} else {
 			UnPlug2.log("do-not-have-child");  // XXX
-			if (this.subgroupkey) {
-				child = new UnPlug2SearchPage.MediaResult(this, result);
-			} else {
-				// TODO XXX This logic isn't clear.
+			if (this.subgroupkey) { // XXX
+				// TODO XXX This logic isn't clear. Subgroupkey could be a list of levels we want to implement instead of being a binary 2-level distinction
 				/*
  main_group MediaResultGroup
    contains MediaResultGroup for a particular mediaid
      contains MediaResult for an individual download
 */
 				child = new UnPlug2SearchPage.MediaResultGroup(this, null);
+				child.add_result(result);
+			} else {
+				child = new UnPlug2SearchPage.MediaResult(this, result);
 			}
 			this.lookup[key] = child;
 			this.children.push(child);
