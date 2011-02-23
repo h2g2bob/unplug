@@ -52,6 +52,7 @@ UnPlug2SearchPage = {
 		
 		// results array to be populated when a callback occurs
 		this.results_lookup = {}; // { download.toSource() : MediaResult }
+		this.results_lookup_length = 0; // equivalent to this.results_lookup.keys().length (which would need FF >= 4.0)
 		this.main_group = new UnPlug2SearchPage.MediaResultGroup();
 		window.addEventListener("load", (function () {
 			document.getElementById("results").appendChild(UnPlug2SearchPage.main_group.element);
@@ -99,7 +100,7 @@ UnPlug2SearchPage = {
 				searchbar.value = "100";
 				status_label.value = UnPlug2.str("search_done");
 				
-				var num_results = UnPlug2SearchPage.results_lookup.length;
+				var num_results = UnPlug2SearchPage.results_lookup_length;
 				document.getElementById("stop_button").disabled = true;
 				if (num_results == 0) {
 					document.getElementById("dynamic_results").value = UnPlug2.str("search_no_results");
@@ -141,8 +142,9 @@ UnPlug2SearchPage = {
 			result.download_tosource = result.download.toSource();
 			var existing_mediaresult = UnPlug2SearchPage.results_lookup[result.download_tosource];
 			if (existing_mediaresult === undefined) {
-				// XXX TODO add to UnPlug2SearchPage.results_lookup
-				UnPlug2SearchPage.main_group.add_result(result);
+				var mediaresult = UnPlug2SearchPage.main_group.add_result(result);
+				UnPlug2SearchPage.results_lookup_length += 1;
+				UnPlug2SearchPage.results_lookup[result.download_tosource] = mediaresult;
 			} else {
 				existing_mediaresult.add_result(result);
 			}
@@ -215,7 +217,11 @@ UnPlug2SearchPage = {
 
 
 UnPlug2SearchPage.MediaResultGroup = (function () {
-	this.get_key_of = (function (mr) { return mr.download_tosource }); // TODO add download_tosource to elem
+	// TODO need to split this to "get_key_of_child" and "get_key_of_result" for the 2 different purpouses
+	// then we can use "tiers" and "depth" to replace "get_key_of" and "subgroup_class"
+	this.get_media_key = (function (child) { return child.result.download_tosource });
+	this.get_result_key = (function (result) { return result.download_tosource });
+
 	this.subgroup_class = UnPlug2SearchPage.MediaResult;
 	this.parent = null;
 	this.children = [];
@@ -223,6 +229,9 @@ UnPlug2SearchPage.MediaResultGroup = (function () {
 	this.element_create();
 });
 UnPlug2SearchPage.MediaResultGroup.prototype = {
+	tiers : [
+	],
+
 	element_create : (function () {
 		this.element = document.createElement("vbox");
 		this.element.style.margin = "3px"; // XXX
@@ -247,13 +256,13 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 
 	add_child : (function (child) {
 		this.children.push(child);
-		this.lookup[this.get_key_of(child.result)] = child;
+		this.lookup[this.get_media_key(child)] = child;
 		this.element.appendChild(child.element);
 		this.sort(); // could be more efficient by inserting in the correct place to begin with
 	}),
 
 	remove_child : (function (child) {
-		delete this.lookup[this.get_key_of(child.result)];
+		delete this.lookup[this.get_media_key(child)];
 		this.children.splice(this.children.indexOf(this), 1);
 		this.element.removeChild(child.element);
 	}),
@@ -267,7 +276,7 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 	}),
 
 	add_result : (function (result) {
-		var child = this.lookup[this.get_key_of(result)];
+		var child = this.lookup[this.get_result_key(result)];
 		if (!child) {
 			child = new this.subgroup_class(result);
 			child.set_parent(this);
