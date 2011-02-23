@@ -52,7 +52,7 @@ UnPlug2SearchPage = {
 		
 		// results array to be populated when a callback occurs
 		this.results_lookup = {}; // { download.toSource() : MediaResult }
-		this.main_group = new UnPlug2SearchPage.MediaResultGroup(null, "mediaid");
+		this.main_group = new UnPlug2SearchPage.MediaResultGroup();
 		window.addEventListener("load", (function () {
 			document.getElementById("results").appendChild(UnPlug2SearchPage.main_group.element);
 		}), true);
@@ -141,7 +141,7 @@ UnPlug2SearchPage = {
 			result.download_tosource = result.download.toSource();
 			var existing_mediaresult = UnPlug2SearchPage.results_lookup[result.download_tosource];
 			if (existing_mediaresult === undefined) {
-				// XXX add to UnPlug2SearchPage.results_lookup
+				// XXX TODO add to UnPlug2SearchPage.results_lookup
 				UnPlug2SearchPage.main_group.add_result(result);
 			} else {
 				existing_mediaresult.add_result(result);
@@ -212,23 +212,103 @@ UnPlug2SearchPage = {
 	endofobject : 1 }
 
 
-UnPlug2SearchPage.MediaResult = (function (parent, result) {
-	this.parent = parent;
+
+
+UnPlug2SearchPage.MediaResultGroup = (function () {
+	this.get_key_of = (function (mr) { return mr.download_tosource }); // TODO add download_tosource to elem
+	this.subgroup_class = UnPlug2SearchPage.MediaResult;
+	this.parent = null;
+	this.children = [];
+	this.lookup = {};
+	this.element_create();
+});
+UnPlug2SearchPage.MediaResultGroup.prototype = {
+	element_create : (function () {
+		this.element = document.createElement("vbox");
+		this.element.style.margin = "3px"; // XXX
+		this.element.style.padding = "3px"; // XXX
+		this.element.style.border = "2px red solid"; // XXX
+		this.element.className = "container";
+	}),
+
+
+	set_parent : (function (parent) {
+		if (this.parent !== null) {
+			this.unset_parent();
+		}
+		this.parent = parent;
+		this.parent.add_child(this);
+	}),
+
+	unset_parent : (function () {
+		this.parent.remove_child(this);
+		this.parent = null;
+	}),
+
+	add_child : (function (child) {
+		this.children.push(child);
+		this.lookup[this.get_key_of(child.result)] = child;
+		this.element.appendChild(child.element);
+		this.sort(); // could be more efficient by inserting in the correct place to begin with
+	}),
+
+	remove_child : (function (child) {
+		delete this.lookup[this.get_key_of(child.result)];
+		this.children.splice(this.children.indexOf(this), 1);
+		this.element.removeChild(child.element);
+	}),
+
+	root : (function () {
+		if (this.parent === null) {
+			return this;
+		} else {
+			return this.root();
+		}
+	}),
+
+	add_result : (function (result) {
+		var child = this.lookup[this.get_key_of(result)];
+		if (!child) {
+			child = new this.subgroup_class(result);
+			child.set_parent(this);
+		}
+		return child.add_result(result);
+	}),
+
+	sort : (function () {
+		// TODO
+	}),
+
+	update_sorting_keys : (function (child) {
+		var changed = false;
+		if (child.quality > this.quality) {
+			this.quality = child.quality;
+			changed = true;
+		}
+		if (child.certainty > this.certainty) {
+			this.certainty = child.certainty;
+			changed = true;
+		}
+		if (changed && this.parent !== null) {
+			this.parent.update_sorting_keys(this);
+		}
+	})
+}
+
+UnPlug2SearchPage.MediaResult = (function (result) {
+	this.parent = null;
 	this.result = result;
-	this.uid = result.uid;
-	this.mediaid = result.details.mediaid;
 	this.history = [result.details];
 	
 	// initial setup:
-	this._create_copy_of_template();
-	this._create_download_buttons();
-	this._update_labels();
-	this._update_quality_certainty();
+	this.element_create();
 });
 UnPlug2SearchPage.MediaResult.prototype = {
-	/*
-	 * sets this.element to a copy of the template element
-	 */
+	element_create : (function () {
+		this._create_copy_of_template();
+		this._create_download_buttons();
+	}),
+
 	_create_copy_of_template : (function () {
 		var orig = document.getElementById("unplug_result_template");
 		this.element = orig.cloneNode(true);
@@ -313,15 +393,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		}
 	}),
 	
-	_update_quality_certainty : (function () {
-		this.quality = this.result.details.quality;
-		this.certainty = this.result.details.certainty;
-	}),
-
-	/*
-	 * Sets the labels to different values (eg: when resut.details changes
-	 */
-	_update_labels : (function () {
+	_element_update : (function () {
 		var details = this.result.details;
 
 		var name_label = this.element.getElementsByTagName("label")[0];
@@ -341,120 +413,49 @@ UnPlug2SearchPage.MediaResult.prototype = {
 			"unplug-result" ].join(" ")
 	}),
 
-	/*
-	 * Sorts the child elements: only meaningful for ResultElementGroup elements
-	 */
-	sort : (function () {
-		throw "Cannot sort a MediaResult";
+	set_parent : (function (parent) {
+		if (this.parent !== null) {
+			this.unset_parent();
+		}
+		this.parent = parent;
+		this.parent.add_child(this);
 	}),
 
-	/*
-	 * update this item with more data
-	 */
+	unset_parent : (function () {
+		this.parent.remove_child(this);
+		this.parent = null;
+	}),
+
+	root : (function () {
+		if (this.parent === null) {
+			UnPlug2.log("MediaResult.root() returned a non-group item");
+			return this;
+		} else {
+			return this.root();
+		}
+	}),
+
 	add_result : (function (result) {
 		// should assert that result.download is the same
 		this.history.push(result.details);
-		if (result.details.certainty > this.result.details.certainty) {
+		if (this.certainty === undefined || result.details.certainty > this.certainty) {
+			// XXX TODO: can copy some fields (eg: default title) iff they are unset, even if less certain
+			
+			// update values we keep track of
 			this.result = result;
-			this._update_labels();
-			this._update_quality_certainty();
-			this.parent.sort();
+			this.quality = this.result.details.quality;
+			this.certainty = this.result.details.certainty;
+
+			// update dom nodes
+			this._element_update();
+
+			// sort
+			if (this.parent !== null) {
+				this.parent.update_sorting_keys(this);
+			}
 		}
 	})
 }
-
-UnPlug2SearchPage.MediaResultGroup = (function (subgroupkey) {
-	this.subgroupkey = subgroupkey;
-	this.children = [];
-	this.lookup = {};
-	this._create();
-});
-UnPlug2SearchPage.MediaResultGroup.prototype = {
-	/*
-	 * creates the element
-	 */
-	_create : (function () {
-		this.element = document.createElement("vbox");
-		this.element.style.margin = "3px"; // XXX
-		this.element.style.padding = "3px"; // XXX
-		this.element.style.border = "2px red solid"; // XXX
-		this.element.className = "container";
-	}),
-	
-	/*
-	 * Returns cmp() for 2 children.
-	 */
-	cmp : (function (a, b) {
-		return (a.certainty - b.certainty) || (a.quality - b.quality) || (a.uid - b.uid);
-	}),
-	
-	/*
-	 * Sorts the child elements
-	 */
-	sort : (function () {
-		// XXX TODO
-	}),
-
-	/*
-	 * Update this element (in which case we'd need to reference parent and call this.parent.sort() if quality/whatever changed!?
-	 */
-	add_result : (function (result) {
-		var key = result.details[this.subgroupkey] || "download_tosource";
-		var child = key ? this.lookup[key] : null;
-		if (child) {
-			UnPlug2.log("have-child"); // XXX
-			child.add_result(result); // updates
-		} else {
-			UnPlug2.log("do-not-have-child");  // XXX
-			if (this.subgroupkey) { // XXX
-				// TODO XXX This logic isn't clear. Subgroupkey could be a list of levels we want to implement instead of being a binary 2-level distinction
-				/*
- main_group MediaResultGroup
-   contains MediaResultGroup for a particular mediaid
-     contains MediaResult for an individual download
-*/
-				child = new UnPlug2SearchPage.MediaResultGroup(this, null);
-				child.add_result(result);
-			} else {
-				child = new UnPlug2SearchPage.MediaResult(this, result);
-			}
-			this.lookup[key] = child;
-			this.children.push(child);
-			this.element.appendChild(child.element);
-			this.sort();
-		}
-		this._update_quality_certainty(child);
-	}),
-	
-	_update_quality_certainty : (function (mr) {
-		var changed = false;
-		if (this.children.length == 0) {
-			this.uid = mr.uid;
-			this.quality = mr.quality;
-			this.certainty = mr.certainty;
-			changed = true;
-		} else {
-			if (mr.uid < this.uid) {
-				this.uid = mr.uid;
-				changed = true;
-			}
-			if (mr.quality > this.quality) {
-				this.quality = mr.quality;
-				changed = true;
-			}
-			if (mr.certainty > this.certainty) {
-				this.certainty = mr.certainty;
-				changed = true;
-			}
-		}
-		if (changed && this.parent !== null) {
-			this.parent.sort();
-		}
-	}),
-	
-	// TODO: need to move element between trees if mediaid gets set/changed?
-}
-
 
 //init
 UnPlug2SearchPage.UnPlug2SearchPage(window.arguments[0])
