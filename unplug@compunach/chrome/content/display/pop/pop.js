@@ -53,7 +53,7 @@ UnPlug2SearchPage = {
 		// results array to be populated when a callback occurs
 		this.results_lookup = {}; // { download.toSource() : MediaResult }
 		this.results_lookup_length = 0; // equivalent to this.results_lookup.keys().length (which would need FF >= 4.0)
-		this.main_group = new UnPlug2SearchPage.MediaResultGroup();
+		this.main_group = new UnPlug2SearchPage.MediaResultGroup([]);
 		window.addEventListener("load", (function () {
 			document.getElementById("results").appendChild(UnPlug2SearchPage.main_group.element);
 		}), true);
@@ -142,11 +142,12 @@ UnPlug2SearchPage = {
 			result.download_tosource = result.download.toSource();
 			var existing_mediaresult = UnPlug2SearchPage.results_lookup[result.download_tosource];
 			if (existing_mediaresult === undefined) {
-				var mediaresult = UnPlug2SearchPage.main_group.add_result(result);
+				var mediaresult = new UnPlug2SearchPage.MediaResult(result);
 				UnPlug2SearchPage.results_lookup_length += 1;
 				UnPlug2SearchPage.results_lookup[result.download_tosource] = mediaresult;
+				UnPlug2SearchPage.main_group.place_mediaresult(mediaresult);
 			} else {
-				existing_mediaresult.add_result(result);
+				existing_mediaresult.update(result);
 			}
 		} catch(e) {
 			UnPlug2.log("ERROR displaying result " + e.toSource());
@@ -216,22 +217,15 @@ UnPlug2SearchPage = {
 
 
 
-UnPlug2SearchPage.MediaResultGroup = (function () {
-	// TODO need to split this to "get_key_of_child" and "get_key_of_result" for the 2 different purpouses
-	// then we can use "tiers" and "depth" to replace "get_key_of" and "subgroup_class"
-	this.get_media_key = (function (child) { return child.result.download_tosource });
-	this.get_result_key = (function (result) { return result.download_tosource });
-
-	this.subgroup_class = UnPlug2SearchPage.MediaResult;
+UnPlug2SearchPage.MediaResultGroup = (function (keychain) {
+	this.keychain = keychain;
+	this.depth = keychain.length;
 	this.parent = null;
 	this.children = [];
 	this.lookup = {};
 	this.element_create();
 });
 UnPlug2SearchPage.MediaResultGroup.prototype = {
-	tiers : [
-	],
-
 	element_create : (function () {
 		this.element = document.createElement("vbox");
 		this.element.style.margin = "3px"; // XXX
@@ -241,30 +235,21 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 	}),
 
 
-	set_parent : (function (parent) {
-		if (this.parent !== null) {
-			this.unset_parent();
-		}
-		this.parent = parent;
-		this.parent.add_child(this);
-	}),
-
-	unset_parent : (function () {
-		this.parent.remove_child(this);
-		this.parent = null;
-	}),
-
 	add_child : (function (child) {
+		var key = child.keychain[this.depth];
 		this.children.push(child);
-		this.lookup[this.get_media_key(child)] = child;
+		this.lookup[key] = child;
 		this.element.appendChild(child.element);
 		this.sort(); // could be more efficient by inserting in the correct place to begin with
+		child.parent = this;
 	}),
 
 	remove_child : (function (child) {
-		delete this.lookup[this.get_media_key(child)];
-		this.children.splice(this.children.indexOf(this), 1);
+		var key = child.keychain[this.depth];
+		delete this.lookup[key];
+		this.children = this.children.splice(this.children.indexOf(this), 1);
 		this.element.removeChild(child.element);
+		child.parent = null;
 	}),
 
 	root : (function () {
@@ -275,13 +260,25 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 		}
 	}),
 
-	add_result : (function (result) {
-		var child = this.lookup[this.get_result_key(result)];
-		if (!child) {
-			child = new this.subgroup_class(result);
-			child.set_parent(this);
+	place_mediaresult : (function (mediaresult) {
+		var key = mediaresult.keychain[this.depth];
+		if (this.depth+1 >= mediaresult.keychain.length) {
+			this.add_child(mediaresult);
+		} else {
+			// need to add to a sub group under this one
+			var child = this.lookup[key];
+			if (!child) {
+				var new_keychain = [];
+				for (var i = 0; i < this.keychain.length; ++i) {
+					new_keychain.push(this.keychain[i]);
+				}
+				new_keychain.push(key);
+				child = new UnPlug2SearchPage.MediaResultGroup(new_keychain);
+				this.add_child(child); // sets this.lookup[key]
+			}
+			// recurse
+			child.place_mediaresult(mediaresult);
 		}
-		return child.add_result(result);
 	}),
 
 	sort : (function () {
@@ -308,9 +305,14 @@ UnPlug2SearchPage.MediaResult = (function (result) {
 	this.parent = null;
 	this.result = result;
 	this.history = [result.details];
+
+	this.keychain = [
+		result.details.mediaid,
+		result.download_tosource ];
 	
 	// initial setup:
 	this.element_create();
+	this.update(result);
 });
 UnPlug2SearchPage.MediaResult.prototype = {
 	element_create : (function () {
@@ -422,19 +424,6 @@ UnPlug2SearchPage.MediaResult.prototype = {
 			"unplug-result" ].join(" ")
 	}),
 
-	set_parent : (function (parent) {
-		if (this.parent !== null) {
-			this.unset_parent();
-		}
-		this.parent = parent;
-		this.parent.add_child(this);
-	}),
-
-	unset_parent : (function () {
-		this.parent.remove_child(this);
-		this.parent = null;
-	}),
-
 	root : (function () {
 		if (this.parent === null) {
 			UnPlug2.log("MediaResult.root() returned a non-group item");
@@ -444,7 +433,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		}
 	}),
 
-	add_result : (function (result) {
+	update : (function (result) {
 		// should assert that result.download is the same
 		this.history.push(result.details);
 		if (this.certainty === undefined || result.details.certainty > this.certainty) {
@@ -452,15 +441,21 @@ UnPlug2SearchPage.MediaResult.prototype = {
 			
 			// update values we keep track of
 			this.result = result;
-			this.quality = this.result.details.quality;
-			this.certainty = this.result.details.certainty;
 
 			// update dom nodes
 			this._element_update();
 
+			// keychain changed?
+			// XXX TODO: this.keychain may have been changed
+			// TODO
+
 			// sort
-			if (this.parent !== null) {
-				this.parent.update_sorting_keys(this);
+			if (this.quality != this.result.details.quality || this.certainty == this.result.details.certainty) {
+				this.quality = this.result.details.quality;
+				this.certainty = this.result.details.certainty;
+				if (this.parent !== null) {
+					this.parent.update_sorting_keys(this);
+				}
 			}
 		}
 	})
