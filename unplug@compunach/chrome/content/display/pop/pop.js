@@ -228,9 +228,6 @@ UnPlug2SearchPage.MediaResultGroup = (function (keychain) {
 UnPlug2SearchPage.MediaResultGroup.prototype = {
 	element_create : (function () {
 		this.element = document.createElement("vbox");
-		this.element.style.margin = "3px"; // XXX
-		this.element.style.padding = "3px"; // XXX
-		this.element.style.border = "2px red solid"; // XXX
 		this.element.className = "container";
 	}),
 
