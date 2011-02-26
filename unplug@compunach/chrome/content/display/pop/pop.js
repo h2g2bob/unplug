@@ -264,15 +264,12 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 		var key = mediaresult.keychain[this.depth];
 		if (this.depth+1 >= mediaresult.keychain.length) {
 			this.add_child(mediaresult);
+			this.update_sorting_keys(mediaresult);
 		} else {
 			// need to add to a sub group under this one
 			var child = this.lookup[key];
 			if (!child) {
-				var new_keychain = [];
-				for (var i = 0; i < this.keychain.length; ++i) {
-					new_keychain.push(this.keychain[i]);
-				}
-				new_keychain.push(key);
+				var new_keychain = this.keychain.concat([key]);
 				child = new UnPlug2SearchPage.MediaResultGroup(new_keychain);
 				this.add_child(child); // sets this.lookup[key]
 			}
@@ -281,23 +278,49 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 		}
 	}),
 
+	cmp : (function (c1, c2) {
+		var r = (c2.certainty - c1.certainty);
+		if (r) { return r; }
+		r = (c2.quality - c1.quality);
+		if (r) { return r; }
+		return c2.download_tosource > c1.download_tosource;
+	}),
+
+	is_sorted : (function () {
+		for (var i = 0; i < this.children.length - 1; ++i) {
+			if (this.cmp(this.children[i], this.children[i+1]) > 0) {
+				return false;
+			}
+		}
+		return true;
+	}),
+
 	sort : (function () {
-		// TODO
+		if (this.is_sorted()) {
+			// also catches case where this.children.length == 0
+			return;
+		}
+		this.children.sort(this.cmp);
+		for (var i = 0; i < this.children.length; ++i) {
+			var c = this.element.removeChild(this.children[i].element);
+			this.element.appendChild(c);
+		}
 	}),
 
 	update_sorting_keys : (function (child) {
 		var changed = false;
-		if (child.quality > this.quality) {
+		if (child.quality > this.quality || this.quality === undefined) {
 			this.quality = child.quality;
 			changed = true;
 		}
-		if (child.certainty > this.certainty) {
+		if (child.certainty > this.certainty || this.certainty === undefined) {
 			this.certainty = child.certainty;
 			changed = true;
 		}
 		if (changed && this.parent !== null) {
 			this.parent.update_sorting_keys(this);
 		}
+		this.sort();
 	})
 }
 
@@ -306,10 +329,8 @@ UnPlug2SearchPage.MediaResult = (function (result) {
 	this.result = result;
 	this.history = [result.details];
 
-	this.keychain = [
-		result.details.mediaid,
-		result.download_tosource ];
-	
+	this.check_keychain_changed();
+
 	// initial setup:
 	this.element_create();
 	this.update(result);
@@ -433,6 +454,23 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		}
 	}),
 
+	check_keychain_changed : (function () {
+		var new_keychain = [
+			this.result.details.mediaid,
+			this.result.download_tosource ];
+		if (!this.keychain) {
+			this.keychain = new_keychain;
+			return true;
+		}
+		for (var i = 0; i < new_keychain.length; ++i) {
+			if (new_keychain[i] != this.keychain[i]) {
+				this.keychain = new_keychain;
+				return true;
+			}
+		}
+		return false;
+	}),
+
 	update : (function (result) {
 		// should assert that result.download is the same
 		this.history.push(result.details);
@@ -446,11 +484,15 @@ UnPlug2SearchPage.MediaResult.prototype = {
 			this._element_update();
 
 			// keychain changed?
-			// XXX TODO: this.keychain may have been changed
-			// TODO
+			if (this.check_keychain_changed()) {
+				var root = this.root();
+				this.parent.remove_child(this);
+				root.place_mediaresult(this);
+				return;
+			}
 
 			// sort
-			if (this.quality != this.result.details.quality || this.certainty == this.result.details.certainty) {
+			if (this.quality != this.result.details.quality || this.certainty != this.result.details.certainty) {
 				this.quality = this.result.details.quality;
 				this.certainty = this.result.details.certainty;
 				if (this.parent !== null) {
