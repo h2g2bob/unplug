@@ -1095,5 +1095,12 @@
 			<media url="http://example.com/example_result" description="You have enabled showing additional results." post="NODOWNLOAD" />
 		</rule>
 	</rule>
+	<rule id="local-testing-scripts">
+		<if_url host="localhost.example.com" />
+		<media url="http://localhost.example.com/media-files/1" description="low quality, low certainty" quality="low" certainty="low" title="One" mediaid="testing" />
+		<media url="http://localhost.example.com/media-files/2" description="high quality, low certainty" quality="high" certainty="low" title="Two" mediaid="testing" />
+		<media url="http://localhost.example.com/media-files/3" description="low quality, high certainty" quality="low" certainty="high" title="Three" mediaid="testing" />
+		<media url="http://localhost.example.com/media-files/4" description="high quality, high certainty" quality="high" certainty="high" title="Four" mediaid="testing" />
+	</rule>
 </unplug>
 
