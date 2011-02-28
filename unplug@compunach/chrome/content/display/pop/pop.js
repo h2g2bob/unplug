@@ -51,10 +51,12 @@ UnPlug2SearchPage = {
 		this._stopped = false;
 		
 		// results array to be populated when a callback occurs
-		this.download_to_uid = {}; // { result.download.toSource() : 1 }
-		this.results = []; // { 1 : result }  ... or rather [ ..., result, ... ]
-		this.media_id_lookup = {}; // { "youtube-324121" : [1, ...] }
-		this.playlist_id_lookup = {}; // { "youtube-uploader-1213" : [1, ...] }
+		this.results_lookup = {}; // { download.toSource() : MediaResult }
+		this.results_lookup_length = 0; // equivalent to this.results_lookup.keys().length (which would need FF >= 4.0)
+		this.main_group = new UnPlug2SearchPage.MediaResultGroup([]);
+		window.addEventListener("load", (function () {
+			document.getElementById("results").appendChild(UnPlug2SearchPage.main_group.element);
+		}), true);
 	},
 	
 	/**
@@ -98,7 +100,7 @@ UnPlug2SearchPage = {
 				searchbar.value = "100";
 				status_label.value = UnPlug2.str("search_done");
 				
-				var num_results = UnPlug2SearchPage.results.length;
+				var num_results = UnPlug2SearchPage.results_lookup_length;
 				document.getElementById("stop_button").disabled = true;
 				if (num_results == 0) {
 					document.getElementById("dynamic_results").value = UnPlug2.str("search_no_results");
@@ -136,205 +138,21 @@ UnPlug2SearchPage = {
 		 * In JavaScript, asking if {"X" : "Y"} == {"X" : "Y"} -> false
 		 *  So convert to source strings and compare to give the correct answer!
 		*/
-		var download_tosource = result.download.toSource();
-		var uid = UnPlug2SearchPage.download_to_uid[download_tosource]; // TODO -- also need to check this key is not a "native object" like "length", "toString", etc!
-		
-		if (uid === undefined) {
-			try {
-				// we need to add a new object
-				var uid = UnPlug2SearchPage.results.length;
-				UnPlug2SearchPage.download_to_uid[download_tosource] = uid;
-				UnPlug2SearchPage.results[uid] = result;
-				result.uid = uid;
-				
-				var reselem = UnPlug2SearchPage.result_e_create();
-				reselem.setAttribute("id", "result_" + uid);
-				reselem.setAttribute("tooltiptext", "uid=" + uid + "\n\ndownload=" + result.download.toSource() + "\n\noriginal = " + result.details.toSource());
-				
-				// sets download callbacks, etc
-				UnPlug2SearchPage.result_e_set_download(reselem, result);
-				
-				// this sets labels, icons, descripions, css, etc
-				// but wont ever move the element
-				UnPlug2SearchPage.result_e_set_description(reselem, result);
-				
-				// container for the group, eg the mediaid and/or playlistid
-				UnPlug2SearchPage.set_container(uid, reselem, result.details);
-				
-			} catch(e) {
-				UnPlug2.log("ERROR displaying result " + e.toSource());
-			}
-		} else {
-			var reselem = document.getElementById("result_" + uid);
-			var old_result = UnPlug2SearchPage.results[uid];
-			if (old_result.details.certainty < result.details.certainty) {
-				// Update
-				UnPlug2SearchPage.results[uid].details = result.details;
-				
-				// we need to update this.results and the widget displayed on the page with our better data
-				reselem.setAttribute("tooltiptext", reselem.getAttribute("tooltiptext") + "\n\nupdated = " + result.details.toSource());
-				UnPlug2SearchPage.result_e_set_description(reselem, result);
-				
-				// it can attach/detach from the parent element as needed
-				UnPlug2SearchPage.update_container(uid, reselem, old_result.details, result.description);
+		try {
+			result.download_tosource = result.download.toSource();
+			var existing_mediaresult = UnPlug2SearchPage.results_lookup[result.download_tosource];
+			if (existing_mediaresult === undefined) {
+				var mediaresult = new UnPlug2SearchPage.MediaResult(result);
+				UnPlug2SearchPage.results_lookup_length += 1;
+				UnPlug2SearchPage.results_lookup[result.download_tosource] = mediaresult;
+				UnPlug2SearchPage.main_group.place_mediaresult(mediaresult);
 			} else {
-				reselem.setAttribute("tooltiptext", reselem.getAttribute("tooltiptext") + "\n\nignored = " + result.details.toSource());
+				existing_mediaresult.update(result);
 			}
+		} catch(e) {
+			UnPlug2.log("ERROR displaying result " + e.toSource());
 		}
 	}),
-	
-	result_e_create : function () {
-		var orig = document.getElementById("unplug_result_template");
-		var dupe = orig.cloneNode(true);
-		dupe.collapsed = false;
-		return dupe;
-	},
-	
-	result_e_set_download : function (reselem, result) {
-		var popup = reselem.getElementsByTagName("menupopup")[0];
-		var button_names = UnPlug2DownloadMethods.button_names();
-		var prev_elem_group = null;
-		var avail_elements = [];
-		
-		// we want to replace the old callbacks with new callbacks
-		while (popup.firstChild) {
-			popup.removeChild(popup.firstChild);
-		}
-		for (var i = 0; i < button_names.length; ++i) {
-			var name = button_names[i];
-			var info = UnPlug2DownloadMethods.getinfo(name);
-			if (info.avail(result)) {
-				if (prev_elem_group != info.group && avail_elements.length != 0) {
-					var spacer = document.createElement("menuseparator");
-					popup.appendChild(spacer);
-				}
-				prev_elem_group = info.group;
-				avail_elements.push(name);
-				var elem = document.createElement("menuitem");
-				prev_elem_is_spacer = false;
-				elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a"))
-				elem.setAttribute("label", UnPlug2.str("dmethod." + name));
-				elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
-				elem.className = "menuitem-iconic " + info.css;
-				elem.addEventListener("command", UnPlug2DownloadMethods.callback(name, result), false);
-				popup.appendChild(elem);
-			}
-		}
-		
-		var copy_button = reselem.getElementsByTagName("toolbarbutton")[0];
-		copy_button.setAttribute("label", UnPlug2.str("dmethod.copyurl"));
-		copy_button.setAttribute("accesskey", UnPlug2.str("dmethod.copyurl.a"));
-		copy_button.setAttribute("tooltiptext", UnPlug2.str("dmethod.copyurl.tip"));
-		
-		var copy_info = UnPlug2DownloadMethods.getinfo("copyurl");
-		if (copy_info && copy_info.avail(result)) {
-			copy_button.addEventListener("command", UnPlug2DownloadMethods.callback("copyurl", result), false);
-			copy_button.setAttribute("disabled", false);
-		} else {
-			copy_button.setAttribute("disabled", true);
-		}
-		
-		var main_button = reselem.getElementsByTagName("toolbarbutton")[1];
-		if (avail_elements.length == 0) {
-			main_button.setAttribute("disabled", true);
-			main_button.className = "menuitem-icon unavailable"
-			main_button.setAttribute("tooltiptext", UnPlug2.str("dmethod.unavailable.tip"));
-		} else {
-			var name = avail_elements[0];
-			var info = UnPlug2DownloadMethods.getinfo(name);
-			main_button.className = "menuitem-iconic " + info.css;
-			main_button.addEventListener("command", UnPlug2DownloadMethods.callback(name, result), false);
-			main_button.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
-		}
-		
-		// setup drag and drop
-		if (result.download.url) { // make draggable if simple url only
-			var image = reselem.getElementsByTagName("image")[0]; // ur-thumbnail
-			reselem.setAttribute("draggable", true);
-			reselem.addEventListener("dragstart", (function (url, image) {
-				return (function (event) {
-					event.dataTransfer.setData('text/uri-list', url);
-					event.dataTransfer.setData('text/plain', url);
-					event.dataTransfer.effectAllowed = "link";
-					event.dataTransfer.setDragImage(image, 25, 25);
-				});
-			})(result.download.url, image), true);
-		}
-	},
-	
-	result_e_set_description : function (reselem, result) {
-		// variables for use in the callbaks (closures)
-		var uid = result.uid;
-		var details = result.details;
-		var that = UnPlug2SearchPage;
-		
-		var name_label = reselem.getElementsByTagName("label")[0];
-		name_label.setAttribute("value", details.name);
-		var desc_label = reselem.getElementsByTagName("label")[1];
-		desc_label.setAttribute("value", details.description);
-		var protocol_label = reselem.getElementsByTagName("label")[2];
-		protocol_label.setAttribute("value", details.protocol);
-		var host_label = reselem.getElementsByTagName("label")[3];
-		host_label.setAttribute("value", details.host);
-		var thumbnail = reselem.getElementsByTagName("image")[0];
-		thumbnail.setAttribute("src", details.thumbnail);
-		
-		reselem.className = [
-			"file-ext-" + (details.file_ext || "unknown"),
-			"certainty-" + (details.certainty < 0 ? "low" : "high"),
-			"unplug-result" ].join(" ")
-	},
-	
-	set_container : function (uid, reselem, details) {
-		if (!details.mediaid) {
-			document.getElementById("results").appendChild(reselem);
-			return;
-		}
-		
-		var minfo = this.media_id_lookup[details.mediaid];
-		// escape used here because could have all sorts of special characters in mediaid
-		var eid = "mediaid_" + escape(details.mediaid || "none");
-		var container = document.getElementById(eid);
-		if (! container) {
-			container = document.createElement("vbox");
-			container.className = "container";
-			container.id = eid;
-			document.getElementById("results").appendChild(container);
-		}
-		if (minfo === undefined) {
-			this.media_id_lookup[details.mediaid] = {
-				certainty : details.certainty,
-				quality : details.quality,
-				best : uid };
-			reselem.className += " mediaid-best";
-			container.appendChild(reselem);
-		} else {
-			if (minfo.certainty < details.certainty || (minfo.certainty == details.certainty && minfo.quality < details.quality)) {
-				var old_best = document.getElementById("result_" + minfo["best"]);
-				old_best.className = old_best.className.replace("mediaid-best", "mediaid-collapse");
-				// this media info is the main one
-				this.media_id_lookup[details.mediaid] = {
-					certainty : details.certainty,
-					quality : details.quality,
-					best : uid };
-				reselem.className += " mediaid-best";
-				container.insertBefore(reselem, container.firstChild);
-			} else {
-				reselem.className += " mediaid-collapse";
-				container.appendChild(reselem);
-			}
-		}
-		container.appendChild(reselem);
-	},
-	
-	update_container : function (uid, reselem, old_details, new_details) {
-		if ((old_details.mediaid || "none") != (new_descripton.mediaid || "none")) {
-			// remove from current container
-			reselem.parentNode.removeChild(reselem);
-			// and add to the new one
-			UnPlug2SearchPage.set_container(uid, reselem, new_details);
-		}
-	},
 	
 	toString : function () {
 		return '<UnPlug2SearchPage>';
@@ -395,6 +213,292 @@ UnPlug2SearchPage = {
 	},
 	
 	endofobject : 1 }
+
+
+
+
+UnPlug2SearchPage.MediaResultGroup = (function (keychain) {
+	this.keychain = keychain;
+	this.depth = keychain.length;
+	this.parent = null;
+	this.children = [];
+	this.lookup = {};
+	this.element_create();
+});
+UnPlug2SearchPage.MediaResultGroup.prototype = {
+	element_create : (function () {
+		this.element = document.createElement("vbox");
+		this.element.className = "container";
+	}),
+
+
+	add_child : (function (child) {
+		var key = child.keychain[this.depth];
+		this.children.push(child);
+		this.lookup[key] = child;
+		this.element.appendChild(child.element);
+		this.sort(); // could be more efficient by inserting in the correct place to begin with
+		child.parent = this;
+	}),
+
+	remove_child : (function (child) {
+		var key = child.keychain[this.depth];
+		delete this.lookup[key];
+		this.children = this.children.splice(this.children.indexOf(this), 1);
+		this.element.removeChild(child.element);
+		child.parent = null;
+	}),
+
+	root : (function () {
+		if (this.parent === null) {
+			return this;
+		} else {
+			return this.root();
+		}
+	}),
+
+	place_mediaresult : (function (mediaresult) {
+		var key = mediaresult.keychain[this.depth];
+		if (this.depth+1 >= mediaresult.keychain.length) {
+			this.add_child(mediaresult);
+			this.update_sorting_keys(mediaresult);
+		} else {
+			// need to add to a sub group under this one
+			var child = this.lookup[key];
+			if (!child) {
+				var new_keychain = this.keychain.concat([key]);
+				child = new UnPlug2SearchPage.MediaResultGroup(new_keychain);
+				this.add_child(child); // sets this.lookup[key]
+			}
+			// recurse
+			child.place_mediaresult(mediaresult);
+		}
+	}),
+
+	cmp : (function (c1, c2) {
+		var r = (c2.certainty - c1.certainty);
+		if (r) { return r; }
+		r = (c2.quality - c1.quality);
+		if (r) { return r; }
+		return c2.download_tosource > c1.download_tosource;
+	}),
+
+	is_sorted : (function () {
+		for (var i = 0; i < this.children.length - 1; ++i) {
+			if (this.cmp(this.children[i], this.children[i+1]) > 0) {
+				return false;
+			}
+		}
+		return true;
+	}),
+
+	sort : (function () {
+		if (this.is_sorted()) {
+			// also catches case where this.children.length == 0
+			return;
+		}
+		this.children.sort(this.cmp);
+		for (var i = 0; i < this.children.length; ++i) {
+			var c = this.element.removeChild(this.children[i].element);
+			this.element.appendChild(c);
+		}
+	}),
+
+	update_sorting_keys : (function (child) {
+		var changed = false;
+		if (child.quality > this.quality || this.quality === undefined) {
+			this.quality = child.quality;
+			changed = true;
+		}
+		if (child.certainty > this.certainty || this.certainty === undefined) {
+			this.certainty = child.certainty;
+			changed = true;
+		}
+		if (changed && this.parent !== null) {
+			this.parent.update_sorting_keys(this);
+		}
+		this.sort();
+	})
+}
+
+UnPlug2SearchPage.MediaResult = (function (result) {
+	this.parent = null;
+	this.result = result;
+	this.history = [result.details];
+
+	this.check_keychain_changed();
+
+	// initial setup:
+	this.element_create();
+	this.update(result);
+});
+UnPlug2SearchPage.MediaResult.prototype = {
+	element_create : (function () {
+		this._create_copy_of_template();
+		this._create_download_buttons();
+	}),
+
+	_create_copy_of_template : (function () {
+		var orig = document.getElementById("unplug_result_template");
+		this.element = orig.cloneNode(true);
+		this.element.collapsed = false;
+	}),
+	
+	/*
+	 * Sets the download buttons based on the result.download value
+	 * result.download should not change once the object is created
+	 * (although the download methods read result.details.title, etc, when
+	 * actually saving stuff)
+	 */
+	_create_download_buttons : (function () {
+		var popup = this.element.getElementsByTagName("menupopup")[0];
+		var button_names = UnPlug2DownloadMethods.button_names();
+		var prev_elem_group = null;
+		var avail_elements = [];
+		
+		// we want to replace the old callbacks with new callbacks
+		while (popup.firstChild) {
+			popup.removeChild(popup.firstChild);
+		}
+		for (var i = 0; i < button_names.length; ++i) {
+			var name = button_names[i];
+			var info = UnPlug2DownloadMethods.getinfo(name);
+			if (info.avail(this.result)) {
+				if (prev_elem_group != info.group && avail_elements.length != 0) {
+					var spacer = document.createElement("menuseparator");
+					popup.appendChild(spacer);
+				}
+				prev_elem_group = info.group;
+				avail_elements.push(name);
+				var elem = document.createElement("menuitem");
+				prev_elem_is_spacer = false;
+				elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a"))
+				elem.setAttribute("label", UnPlug2.str("dmethod." + name));
+				elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
+				elem.className = "menuitem-iconic " + info.css;
+				elem.addEventListener("command", UnPlug2DownloadMethods.callback(name, this.result), false);
+				popup.appendChild(elem);
+			}
+		}
+		
+		var copy_button = this.element.getElementsByTagName("toolbarbutton")[0];
+		copy_button.setAttribute("label", UnPlug2.str("dmethod.copyurl"));
+		copy_button.setAttribute("accesskey", UnPlug2.str("dmethod.copyurl.a"));
+		copy_button.setAttribute("tooltiptext", UnPlug2.str("dmethod.copyurl.tip"));
+		
+		var copy_info = UnPlug2DownloadMethods.getinfo("copyurl");
+		if (copy_info && copy_info.avail(this.result)) {
+			copy_button.addEventListener("command", UnPlug2DownloadMethods.callback("copyurl", this.result), false);
+			copy_button.setAttribute("disabled", false);
+		} else {
+			copy_button.setAttribute("disabled", true);
+		}
+		
+		var main_button = this.element.getElementsByTagName("toolbarbutton")[1];
+		if (avail_elements.length == 0) {
+			main_button.setAttribute("disabled", true);
+			main_button.className = "menuitem-icon unavailable"
+			main_button.setAttribute("tooltiptext", UnPlug2.str("dmethod.unavailable.tip"));
+		} else {
+			var name = avail_elements[0];
+			var info = UnPlug2DownloadMethods.getinfo(name);
+			main_button.className = "menuitem-iconic " + info.css;
+			main_button.addEventListener("command", UnPlug2DownloadMethods.callback(name, this.result), false);
+			main_button.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
+		}
+		
+		// setup drag and drop
+		if (this.result.download.url) { // make draggable if simple url only
+			var image = this.element.getElementsByTagName("image")[0]; // ur-thumbnail
+			this.element.setAttribute("draggable", true);
+			this.element.addEventListener("dragstart", (function (url, image) {
+				return (function (event) {
+					event.dataTransfer.setData('text/uri-list', url);
+					event.dataTransfer.setData('text/plain', url);
+					event.dataTransfer.effectAllowed = "link";
+					event.dataTransfer.setDragImage(image, 25, 25);
+				});
+			})(this.result.download.url, image), true);
+		}
+	}),
+	
+	_element_update : (function () {
+		var details = this.result.details;
+
+		var name_label = this.element.getElementsByTagName("label")[0];
+		name_label.setAttribute("value", details.name);
+		var desc_label = this.element.getElementsByTagName("label")[1];
+		desc_label.setAttribute("value", details.description);
+		var protocol_label = this.element.getElementsByTagName("label")[2];
+		protocol_label.setAttribute("value", details.protocol);
+		var host_label = this.element.getElementsByTagName("label")[3];
+		host_label.setAttribute("value", details.host);
+		var thumbnail = this.element.getElementsByTagName("image")[0];
+		thumbnail.setAttribute("src", details.thumbnail);
+		
+		this.element.className = [
+			"file-ext-" + (details.file_ext || "unknown"),
+			"certainty-" + (details.certainty < 0 ? "low" : "high"),
+			"unplug-result" ].join(" ")
+	}),
+
+	root : (function () {
+		if (this.parent === null) {
+			UnPlug2.log("MediaResult.root() returned a non-group item");
+			return this;
+		} else {
+			return this.root();
+		}
+	}),
+
+	check_keychain_changed : (function () {
+		var new_keychain = [
+			this.result.details.mediaid,
+			this.result.download_tosource ];
+		if (!this.keychain) {
+			this.keychain = new_keychain;
+			return true;
+		}
+		for (var i = 0; i < new_keychain.length; ++i) {
+			if (new_keychain[i] != this.keychain[i]) {
+				this.keychain = new_keychain;
+				return true;
+			}
+		}
+		return false;
+	}),
+
+	update : (function (result) {
+		// should assert that result.download is the same
+		this.history.push(result.details);
+		if (this.certainty === undefined || result.details.certainty > this.certainty) {
+			// XXX TODO: can copy some fields (eg: default title) iff they are unset, even if less certain
+			
+			// update values we keep track of
+			this.result = result;
+
+			// update dom nodes
+			this._element_update();
+
+			// keychain changed?
+			if (this.check_keychain_changed()) {
+				var root = this.root();
+				this.parent.remove_child(this);
+				root.place_mediaresult(this);
+				return;
+			}
+
+			// sort
+			if (this.quality != this.result.details.quality || this.certainty != this.result.details.certainty) {
+				this.quality = this.result.details.quality;
+				this.certainty = this.result.details.certainty;
+				if (this.parent !== null) {
+					this.parent.update_sorting_keys(this);
+				}
+			}
+		}
+	})
+}
 
 //init
 UnPlug2SearchPage.UnPlug2SearchPage(window.arguments[0])
