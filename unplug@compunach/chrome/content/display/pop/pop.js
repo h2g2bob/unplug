@@ -453,7 +453,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 
 	check_keychain_changed : (function () {
 		var new_keychain = [
-			this.result.details.mediaid,
+			this.result.details.mediaid || this.result.download_tosource,
 			this.result.download_tosource ];
 		if (!this.keychain) {
 			this.keychain = new_keychain;
