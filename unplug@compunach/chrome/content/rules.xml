@@ -66,39 +66,6 @@
 	<!--
 		Now the actual rules
 	-->
-	<rule id="generic_flv_string">
-		<!-- possible alternative? <each_re ref="flvre" re="(https?://[a-z0-9_/\.\-]+\.flv(?:\?[a-z0-9_/\.%=&amp;\-]*)?)" flags="i"> -->
-		<each_re ref="flvre" re="[&quot;']((?:http|/)[^&quot;']+\.(flv|mp4|avi)(?:\?[^&quot;']+)?)[&quot;']">
-			<rule id="unescape">
-				<if_re re="%3a%2f%2f" flags="i" string="${flvre.1}" />
-				<rule>
-					<if_re ref="flvre" re="^(.*)$" string="${urldecode:flvre.1}" />
-					<rule goto="genflv" />
-				</rule>
-			</rule>
-			<rule id="genflv" target="genflv">
-				<ifnot_re re="%3a%2f%2f" flags="i" string="${flvre.1}" />
-				<media url="${flvre.1}" certainty="low" title="${origtitle.innerHTML}" type="flv" />
-				<rule id="tube8">
-					<if_url ref="url" host="tube8.com" />
-					<optional_re ref="title" re="&lt;h1 class=&quot;main-title main-sprite-img&quot;&gt;([^&lt;&gt;]+)&lt;/h1&gt;" />
-					<optional_re ref="mediaparts" re="/(\d+/\d+/[\da-f]+)/[\da-f]+\.flv" string="${flvre.1}" />
-					<media url="${flvre.1}" title="${either:title.1:origtitle.innerHTML}" thumbnail="http://t8-pics.phncdn.com/${mediaparts.1}/190x143/1.jpg" type="flv" />
-				</rule>
-				<rule id="extremetube">
-					<if_re ref="thumbid" string="${flvre.1}" re="extremetube.com/dl/.*/videos/(\d+/\d+/\d+)/\d+\.flv\?" />
-					<optional_element ref="title" tagname="h1" require_attrs="title" />
-					<media url="${flvre.1}" title="${either:title.title:origtitle.innerHTML}" thumbnail="http://xt-pics.phncdn.com/thumbs/${thumbid.1}/240x180/1.jpg" type="flv" />
-				</rule>
-				<rule id="facebook-2010-12">
-					<if_url host="facebook.com" />
-					<optional_re ref="title" re="&lt;h3 class=&quot;[^&quot;]*video_title[^&gt;]+&gt;([^&lt;]+)&lt;/h3&gt;" />
-					<optional_re ref="thumb" re="&quot;(https?[^&quot;]+akamaihd\.net%2Fhvthumb[^&quot;]+\.jpg)&quot;" />
-					<media url="${flvre.1}" title="${either:title.1:origtitle.innerHTML}" thumbnail="${urldecode:thumb.1}" type="flv" />
-				</rule>
-			</rule>
-		</each_re>
-	</rule>
 	<rule id="clipfish.de">
 		<if_url host="clipfish.de" ref="url" />
 		<rule>
@@ -425,6 +392,43 @@
 		This also work around scripts
 	-->
 	<download id="flashblock_workaround" url="${.url}">
+		<rule id="generic_flv_string">
+			<!-- possible alternative? <each_re ref="flvre" re="(https?://[a-z0-9_/\.\-]+\.flv(?:\?[a-z0-9_/\.%=&amp;\-]*)?)" flags="i"> -->
+			<each_re ref="flvre" re="[&quot;']((?:http|/)[^&quot;']+\.(flv|mp4|avi)(?:(?:%3f|%3F|\?)[^&quot;']+)?)[&quot;']">
+				<rule id="unescape">
+					<if_re re="%3a%2f%2f" flags="i" string="${flvre.1}" />
+					<rule>
+						<if_re ref="flvre" re="^(.*)$" string="${urldecode:flvre.1}" />
+						<rule goto="genflv" />
+					</rule>
+				</rule>
+				<rule id="genflv" target="genflv">
+					<ifnot_re re="%3a%2f%2f" flags="i" string="${flvre.1}" />
+					<media url="${flvre.1}" certainty="low" title="${origtitle.innerHTML}" type="flv" />
+					<rule id="extreemetube">
+						<if_re ref="title" re="&lt;div class=&quot;absolute title\-box&quot;&gt;\s*&lt;h1 class=&quot;title\-video\-box float\-left&quot;[^&gt;]*&gt;\s*([^&lt;]+)\s*&lt;/h1&gt;" />
+						<media url="${flvre.1}" title="${title.1}" type="flv" />
+					</rule>
+					<rule id="tube8">
+						<if_url ref="url" host="tube8.com" />
+						<optional_re ref="title" re="&lt;h1 class=&quot;main-title main-sprite-img&quot;&gt;([^&lt;&gt;]+)&lt;/h1&gt;" />
+						<optional_re ref="mediaparts" re="/(\d+/\d+/[\da-f]+)/[\da-f]+\.flv" string="${flvre.1}" />
+						<media url="${flvre.1}" title="${either:title.1:origtitle.innerHTML}" thumbnail="http://t8-pics.phncdn.com/${mediaparts.1}/190x143/1.jpg" type="flv" />
+					</rule>
+					<rule id="extremetube">
+						<if_re ref="thumbid" string="${flvre.1}" re="extremetube.com/dl/.*/videos/(\d+/\d+/\d+)/\d+\.flv\?" />
+						<optional_element ref="title" tagname="h1" require_attrs="title" />
+						<media url="${flvre.1}" title="${either:title.title:origtitle.innerHTML}" thumbnail="http://xt-pics.phncdn.com/thumbs/${thumbid.1}/240x180/1.jpg" type="flv" />
+					</rule>
+					<rule id="facebook-2010-12">
+						<if_url host="facebook.com" />
+						<optional_re ref="title" re="&lt;h3 class=&quot;[^&quot;]*video_title[^&gt;]+&gt;([^&lt;]+)&lt;/h3&gt;" />
+						<optional_re ref="thumb" re="&quot;(https?[^&quot;]+akamaihd\.net%2Fhvthumb[^&quot;]+\.jpg)&quot;" />
+						<media url="${flvre.1}" title="${either:title.1:origtitle.innerHTML}" thumbnail="${urldecode:thumb.1}" type="flv" />
+					</rule>
+				</rule>
+			</each_re>
+		</rule>
 		<rule id="each_embed">
 			<each_element ref="embedelem" tagname="embed" require_attrs="src" attrs="flashvars">
 				<rule>
