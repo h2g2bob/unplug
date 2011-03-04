@@ -684,10 +684,10 @@
 		<rule id="youtube.com" target="youtube.com">
 			<if_url ref="url" host="youtube.com" />
 			<rule id="youtube-single" target="youtube-single">
-				<if_re ref="fmt_stream_map" re="&amp;fmt_stream_map=([^&amp;]+)" />
+				<if_re ref="fmt_stream_map" re="&quot;fmt_stream_map&quot;\s*:\s*&quot;([^&quot;]+)&quot;" />
 				<optional_re ref="title" re="&lt;title&gt;\s*YouTube\s+\-\s+(.*)\s*&lt;/title&gt;" />
 				<optional_re ref="video_id" re="&lt;input type=&quot;hidden&quot; name=&quot;video_id&quot; value=&quot;([^&quot;]+)&quot; /&gt;" />
-				<each_re ref="fmt_part" string="${urldecode:fmt_stream_map.1}" re="([^,]+)">
+				<each_re ref="fmt_part" string="${jsdecode:fmt_stream_map.1}" re="([^,]+)">
 					<rule id="youtube-http">
 						<if_re ref="fmt_url" re="^(\d+)\|(http[^\|]+)(?:\|.*)?$" string="${fmt_part.1}" />
 						<rule>
