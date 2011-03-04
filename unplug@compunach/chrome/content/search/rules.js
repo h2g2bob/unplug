@@ -375,7 +375,7 @@ UnPlug2Rules = {
 			"k5", "v5", "k6", "v6", "k7", "v7", "k8", "v8", "k9", "v9",
 			"k10", "v10", "k11", "v11", "k12", "v12", "k13", "v13", "k14", "v14",
 			"k15", "v15", "k16", "v16", "k17", "v17", "k18", "v18", "k19", "v19",
-			"k20", "v20"],
+			"k20", "v20", "default"],
 		apply_ref : true,
 		execute   : function (data, url, text, doc) {
 			if (!data.input) { return false; }
@@ -400,7 +400,7 @@ UnPlug2Rules = {
 				case data.k18: return {1: data.v18};
 				case data.k19: return {1: data.v19};
 				case data.k20: return {1: data.v20};
-				default: return false;
+				default: return data.default ? {1: data.default} : false;
 			}
 		}
 	},
