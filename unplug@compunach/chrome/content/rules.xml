@@ -691,39 +691,34 @@
 					<rule id="youtube-http">
 						<if_re ref="fmt_url" re="^(\d+)\|(http[^\|]+)(?:\|.*)?$" string="${fmt_part.1}" />
 						<rule>
-							<if_re string="${fmt_url.1}" re="^(22)$" />
+							<optional_switch ref="quality" input="${fmt_url.1}"
+								k1="4" v1="mid"
+								k2="5" v2="low"
+								k3="18" v3="mid"
+								k4="22" v4="very-high"
+								k5="34" v5="mid"
+								k6="35" v6="high"
+							/>
+							<optional_switch ref="description" input="${fmt_url.1}_"
+								k1="4" v1="${translate:mid_quality}"
+								k2="5" v2="${translate:low_quality}"
+								k3="18" v3="${translate:mid_quality}"
+								k4="22" v4="${translate:hd_quality}"
+								k5="34" v5="${translate:mid_quality}"
+								k6="35" v6="${translate:high_quality}"
+								default="Unknown quality code ${fmt_url.1}"
+							/>
+							<optional_switch ref="type" input="${fmt_url.1}"
+								k1="4" v1="flv"
+								k2="5" v2="flv"
+								k3="18" v3="mp4"
+								k4="22" v4="mp4"
+								k5="34" v5="flv"
+								k6="35" v6="flv"
+							/>
 							<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-								quality="very-high" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
-								description="${translate:hd_quality} - ${optional:title.1}" type="mp4" />
-						</rule>
-						<rule>
-							<if_re string="${fmt_url.1}" re="^(5)$" />
-							<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-								quality="low" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
-								description="${translate:low_quality} - ${optional:title.1}" type="flv" />
-						</rule>
-						<rule>
-							<if_re string="${fmt_url.1}" re="^(34|4)$" />
-							<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-								quality="mid" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
-								description="${translate:mid_quality} - ${optional:title.1}" type="flv" />
-						</rule>
-						<rule>
-							<if_re string="${fmt_url.1}" re="^(18)$" />
-							<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-								quality="mid" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
-								description="${translate:mid_quality} (mp4) - ${optional:title.1}" type="mp4" />
-						</rule>
-						<rule>
-							<if_re string="${fmt_url.1}" re="^(35)$" />
-							<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-								quality="mid" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
-								description="${translate:high_quality} - ${optional:title.1}" type="flv" />
-						</rule>
-						<rule>
-							<ifnot_re string="${fmt_url.1}" re="^(4|5|18|22|34|35)$" />
-							<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-								description="Unknown quality code ${fmt_url.1} - ${optional:title.1}" type="flv" />
+								quality="${quality.1}" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
+								description="${description.1} ${optional:type.1}" type="${type.1}" />
 						</rule>
 					</rule>
 					<rule id="youtube-rtmp">
