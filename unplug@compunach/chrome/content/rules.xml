@@ -699,7 +699,7 @@
 								k5="34" v5="mid"
 								k6="35" v6="high"
 							/>
-							<optional_switch ref="description" input="${fmt_url.1}_"
+							<optional_switch ref="description" input="${fmt_url.1}"
 								k1="4" v1="${translate:mid_quality}"
 								k2="5" v2="${translate:low_quality}"
 								k3="18" v3="${translate:mid_quality}"
