@@ -402,6 +402,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		} else {
 			var name = avail_elements[0];
 			var info = UnPlug2DownloadMethods.getinfo(name);
+			main_button.setAttribute("disabled", false);
 			main_button.className = "menuitem-iconic " + info.css;
 			main_button.addEventListener("command", UnPlug2DownloadMethods.callback(name, this.result), false);
 			main_button.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
