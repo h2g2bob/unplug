@@ -27,6 +27,8 @@ hd_quality=High definition
 embedplayer=Osadzony objekt (prawdopodobnie odtwarzacz, nie wideo)
 
 # download methods
+save_to_file=Save As
+save_to_directory=Save to Folder
 dmethod.open-tab=Otwórz w nowej karcie
 dmethod.open-tab.a=k
 dmethod.open-tab.tip=
@@ -71,3 +73,4 @@ extern.cancel.manyfile=Would you like to cancel %s active downloads?
 extern.cancel.stop=Stop
 extern.cancel.dontstop=Don't stop
 extern.cancel.deletefile=Delete partially downloaded file
+

@@ -59,6 +59,24 @@ UnPlug2SearchPage = {
 		}), true);
 	},
 	
+	done_load : (function () {
+		// fill in the save-as box list
+		var sal = document.getElementById("save_all_list");
+		var bnl = UnPlug2DownloadMethods.save_all_buttons();
+		for (var i = 0; i < bnl.length; ++i) {
+			var name = bnl[i];
+			var info = UnPlug2DownloadMethods.getinfo(name);
+			var elem = sal.appendItem(UnPlug2.str("dmethod." + name), name);
+			elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a"))
+			elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
+			elem.className = "menuitem-iconic save-all " + info.css;
+		}
+		sal.value = "saveas";
+		
+		// now start the search automatically
+		UnPlug2SearchPage.do_search();
+	}),
+	
 	/**
 	 * search the parent window for media, returning search result objects
 	 */
@@ -73,6 +91,13 @@ UnPlug2SearchPage = {
 			UnPlug2.log(e.toSource());
 		}
 	},
+	
+	/* clicked "save all" button */
+	do_saveall : (function () {
+		var method = document.getElementById("save_all_list").value;
+		var result_list = UnPlug2SearchPage.main_group.list_checked_items();
+		UnPlug2DownloadMethods.exec_multiple(method, result_list);
+	}),
 	
 	/**
 	 * Callback for UnPlug2Rules.search
@@ -257,6 +282,18 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 		}
 	}),
 
+	list_checked_items : (function () {
+		var rtn = [];
+		for (var i = 0; i < this.children.length; ++i) {
+			if (this.children[i].list_checked_items) {
+				rtn += this.children[i].list_checked_items();
+			} else if (this.children[i].is_checked()) {
+				rtn.push(this.children[i]);
+			}
+		}
+		return rtn;
+	}),
+
 	place_mediaresult : (function (mediaresult) {
 		var key = mediaresult.keychain[this.depth];
 		if (this.depth+1 >= mediaresult.keychain.length) {
@@ -352,7 +389,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 	 */
 	_create_download_buttons : (function () {
 		var popup = this.element.getElementsByTagName("menupopup")[0];
-		var button_names = UnPlug2DownloadMethods.button_names();
+		var button_names = UnPlug2DownloadMethods.avail_buttons(this.result);
 		var prev_elem_group = null;
 		var avail_elements = [];
 		
@@ -363,22 +400,20 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		for (var i = 0; i < button_names.length; ++i) {
 			var name = button_names[i];
 			var info = UnPlug2DownloadMethods.getinfo(name);
-			if (info.avail(this.result)) {
-				if (prev_elem_group != info.group && avail_elements.length != 0) {
-					var spacer = document.createElement("menuseparator");
-					popup.appendChild(spacer);
-				}
-				prev_elem_group = info.group;
-				avail_elements.push(name);
-				var elem = document.createElement("menuitem");
-				prev_elem_is_spacer = false;
-				elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a"))
-				elem.setAttribute("label", UnPlug2.str("dmethod." + name));
-				elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
-				elem.className = "menuitem-iconic " + info.css;
-				elem.addEventListener("command", UnPlug2DownloadMethods.callback(name, this.result), false);
-				popup.appendChild(elem);
+			if (prev_elem_group != info.group && avail_elements.length != 0) {
+				var spacer = document.createElement("menuseparator");
+				popup.appendChild(spacer);
 			}
+			prev_elem_group = info.group;
+			avail_elements.push(name);
+			var elem = document.createElement("menuitem");
+			prev_elem_is_spacer = false;
+			elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a"))
+			elem.setAttribute("label", UnPlug2.str("dmethod." + name));
+			elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
+			elem.className = "menuitem-iconic " + info.css;
+			elem.addEventListener("command", UnPlug2DownloadMethods.callback(name, this.result), false);
+			popup.appendChild(elem);
 		}
 		
 		var copy_button = this.element.getElementsByTagName("toolbarbutton")[0];
@@ -402,7 +437,6 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		} else {
 			var name = avail_elements[0];
 			var info = UnPlug2DownloadMethods.getinfo(name);
-			main_button.setAttribute("disabled", false);
 			main_button.className = "menuitem-iconic " + info.css;
 			main_button.addEventListener("command", UnPlug2DownloadMethods.callback(name, this.result), false);
 			main_button.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
@@ -450,6 +484,10 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		} else {
 			return this.root();
 		}
+	}),
+
+	is_checked : (function () {
+		return this.element.getElementsByTagName("checkbox")[0].checked;
 	}),
 
 	check_keychain_changed : (function () {

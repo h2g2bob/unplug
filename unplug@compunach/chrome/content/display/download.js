@@ -64,12 +64,25 @@ var UnPlug2DownloadMethods = {
 		});
 	}),
 	
-	/* button_names:
+	/* avail_buttons:
 	 * returns the button names, in order of preference (ie, the most obscure last)
 	 */
-	button_names : (function () {
-		return this._button_names;
+	avail_buttons : (function (result) {
+		var that = this;
+		return this._button_names.filter(function (val) {
+			return that._button_lookup[val].avail(result);
+		});
 	}),
+	
+	/* returns the names of all buttons available for exec_multiple */
+	save_all_buttons : (function () {
+		var that = this;
+		return this._button_names.filter(function (val) {
+			var info = that._button_lookup[val];
+			return (info.exec_fp || info.signal_get_argv);
+		});
+	}),
+	
 	get_extern_tool_names : (function () {
 		var out = [];
 		for (var i = 0; i < this._button_names.length; ++i) {
@@ -80,9 +93,11 @@ var UnPlug2DownloadMethods = {
 		}
 		return out;
 	}),
+	
 	getinfo : (function (name) {
 		return this._button_lookup[name];
 	}),
+	
 	callback : (function (name, result) {
 		var that = this;
 		return (function (evt) {
@@ -135,6 +150,61 @@ var UnPlug2DownloadMethods = {
 		}
 	}),
 	
+	exec_multiple : (function (method, result_list) {
+		var info = this._button_lookup[method];
+		
+		const nsIFilePicker = Components.interfaces.nsIFilePicker;
+		const nsifile = Components.interfaces.nsIFile;
+		var filepicker = Components.classes["@mozilla.org/filepicker;1"]
+			.createInstance(nsIFilePicker);
+		filepicker.init(window, UnPlug2.str("save_to_directory"), nsIFilePicker.modeGetFolder);
+		
+		// default directory
+		var path = UnPlug2.get_pref("savepath");
+		if (!path) {
+			path = Components.classes["@mozilla.org/download-manager;1"]
+				.getService(Components.interfaces.nsIDownloadManager)
+				.defaultDownloadsDirectory.path;
+		}
+		if (path) {
+			var f = Components.classes["@mozilla.org/file/local;1"]
+				.createInstance(Components.interfaces.nsILocalFile);
+			f.initWithPath(path);
+			if (f.exists() && f.isDirectory()) {
+				filepicker.displayDirectory = f;
+			}
+		}
+		
+		var ret = filepicker.show();
+		if (ret !== nsIFilePicker.returnOK) {
+			return;
+		}
+		UnPlug2.set_pref("savepath", filepicker.file.parent.path);
+		
+		for (var i = 0; i < result_list.length; ++i) {
+			var res = result_list[i];
+			if (!info.avail(res)) {
+				UnPlug2.log("Not doing save-all (is unavailable) for " + method + " result " + res.toSource());
+				continue;
+			}
+			/* we create the file, then over-write it
+			 * because calling exec() does not always create the
+			 * file immediately (so testing file.exists() is not
+			 * sufficient).
+			 */
+			var filename = filepicker.file.clone();
+			filename.append(res.details.name);
+			filename.createUnique(nsifile.NORMAL_FILE_TYPE, 0600);
+			if (info.exec_fp) {
+				info.exec_fp(res, filename);
+			} else if (info.signal_get_argv) {
+				alert("info.signal_get_argv() for exec_multiple() is not implemented") // TODO
+			} else {
+				alert("Unable to download file with method " + method);
+			}
+		}
+	}),
+	
 	exec_from_signal : (function (signal) {
 		/*
 		 * This code is executed from display/extern/extern.xul
@@ -178,12 +248,12 @@ var UnPlug2DownloadMethods = {
 			false );
 		return {
 			process : process,
-			file : file.file }
+			file : file }
 	}),
 	
 	/**
 	 * Displays save-as box
-	 * return { file : nsIFile?, fileURL : nsIFileURL? }, or null for cancel.
+	 * return an nsILocalFile, or null for cancel.
 	 */
 	_save_as_box : (function (name, ext) {
 		// make string, strip whitespace
@@ -209,7 +279,7 @@ var UnPlug2DownloadMethods = {
 		var nsIFilePicker = Components.interfaces.nsIFilePicker;
 		var filepicker = Components.classes["@mozilla.org/filepicker;1"]
 			.createInstance(nsIFilePicker);
-		filepicker.init(window, "Save as", nsIFilePicker.modeSave);
+		filepicker.init(window, UnPlug2.str("save_to_file"), nsIFilePicker.modeSave);
 		
 		// default directory
 		var path = UnPlug2.get_pref("savepath");
@@ -235,7 +305,7 @@ var UnPlug2DownloadMethods = {
 		if (ret != nsIFilePicker.returnOK && ret != nsIFilePicker.returnReplace)
 			return null; // cancelled
 		UnPlug2.set_pref("savepath", filepicker.file.parent.path);
-		return { "file" : filepicker.file, "fileURL" : filepicker.fileURL };
+		return filepicker.file;
 	}),
 
 	_nsifile_if_exec : (function (fname) {
@@ -306,7 +376,7 @@ UnPlug2DownloadMethods.add_button("saveas", {
 		var persistArgs = {
 			source      : nsiurl,
 			contentType : "application/octet-stream",
-			target      : file.fileURL,
+			target      : io_service.newFileURI(file),
 			postData    : null,
 			bypassCache : false
 		};
@@ -348,8 +418,7 @@ UnPlug2DownloadMethods.add_button("dta", {
 		}
 		return true;
 	}),
-	exec_fp : (function (res, fileobj) {
-		var file = fileobj.file;
+	exec_fp : (function (res, file) {
 		if (file.leafName.indexOf("*") >= 0) {
 			// we use the renaming mask, which treats *name*, etc as special.
 			throw "Filename contains star";
@@ -423,7 +492,7 @@ UnPlug2DownloadMethods.add_button("rtmpdump", {
 			"--rtmp", res.download.rtmp || res.download.url,
 			"--pageUrl", res.download.referer,
 			"--swfUrl", res.download.swfurl || res.download.referer, // this is invalid, but good enough most of the time.
-			"--flv", savefile.file.path ];
+			"--flv", savefile.path ];
 		if (res.download.rtmp) {
 			if (res.download.playpath) {
 				cmds.push("--playpath");
@@ -514,7 +583,7 @@ UnPlug2DownloadMethods.add_button("vlc", {
 			"-Isignals", // no gui
 			res.download.url,
 			":demux=dump",
-            		":demuxdump-file=" + savefile.file.path,
+            		":demuxdump-file=" + savefile.path,
 			":sout-all",
 			"vlc://quit" ];
 	}),

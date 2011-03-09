@@ -19,7 +19,6 @@ search_n_results=# találat
 search_no_results=Nincs találat
 cannot_download_this_kind=Nem lehet letölteni ezt a típusú fájlt
 
-
 # for rules.xml
 high_quality=Magas minőség
 low_quality=Alacsony minőség
@@ -28,6 +27,8 @@ hd_quality=Nagy felbontás
 embedplayer=Beágyazott objektum (valószínűleg médialejátszó, nem video)
 
 # download methods
+save_to_file=Save As
+save_to_directory=Save to Folder
 dmethod.open-tab=Megnyitás új fülön
 dmethod.open-tab.a=f
 dmethod.open-tab.tip=Megnyitás új fülön.
@@ -55,6 +56,7 @@ dmethod.rtmpdump.tip=Eszköz (rtmpdump) beszerzése vagy futtatása.
 dmethod.vlc=VLC
 dmethod.vlc.a=V
 dmethod.vlc.tip=Eszköz (vlc) beszerzése vagy futtatása.
+
 dmethod.unavailable.tip=Nem lehet letölteni ezt a fájlt.
 
 proc.status.error=Error
