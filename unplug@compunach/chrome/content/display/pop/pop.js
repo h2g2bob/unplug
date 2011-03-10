@@ -353,6 +353,12 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		var orig = document.getElementById("unplug_result_template");
 		this.element = orig.cloneNode(true);
 		this.element.collapsed = false;
+		var downloadbutton = this.element.getElementsByTagName("toolbarbutton")[1];
+		this.element.addEventListener("click", (function (evt) {
+			if (evt.button == 2) {
+				downloadbutton.open = true;
+			}
+		}), false);
 	}),
 	
 	/*
