@@ -57,6 +57,10 @@ dmethod.vlc.tip=
 
 dmethod.unavailable.tip=No downloader
 
+trace=Debug
+trace.a=g
+trace.tip=Show information which can be used for debugging
+
 proc.status.error=Error
 proc.status.running=Running
 proc.status.done=Done

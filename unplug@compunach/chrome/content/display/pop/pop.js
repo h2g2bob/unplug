@@ -185,7 +185,18 @@ UnPlug2SearchPage = {
 				10000);
 		dl.start()
 	},
-	
+
+	report_status_cb : (function (working, result_item) {
+		return (function (evt) {
+			if (working === null) {
+				alert("The following information can be used for debugging:\n\n" + result_item.trace() + "\n\n" + result_item.history.toSource());
+			} else {
+				alert("NOT IMPLEMENTED: Send this to server:\n\n" + working + "\n" + result_item.trace());
+			}
+			evt.stopPropagation();
+		});
+	}),
+
 	done_nothing_found_msg : function () {
 		var el = document.getElementById("notfound_button");
 		el.label = UnPlug2.str("nothing_found_done");
@@ -324,7 +335,7 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 UnPlug2SearchPage.MediaResult = (function (result) {
 	this.parent = null;
 	this.result = result;
-	this.history = [result.details];
+	this.history = [];
 
 	this.check_keychain_changed();
 
@@ -356,6 +367,15 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		var prev_elem_group = null;
 		var avail_elements = [];
 		
+		var make_elem = (function (name, callback) {
+			var elem = document.createElement("menuitem");
+			elem.setAttribute("accesskey", UnPlug2.str(name + ".a"))
+			elem.setAttribute("label", UnPlug2.str(name));
+			elem.setAttribute("tooltiptext", UnPlug2.str(name + ".tip"));
+			elem.addEventListener("command", callback, false);
+			return elem
+		});
+
 		// we want to replace the old callbacks with new callbacks
 		while (popup.firstChild) {
 			popup.removeChild(popup.firstChild);
@@ -365,22 +385,24 @@ UnPlug2SearchPage.MediaResult.prototype = {
 			var info = UnPlug2DownloadMethods.getinfo(name);
 			if (info.avail(this.result)) {
 				if (prev_elem_group != info.group && avail_elements.length != 0) {
-					var spacer = document.createElement("menuseparator");
-					popup.appendChild(spacer);
+					popup.appendChild(
+						document.createElement("menuseparator"));
 				}
 				prev_elem_group = info.group;
 				avail_elements.push(name);
-				var elem = document.createElement("menuitem");
 				prev_elem_is_spacer = false;
-				elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a"))
-				elem.setAttribute("label", UnPlug2.str("dmethod." + name));
-				elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
+				var elem = make_elem("dmethod." + name, UnPlug2DownloadMethods.callback(name, this.result))
 				elem.className = "menuitem-iconic " + info.css;
-				elem.addEventListener("command", UnPlug2DownloadMethods.callback(name, this.result), false);
 				popup.appendChild(elem);
 			}
 		}
 		
+
+		popup.appendChild(
+			document.createElement("menuseparator"));
+		popup.appendChild(
+			make_elem("trace", UnPlug2SearchPage.report_status_cb(null, this)));
+
 		var copy_button = this.element.getElementsByTagName("toolbarbutton")[0];
 		copy_button.setAttribute("label", UnPlug2.str("dmethod.copyurl"));
 		copy_button.setAttribute("accesskey", UnPlug2.str("dmethod.copyurl.a"));
@@ -441,6 +463,12 @@ UnPlug2SearchPage.MediaResult.prototype = {
 			"file-ext-" + (details.file_ext || "unknown"),
 			"certainty-" + (details.certainty < 0 ? "low" : "high"),
 			"unplug-result" ].join(" ")
+	}),
+
+	trace : (function () {
+		return this.history.map((function (h) {
+			return h.trace;
+		})).join("\n");
 	}),
 
 	root : (function () {
