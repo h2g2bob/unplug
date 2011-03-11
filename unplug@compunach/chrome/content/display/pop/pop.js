@@ -335,6 +335,9 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 UnPlug2SearchPage.MediaResult = (function (result) {
 	this.parent = null;
 	this.result = result;
+
+	// history stores the results we were passed.
+	// NOTE: It is not accurate because update() copies data over unset fields
 	this.history = [];
 
 	this.check_keychain_changed();
@@ -507,8 +510,12 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		// should assert that result.download is the same
 		this.history.push(result.details);
 		if (this.certainty === undefined || result.details.certainty > this.certainty) {
-			// XXX TODO: can copy some fields (eg: default title) iff they are unset, even if less certain
-			
+			// can copy some fields (eg: default title) if they are unset, even if less certain
+			// NOTE: this is destructive to history!
+			result.name = result.name || this.result.name;
+			result.description = result.description || this.result.description;
+			result.thumbnail = result.thumbnail || this.result.thumbnail;
+
 			// update values we keep track of
 			this.result = result;
 
@@ -531,6 +538,12 @@ UnPlug2SearchPage.MediaResult.prototype = {
 					this.parent.update_sorting_keys(this);
 				}
 			}
+		} else if (!this.result.name || !this.result.description || !this.result.thumbnail) {
+			// can copy some fields (eg: default title) if they are unset, even if less certain
+			// NOTE: this is destructive to history!
+			this.result.name = this.result.name || result.name;
+			this.result.description = this.result.description || result.description;
+			this.result.thumbnail = this.result.thumbnail || result.thumbnail;
 		}
 	})
 }
