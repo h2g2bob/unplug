@@ -294,6 +294,22 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 		return rtn;
 	}),
 
+	update_auto_ticked : (function () {
+		// assumes .sort() has been called and ignore subgroups
+		for (var i = 0; i < this.children.length; ++i) {
+			if (this.children[i].update_auto_ticked) {
+				return; // leave it alone
+			}
+			if (!this.children[i].auto_checked) {
+				return; // user edited checkboxes
+			}
+		}
+		for (var i = 0; i < this.children.length; ++i) {
+			// XXX also check for certainty value
+			this.children[i].set_checked(i == 0); // assumes sorted results
+		}
+	}),
+
 	place_mediaresult : (function (mediaresult) {
 		var key = mediaresult.keychain[this.depth];
 		if (this.depth+1 >= mediaresult.keychain.length) {
@@ -339,6 +355,7 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 			var c = this.element.removeChild(this.children[i].element);
 			this.element.appendChild(c);
 		}
+		this.update_auto_ticked();
 	}),
 
 	update_sorting_keys : (function (child) {
@@ -362,6 +379,7 @@ UnPlug2SearchPage.MediaResult = (function (result) {
 	this.parent = null;
 	this.result = result;
 	this.history = [result.details];
+	this.auto_checked = true;
 
 	this.check_keychain_changed();
 
@@ -379,6 +397,10 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		var orig = document.getElementById("unplug_result_template");
 		this.element = orig.cloneNode(true);
 		this.element.collapsed = false;
+		var callback = (function (that) {
+			return (function (evt) { that.auto_checked = false; });
+		});
+		this.element.getElementsByTagName("checkbox")[0].addEventListener("click", callback(this), false);
 	}),
 	
 	/*
@@ -488,6 +510,14 @@ UnPlug2SearchPage.MediaResult.prototype = {
 
 	is_checked : (function () {
 		return this.element.getElementsByTagName("checkbox")[0].checked;
+	}),
+
+	set_checked : (function (yesno) {
+		if (yesno) {
+			this.element.getElementsByTagName("checkbox")[0].setAttribute("checked", true);
+		} else {
+			this.element.getElementsByTagName("checkbox")[0].removeAttribute("checked");
+		}
 	}),
 
 	check_keychain_changed : (function () {
