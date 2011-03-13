@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://unplug/skin/searchpage.css" type="text/css"?>
-<!DOCTYPE dialog [
+<!DOCTYPE window [
 	<!ENTITY % dtdcommon SYSTEM "chrome://unplug/locale/common.dtd">
 	%dtdcommon;
 	<!ENTITY % dtdlocal SYSTEM "chrome://unplug/locale/searchpage.dtd">
@@ -34,22 +34,17 @@
  *
  */
 -->
-<dialog id="cn_unplug2_search"
+<window id="cn_unplug2_search"
   title="&dialog.title;"
   flex="1"
-  buttons="extra1,accept"
-  defaultButton="accept"
 
   width="600"
   height="500"
   
-  buttonlabelextra1="&configure;"
-  buttonaccesskeyextra1="&configure.a;"
-  
   onload="UnPlug2SearchPage.done_load();"
-  ondialogaccept=""
-  ondialogextra1="window.openDialog(&quot;chrome://unplug/content/config/config.xul&quot;)"
   onbeforeunload="UnPlug2SearchPage.abort();"
+
+  style="padding: 0.5em;"
   
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 	
@@ -64,8 +59,8 @@
 	<!-- DTA object in DTA 2.0 -->
 	<script type="application/javascript" src="chrome://dta/content/common/internalFunctions.js"/>
 	
-	<dialogheader title="&header.title;" description="&header.subtitle;"/>
-	<vbox id="results" style="overflow: -moz-scrollbars-vertical; border: 1px #666666 solid;" flex="1" />
+	<dialogheader title="&header.title;" description="&header.subtitle;" style="margin: 0; margin-bottom: 0.5em;" />
+	<vbox id="results" style="overflow: -moz-scrollbars-vertical; border: 1px #666666 solid; margin: 0;" flex="1" />
 	<spacer height="0.5em" />
 	<hbox>
 		<label id="dynamic_download" value="" />
@@ -85,7 +80,12 @@
 	</hbox>
 	<spacer height="0.5em" />
 	<progressmeter id="search_progress" mode="determined" value="0"/>
-	
+	<hbox>
+		<button label="&configure;" accesskey="&configure.a;" oncommand="window.openDialog(&quot;chrome://unplug/content/config/config.xul&quot;);" />
+		<spacer flex="1" />
+		<button label="OK" accesskey="O" oncommand="window.close();" />
+	</hbox>
+
 	<!-- this is the form of the result itself. We'll clone this to use in our display -->
 	<vbox id="unplug_result_template" flex="0" collapsed="true">
 		<toolbar flex="1">
@@ -126,5 +126,5 @@
 			</toolbarbutton>
 		</toolbar>
 	</vbox>
-</dialog>
+</window>
 
