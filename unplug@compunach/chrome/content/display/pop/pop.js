@@ -263,6 +263,7 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 		this.lookup[key] = child;
 		this.element.appendChild(child.element);
 		this.sort(); // could be more efficient by inserting in the correct place to begin with
+		this.update_auto_ticked(); // sort doesn't always call this
 		child.parent = this;
 	}),
 
@@ -306,7 +307,7 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 		}
 		for (var i = 0; i < this.children.length; ++i) {
 			// XXX also check for certainty value
-			this.children[i].set_checked(i == 0); // assumes sorted results
+			this.children[i].set_checked(i == 0 && this.children[i].certainty >= 10); // assumes sorted results
 		}
 	}),
 
