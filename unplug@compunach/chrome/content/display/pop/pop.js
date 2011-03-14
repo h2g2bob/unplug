@@ -287,7 +287,7 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 		var rtn = [];
 		for (var i = 0; i < this.children.length; ++i) {
 			if (this.children[i].list_checked_items) {
-				rtn += this.children[i].list_checked_items();
+				rtn = rtn.concat(this.children[i].list_checked_items());
 			} else if (this.children[i].is_checked()) {
 				rtn.push(this.children[i]);
 			}
