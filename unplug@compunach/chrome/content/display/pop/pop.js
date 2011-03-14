@@ -60,19 +60,6 @@ UnPlug2SearchPage = {
 	},
 	
 	done_load : (function () {
-		// fill in the save-as box list
-		var sal = document.getElementById("save_all_list");
-		var bnl = UnPlug2DownloadMethods.save_all_buttons();
-		for (var i = 0; i < bnl.length; ++i) {
-			var name = bnl[i];
-			var info = UnPlug2DownloadMethods.getinfo(name);
-			var elem = sal.appendItem(UnPlug2.str("dmethod." + name), name);
-			elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a"))
-			elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
-			elem.className = "menuitem-iconic save-all " + info.css;
-		}
-		sal.value = "saveas";
-		
 		// now start the search automatically
 		UnPlug2SearchPage.do_search();
 	}),
@@ -94,9 +81,9 @@ UnPlug2SearchPage = {
 	
 	/* clicked "save all" button */
 	do_saveall : (function () {
-		var method = document.getElementById("save_all_list").value;
-		var result_list = UnPlug2SearchPage.main_group.list_checked_items();
-		UnPlug2DownloadMethods.exec_multiple(method, result_list);
+		var resultitem_list = UnPlug2SearchPage.main_group.list_checked_items();
+		var result_list = resultitem_list.map((function (x) { return x.result; }));
+		window.openDialog("chrome://unplug/content/display/all/all.xul", "unplug_save_all", "chrome,modal", result_list);
 	}),
 	
 	/**

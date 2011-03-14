@@ -75,11 +75,6 @@
 		</hbox>
 	</vbox>
 	<spacer height="0.5em" />
-	<hbox align="center">
-		<label value="Save all with" accesskey="w" control="save_all_list" />
-		<menulist flex="1" id="save_all_list" />
-	</hbox>
-	<spacer height="0.5em" />
 	<hbox>
 		<button oncommand="UnPlug2SearchPage.abort();" id="stop_button" label="&stop.label;"  accesskey="&stop.accesskey;" />
 		<button label="&configure;" accesskey="&configure.a;" oncommand="window.openDialog(&quot;chrome://unplug/content/config/config.xul&quot;);" />
