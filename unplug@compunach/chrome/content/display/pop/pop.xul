@@ -60,30 +60,32 @@
 	<script type="application/javascript" src="chrome://dta/content/common/internalFunctions.js"/>
 	
 	<dialogheader title="&header.title;" description="&header.subtitle;" style="margin: 0; margin-bottom: 0.5em;" />
-	<vbox id="results" style="overflow: -moz-scrollbars-vertical; border: 1px #666666 solid; margin: 0;" flex="1" />
-	<spacer height="0.5em" />
-	<hbox>
-		<label id="dynamic_download" value="" />
-		<spacer flex="1" />
-		<label id="dynamic_results" value="" />
-	</hbox>
-	<hbox>
-		<button oncommand="UnPlug2SearchPage.abort();" id="stop_button" label="&stop.label;"  accesskey="&stop.accesskey;" />
-		<spacer flex="1" />
-		<button oncommand="UnPlug2SearchPage.send_nothing_found_msg();" id="notfound_button" label="&notfound.label;"  accesskey="&notfound.accesskey;" />
-	</hbox>
+	<vbox id="results-container" style="overflow: -moz-scrollbars-vertical; border: 1px #666666 solid; margin: 0;" flex="1">
+		<vbox id="results" />
+		<spacer style="height: 0.5em;" />
+		<hbox>
+			<progressmeter id="search_progress" mode="determined" value="0" style="width: 30%;" />
+			<label id="dynamic_results" value="" />
+			<spacer flex="1" />
+			<label id="dynamic_download" value="" />
+		</hbox>
+		<hbox>
+			<spacer flex="1" />
+			<label oncommand="UnPlug2SearchPage.send_nothing_found_msg();" id="notfound_button" value="&notfound.label;"  accesskey="&notfound.accesskey;" class="text-link" />
+		</hbox>
+	</vbox>
 	<spacer height="0.5em" />
 	<hbox align="center">
 		<label value="Save all with" accesskey="w" control="save_all_list" />
 		<menulist flex="1" id="save_all_list" />
-		<button label="Save all" accesskey="a" oncommand="UnPlug2SearchPage.do_saveall();" />
 	</hbox>
 	<spacer height="0.5em" />
-	<progressmeter id="search_progress" mode="determined" value="0"/>
 	<hbox>
+		<button oncommand="UnPlug2SearchPage.abort();" id="stop_button" label="&stop.label;"  accesskey="&stop.accesskey;" />
 		<button label="&configure;" accesskey="&configure.a;" oncommand="window.openDialog(&quot;chrome://unplug/content/config/config.xul&quot;);" />
 		<spacer flex="1" />
-		<button label="OK" accesskey="O" oncommand="window.close();" />
+		<button label="Close" accesskey="C" oncommand="window.close();" />
+		<button label="Save all" accesskey="a" oncommand="UnPlug2SearchPage.do_saveall();" />
 	</hbox>
 
 	<!-- this is the form of the result itself. We'll clone this to use in our display -->
