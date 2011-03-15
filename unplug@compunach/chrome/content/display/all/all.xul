@@ -32,12 +32,13 @@
  *
  */
 -->
-<dialog id="unplug_extern"
+<dialog
   title="&dialog.title;: Download multiple files"
   flex="1"
-  buttons="cancel,ok"
-  defaultButton="cancel"
+  buttons="cancel,accept"
+  defaultButton="accept"
   ondialogcancel=""
+  ondialogaccept="return do_begin_downloads();"
 
   width="650"
   height="300"

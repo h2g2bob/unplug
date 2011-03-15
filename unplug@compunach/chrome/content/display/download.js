@@ -150,9 +150,7 @@ var UnPlug2DownloadMethods = {
 		}
 	}),
 	
-	exec_multiple : (function (method, result_list) {
-		var info = this._button_lookup[method];
-		
+	folder_picker : (function () {
 		const nsIFilePicker = Components.interfaces.nsIFilePicker;
 		const nsifile = Components.interfaces.nsIFile;
 		var filepicker = Components.classes["@mozilla.org/filepicker;1"]
@@ -177,10 +175,19 @@ var UnPlug2DownloadMethods = {
 		
 		var ret = filepicker.show();
 		if (ret !== nsIFilePicker.returnOK) {
-			return;
+			return null;
 		}
 		UnPlug2.set_pref("savepath", filepicker.file.parent.path);
-		
+		return filepicker.file;
+	}),
+
+	exec_multiple : (function (method, result_list, folder) {
+		const nsifile = Components.interfaces.nsIFile;
+		var info = this._button_lookup[method];
+		if (folder === null) {
+			return;
+		}
+
 		for (var i = 0; i < result_list.length; ++i) {
 			var res = result_list[i];
 			if (!info.avail(res)) {
@@ -192,7 +199,7 @@ var UnPlug2DownloadMethods = {
 			 * file immediately (so testing file.exists() is not
 			 * sufficient).
 			 */
-			var filename = filepicker.file.clone();
+			var filename = folder.clone();
 			filename.append(res.details.name);
 			filename.createUnique(nsifile.NORMAL_FILE_TYPE, 0600);
 			if (info.exec_fp) {

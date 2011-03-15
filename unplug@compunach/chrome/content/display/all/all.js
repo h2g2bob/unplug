@@ -26,7 +26,6 @@
 
 /*
 
-TODO Add a save button
 TODO Add a way to select the folder to download into
 TODO Some download methods are not compatible with download all (eg: copy link). Need to skip them (perhaps change avail_buttons).
 TODO CSS needed on "Plus N which won't be downloaded"
@@ -135,11 +134,17 @@ var refresh_list = (function () {
 	}
 });
 
-var begin_download = (function () {
-	// TODO
-	// XXX for each method in solution
-	var method = document.getElementById("save_all_list").value;
-	UnPlug2DownloadMethods.exec_multiple(method, results);
+var do_begin_downloads = (function () {
+	var solution = download_solution();
+	var folder = UnPlug2DownloadMethods.folder_picker();
+	if (!folder) {
+		return false; // supress closing of window
+	}
+	for (var i = 0; i < solution["method_names"].length; ++i) {
+		var method = solution["method_names"][i];
+		var result_list = solution["results_by_method"][method];
+		UnPlug2DownloadMethods.exec_multiple(method, result_list, folder);
+	}
 });
 
 window.addEventListener("load", (function () {
