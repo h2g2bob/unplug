@@ -74,13 +74,32 @@
 			<label oncommand="UnPlug2SearchPage.send_nothing_found_msg();" id="notfound_button" value="&notfound.label;"  accesskey="&notfound.accesskey;" class="text-link" />
 		</hbox>
 	</vbox>
+	<groupbox>
+		<caption label="Download selected results" />
+		<hbox>
+			<vbox flex="1">
+				<vbox>
+					<checkbox label="Save as (4 files)" checked="true" />
+				</vbox>
+				<spacer flex="1" />
+			</vbox>
+			<vbox flex="1">
+				<vbox>
+					<checkbox label="Rtmpdump" />
+					<checkbox label="VLC" />
+					<checkbox label="Open in new tab" />
+				</vbox>
+				<spacer flex="1" />
+			</vbox>
+		</hbox>
+	</groupbox>
 	<spacer height="0.5em" />
 	<hbox>
-		<button oncommand="UnPlug2SearchPage.abort();" id="stop_button" label="&stop.label;"  accesskey="&stop.accesskey;" />
-		<button label="&configure;" accesskey="&configure.a;" oncommand="window.openDialog(&quot;chrome://unplug/content/config/config.xul&quot;);" />
-		<spacer flex="1" />
 		<button label="Close" accesskey="C" oncommand="window.close();" />
-		<button label="Save all" accesskey="a" oncommand="UnPlug2SearchPage.do_saveall();" />
+		<button label="&configure;" accesskey="&configure.a;" oncommand="window.openDialog(&quot;chrome://unplug/content/config/config.xul&quot;);" />
+		<button oncommand="UnPlug2SearchPage.abort();" id="stop_button" label="&stop.label;"  accesskey="&stop.accesskey;" />
+		<spacer flex="1" />
+		<button label="Download selected" accesskey="a" oncommand="UnPlug2SearchPage.do_saveall();" />
 	</hbox>
 
 	<!-- this is the form of the result itself. We'll clone this to use in our display -->
