@@ -78,28 +78,22 @@
 		<caption label="Download selected results" />
 		<hbox>
 			<vbox flex="1">
-				<vbox>
-					<checkbox label="Save as (4 files)" checked="true" />
-				</vbox>
+				<vbox id="selected_methods_enabled" />
 				<spacer flex="1" />
 			</vbox>
 			<vbox flex="1">
-				<vbox>
-					<checkbox label="Rtmpdump" />
-					<checkbox label="VLC" />
-					<checkbox label="Open in new tab" />
-				</vbox>
+				<vbox id="selected_methods_disabled" />
 				<spacer flex="1" />
 			</vbox>
 		</hbox>
 	</groupbox>
 	<spacer height="0.5em" />
 	<hbox>
-		<button label="Close" accesskey="C" oncommand="window.close();" />
-		<button label="&configure;" accesskey="&configure.a;" oncommand="window.openDialog(&quot;chrome://unplug/content/config/config.xul&quot;);" />
-		<button oncommand="UnPlug2SearchPage.abort();" id="stop_button" label="&stop.label;"  accesskey="&stop.accesskey;" />
+		<button tabindex="2" label="Close" accesskey="C" oncommand="window.close();" />
+		<button tabindex="3" label="&configure;" accesskey="&configure.a;" oncommand="window.openDialog(&quot;chrome://unplug/content/config/config.xul&quot;);" />
+		<button tabindex="4" id="stop_button" label="&stop.label;"  accesskey="&stop.accesskey;" oncommand="UnPlug2SearchPage.abort();" />
 		<spacer flex="1" />
-		<button label="Download selected" accesskey="a" oncommand="UnPlug2SearchPage.do_saveall();" />
+		<button tabindex="1" id="download_all" label="Download selected" accesskey="D" oncommand="UnPlug2SearchPage.do_saveall();" />
 	</hbox>
 
 	<!-- this is the form of the result itself. We'll clone this to use in our display -->

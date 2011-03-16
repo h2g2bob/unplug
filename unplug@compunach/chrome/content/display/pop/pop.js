@@ -46,6 +46,8 @@ UnPlug2SearchPage = {
 		this.preferred_downloaders.push("saveas");
 		// this.preferred_downloaders.push("openover");
 		this.preferred_downloaders.push("fallback");
+
+		this.selected_methods_excluded = [];
 		
 		// set this to true to stop everything
 		this._stopped = false;
@@ -54,6 +56,8 @@ UnPlug2SearchPage = {
 		this.results_lookup = {}; // { download.toSource() : MediaResult }
 		this.results_lookup_length = 0; // equivalent to this.results_lookup.keys().length (which would need FF >= 4.0)
 		this.main_group = new UnPlug2SearchPage.MediaResultGroup([]);
+		this.main_group.signal_user_change_checkbox = UnPlug2SearchPage.refresh_selected_methods;
+
 		window.addEventListener("load", (function () {
 			document.getElementById("results").appendChild(UnPlug2SearchPage.main_group.element);
 		}), true);
@@ -62,6 +66,7 @@ UnPlug2SearchPage = {
 	done_load : (function () {
 		// now start the search automatically
 		UnPlug2SearchPage.do_search();
+		document.getElementById("download_all").focus();
 	}),
 	
 	/**
@@ -81,9 +86,18 @@ UnPlug2SearchPage = {
 	
 	/* clicked "save all" button */
 	do_saveall : (function () {
-		var resultitem_list = UnPlug2SearchPage.main_group.list_checked_items();
-		var result_list = resultitem_list.map((function (x) { return x.result; }));
-		window.openDialog("chrome://unplug/content/display/all/all.xul", "unplug_save_all", "chrome,modal", result_list);
+		var solution = UnPlug2SearchPage.selected_methods_solution();
+		var folder = UnPlug2DownloadMethods.folder_picker();
+		if (!folder) {
+			return;
+		}
+		for (var i = 0; i < solution["method_names"].length; ++i) {
+			var method = solution["method_names"][i];
+			var resultitem_list = solution["result_item_by_method"][method];
+			var result_list = resultitem_list.map((function (x) { return x.result; }));
+			UnPlug2DownloadMethods.exec_multiple(method, result_list, folder);
+		}
+		window.close();
 	}),
 	
 	/**
@@ -161,6 +175,7 @@ UnPlug2SearchPage = {
 			} else {
 				existing_mediaresult.update(result);
 			}
+			UnPlug2SearchPage.refresh_selected_methods();
 		} catch(e) {
 			UnPlug2.log("ERROR displaying result " + e.toSource());
 		}
@@ -208,7 +223,105 @@ UnPlug2SearchPage = {
 		el.label = UnPlug2.str("nothing_found_failed");
 		el.disabled = "false";
 	},
-	
+
+	refresh_selected_methods : (function () {
+		var enabled_container = document.getElementById("selected_methods_enabled");
+		var disabled_container = document.getElementById("selected_methods_disabled");
+		var solution = UnPlug2SearchPage.selected_methods_solution();
+
+		while (enabled_container.firstChild) {
+			enabled_container.removeChild(enabled_container.firstChild);
+		}
+		while (disabled_container.firstChild) {
+			disabled_container.removeChild(disabled_container.firstChild);
+		}
+
+		var new_checkbox = (function (container, method, count) {
+			var elem = document.createElement("checkbox");
+			var label = UnPlug2.str("dmethod." + name);
+			if (count) {
+				label += " (" + count + " files)";
+				checked = true;
+			} else {
+				checked = false;
+			}
+			elem.setAttribute("label", label);
+			elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a"));
+			elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
+			elem.setAttribute("checked", checked);
+			container.appendChild(elem);
+			return elem;
+		});
+		
+		for (var i = 0; i < solution["method_names"].length; ++i) {
+			var name = solution["method_names"][i];
+			var count = solution["result_item_by_method"][name].length;
+			if (name === null) {
+				var elem = document.createElement("label");
+				elem.setAttribute("value", "Plus " + count + " results which will not be downloaded");
+				enabled_container.appendChild(elem);
+			} else {
+				new_checkbox(enabled_container, name, count).addEventListener("command", (function (name) {
+					return (function (evt) {
+						if (UnPlug2SearchPage.selected_methods_excluded.indexOf(name) < 0) {
+							UnPlug2SearchPage.selected_methods_excluded.push(name);
+						}
+						UnPlug2SearchPage.refresh_selected_methods();
+					});
+				})(name), false);
+			}
+		}
+
+		for (var i = 0; i < UnPlug2SearchPage.selected_methods_excluded.length; ++i) {
+			var name = UnPlug2SearchPage.selected_methods_excluded[i];
+			new_checkbox(disabled_container, name, null).addEventListener("command", (function (name) {
+				return (function (evt) {
+					var idx = UnPlug2SearchPage.selected_methods_excluded.indexOf(name);
+					if (idx >= 0) {
+						UnPlug2SearchPage.selected_methods_excluded.splice(idx, 1);
+					}
+					UnPlug2SearchPage.refresh_selected_methods();
+				});
+			})(name), false);
+		}
+		
+	}),
+
+	selected_methods_solution : (function () {
+		var solution = {
+			"result_item_by_method" : {},
+			"method_names" : []
+		};
+		var resultitem_list = UnPlug2SearchPage.main_group.list_checked_items();
+		for (var i = 0; i < resultitem_list.length; ++i) {
+			var methods = UnPlug2DownloadMethods.avail_buttons(resultitem_list[i].result);
+			var best_method = null;
+			for (var j = 0; j < methods.length; ++j) {
+				if (UnPlug2SearchPage.selected_methods_excluded.indexOf(methods[j]) < 0) {
+					best_method = methods[j];
+					break;
+				}
+			}
+			if (solution["method_names"].indexOf(best_method) < 0) {
+				solution["method_names"].push(best_method);
+				solution["result_item_by_method"][best_method] = [];
+			}
+			solution["result_item_by_method"][best_method].push(resultitem_list[i])
+		}
+
+		solution["method_names"].sort((function (a, b) {
+			if (a === null) {
+				return +1;
+			} else if (b === null) {
+				return -1;
+			} else {
+				return solution["result_item_by_method"][b].length - solution["result_item_by_method"][a].length;
+			}
+		}));
+
+		return solution;
+	}),
+
 	/*
 	 * Stop downloading/searching pages!
 	 */
@@ -266,7 +379,7 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 		if (this.parent === null) {
 			return this;
 		} else {
-			return this.root();
+			return this.parent.root();
 		}
 	}),
 
@@ -386,7 +499,13 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		this.element = orig.cloneNode(true);
 		this.element.collapsed = false;
 		var callback = (function (that) {
-			return (function (evt) { that.auto_checked = false; });
+			return (function (evt) {
+				that.auto_checked = false;
+				var f = that.root().signal_user_change_checkbox;
+				if (f) {
+					window.setTimeout(f, 10); // tickbox change hasn't been applied at this point
+				}
+			});
 		});
 		this.element.getElementsByTagName("checkbox")[0].addEventListener("click", callback(this), false);
 	}),
@@ -492,7 +611,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 			UnPlug2.log("MediaResult.root() returned a non-group item");
 			return this;
 		} else {
-			return this.root();
+			return this.parent.root();
 		}
 	}),
 
@@ -501,10 +620,14 @@ UnPlug2SearchPage.MediaResult.prototype = {
 	}),
 
 	set_checked : (function (yesno) {
+		var elem = this.element.getElementsByTagName("checkbox")[0];
+		if (yesno == elem.hasAttribute("checked")) {
+			return; // no change
+		}
 		if (yesno) {
-			this.element.getElementsByTagName("checkbox")[0].setAttribute("checked", true);
+			elem.setAttribute("checked", true);
 		} else {
-			this.element.getElementsByTagName("checkbox")[0].removeAttribute("checked");
+			elem.removeAttribute("checked");
 		}
 	}),
 
