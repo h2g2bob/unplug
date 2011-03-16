@@ -256,7 +256,8 @@ UnPlug2SearchPage = {
 		
 		for (var i = 0; i < solution["method_names"].length; ++i) {
 			var name = solution["method_names"][i];
-			var count = solution["result_item_by_method"][name].length;
+			var result_items_enabled = solution["result_item_by_method"][name];
+			var count = result_items_enabled.length;
 			if (name === null) {
 				var elem = document.createElement("label");
 				elem.setAttribute("value", "Plus " + count + " results which will not be downloaded");
@@ -271,6 +272,9 @@ UnPlug2SearchPage = {
 						UnPlug2SearchPage.refresh_selected_methods();
 					});
 				})(name), false);
+			}
+			for (var j = 0; j < result_items_enabled.length; ++j) {
+				result_items_enabled[j].style_will_download(name !== null);
 			}
 		}
 
@@ -607,10 +611,15 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		var thumbnail = this.element.getElementsByTagName("image")[0];
 		thumbnail.setAttribute("src", details.thumbnail);
 		
-		this.element.className = [
+		this.basic_css = [
 			"file-ext-" + (details.file_ext || "unknown"),
 			"certainty-" + (details.certainty < 0 ? "low" : "high"),
 			"unplug-result" ].join(" ")
+		this.element.className = this.basic_css;
+	}),
+
+	style_will_download : (function (yesno) {
+		this.element.className = this.basic_css + (yesno ? " will-download" : " will-not-download");
 	}),
 
 	root : (function () {
@@ -636,6 +645,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		} else {
 			elem.removeAttribute("checked");
 		}
+		this.element.className = this.basic_css;
 	}),
 
 	check_keychain_changed : (function () {

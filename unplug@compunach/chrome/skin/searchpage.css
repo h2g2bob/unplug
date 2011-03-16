@@ -1,6 +1,16 @@
 .unplug-result {
 }
 
+.unplug-result.will-download {
+	background: #ccffcc;
+	border: 3px green solid;
+}
+
+.unplug-result.will-not-download {
+	background: #ffcccc;
+	border: 3px red solid;
+}
+
 .unplug-result image.ur-thumbnail {
 	width: 4.8em;
 	height: 2.8em;
