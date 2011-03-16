@@ -64,10 +64,11 @@ var UnPlug2DownloadMethods = {
 		});
 	}),
 	
-	/* avail_buttons:
-	 * returns the button names, in order of preference (ie, the most obscure last)
+	/* methods_for_result:
+	 * returns the button names (methods), in order of preference (ie,
+	 * the most obscure last)
 	 */
-	avail_buttons : (function (result) {
+	methods_for_result : (function (result) {
 		var that = this;
 		return this._button_names.filter(function (val) {
 			return that._button_lookup[val].avail(result);

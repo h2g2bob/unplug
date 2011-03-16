@@ -518,7 +518,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 	 */
 	_create_download_buttons : (function () {
 		var popup = this.element.getElementsByTagName("menupopup")[0];
-		var button_names = UnPlug2DownloadMethods.avail_buttons(this.result);
+		var button_names = UnPlug2DownloadMethods.methods_for_result(this.result);
 		var prev_elem_group = null;
 		var avail_elements = [];
 		
