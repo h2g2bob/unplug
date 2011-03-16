@@ -294,7 +294,7 @@ UnPlug2SearchPage = {
 		};
 		var resultitem_list = UnPlug2SearchPage.main_group.list_checked_items();
 		for (var i = 0; i < resultitem_list.length; ++i) {
-			var methods = UnPlug2DownloadMethods.avail_buttons(resultitem_list[i].result);
+			var methods = UnPlug2DownloadMethods.methods_for_result_multiple(resultitem_list[i].result);
 			var best_method = null;
 			for (var j = 0; j < methods.length; ++j) {
 				if (UnPlug2SearchPage.selected_methods_excluded.indexOf(methods[j]) < 0) {

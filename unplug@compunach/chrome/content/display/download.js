@@ -73,16 +73,19 @@ var UnPlug2DownloadMethods = {
 			return that._button_lookup[val].avail(result);
 		});
 	}),
-	
-	/* returns the names of all buttons available for exec_multiple */
-	save_all_buttons : (function () {
+
+	/* methods_for_result_multiple:
+	 * returns the names of all buttons (methods) available for
+	 * exec_multiple, in order of preference (ie: the most obscure last)
+	 */
+	methods_for_result_multiple : (function (result) {
 		var that = this;
-		return this._button_names.filter(function (val) {
+		return this.methods_for_result(result).filter(function (val) {
 			var info = that._button_lookup[val];
 			return (info.exec_fp || info.signal_get_argv);
 		});
 	}),
-	
+
 	get_extern_tool_names : (function () {
 		var out = [];
 		for (var i = 0; i < this._button_names.length; ++i) {
