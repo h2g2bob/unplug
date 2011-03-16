@@ -236,6 +236,7 @@ UnPlug2SearchPage = {
 			disabled_container.removeChild(disabled_container.firstChild);
 		}
 
+		var can_download_all = false;
 		var new_checkbox = (function (container, method, count) {
 			var elem = document.createElement("checkbox");
 			var label = UnPlug2.str("dmethod." + name);
@@ -261,6 +262,7 @@ UnPlug2SearchPage = {
 				elem.setAttribute("value", "Plus " + count + " results which will not be downloaded");
 				enabled_container.appendChild(elem);
 			} else {
+				can_download_all = true;
 				new_checkbox(enabled_container, name, count).addEventListener("command", (function (name) {
 					return (function (evt) {
 						if (UnPlug2SearchPage.selected_methods_excluded.indexOf(name) < 0) {
@@ -285,6 +287,11 @@ UnPlug2SearchPage = {
 			})(name), false);
 		}
 		
+		if (can_download_all) {
+			document.getElementById("download_all").removeAttribute("disabled");
+		} else {
+			document.getElementById("download_all").setAttribute("disabled", true);
+		}
 	}),
 
 	selected_methods_solution : (function () {
