@@ -717,7 +717,7 @@
 								k6="35" v6="flv"
 							/>
 							<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-								quality="${quality.1}" title="${either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
+								quality="${quality.1}" title="${htmldecode:either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
 								description="${description.1} ${optional:type.1}" type="${type.1}" />
 						</rule>
 					</rule>
