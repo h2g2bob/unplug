@@ -181,7 +181,7 @@ var UnPlug2DownloadMethods = {
 		if (ret !== nsIFilePicker.returnOK) {
 			return null;
 		}
-		UnPlug2.set_pref("savepath", filepicker.file.parent.path);
+		UnPlug2.set_pref("savepath", filepicker.file.path);
 		return filepicker.file;
 	}),
 
