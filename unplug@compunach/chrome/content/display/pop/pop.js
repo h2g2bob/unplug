@@ -189,7 +189,7 @@ UnPlug2SearchPage = {
 	report_status_cb : (function (working, result_item) {
 		return (function (evt) {
 			if (working === null) {
-				alert("The following information can be used for debugging:\n\n" + result_item.trace() + "\n\n" + result_item.history.toSource());
+				alert("The following information can be used for debugging:\n\nTraceback:\n" + result_item.trace() + "\n\nKeychain:\n" + result_item.keychain.toSource() + "\n\nHistory:\n" + result_item.history.toSource());
 			} else {
 				alert("NOT IMPLEMENTED: Send this to server:\n\n" + working + "\n" + result_item.trace());
 			}
