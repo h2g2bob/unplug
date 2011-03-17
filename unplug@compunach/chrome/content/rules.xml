@@ -743,23 +743,55 @@
 					</rule>
 				</each_re>
 			</rule>
-			<rule id="youtube-channel">
-				<!-- click the "see all uploads" link -->
+			<rule>
 				<if_re string="${url.path}" ref="username" re="^/user/([^#\?]+)" />
-				<optional_re ref="session" re="window.ajax_session_info = 'session_token=(.*?)';" />
-				<download url="http://www.youtube.com/profile_ajax?action_ajax=1&amp;user=${urlencode:username.1}&amp;new=1&amp;box_method=load_playlist&amp;box_name=user_playlist_navigator&amp;playlistName=uploads&amp;sort=default" post="session_token=${optional:urlencode:session.1}&amp;messages=%5B%7B%22type%22%3A%22box_method%22%2C%22request%22%3A%7B%22name%22%3A%22user_playlist_navigator%22%2C%22x_position%22%3A1%2C%22y_position%22%3A-2%2C%22palette%22%3A%22default%22%2C%22method%22%3A%22load_playlist%22%2C%22params%22%3A%7B%22playlist_name%22%3A%22uploads%22%2C%22view%22%3A%22play%22%2C%22playlist_sort%22%3A%22default%22%7D%7D%7D%5D">
-					<each_re re="&lt;div id=\\&quot;playnav\-play\-uploads\-page\-(\d+)\\&quot;" ref="pagenum">
-						<!-- lets limit this to top few pages so we don't get an insane (or unlimited!) number of results (although we hit our download limit eventually...) -->
-						<if_re string="_${pagenum.1}_" re="_[0-3]_" />
-						<download url="http://www.youtube.com/profile_ajax?action_ajax=1&amp;user=${urlencode:username.1}&amp;new=1&amp;box_method=load_playlist_page&amp;box_name=user_playlist_navigator" post="session_token=${optional:session.1}&amp;messages=%5B%7B%22type%22%3A%22box_method%22%2C%22request%22%3A%7B%22name%22%3A%22user_playlist_navigator%22%2C%22x_position%22%3A1%2C%22y_position%22%3A-2%2C%22palette%22%3A%22default%22%2C%22method%22%3A%22load_playlist_page%22%2C%22params%22%3A%7B%22playlist_name%22%3A%22uploads%22%2C%22encrypted_playlist_id%22%3A%22uploads%22%2C%22query%22%3A%22%22%2C%22encrypted_shmoovie_id%22%3A%22uploads%22%2C%22page_num%22%3A${pagenum.1}%2C%22view%22%3A%22play%22%2C%22playlist_sort%22%3A%22default%22%7D%7D%7D%5D">
-							<each_re ref="link" re="&lt;a href=\\&quot;\\/(watch\?v=[^&quot;]+)\\&quot; class=\\&quot;playnav-item-title">
-								<download url="http://www.youtube.com/${jsdecode:link.1}">
-									<rule goto="youtube-single" />
-								</download>
-							</each_re>
-						</download>
-					</each_re>
-				</download>
+
+				<!-- currently playing item from channel -->
+				<optional_re string="${url.path}" ref="nowplaying" re="#p/u/\d+/([^/]+)$" />
+
+				<!-- playlist id and current playlist item -->
+				<optional_re string="${url.path}" ref="nowplaylist" re="#p/c/([^/]+)(?:/\d+/([^/]+))?$" />
+
+				<!-- playlist "more info" display -->
+				<optional_re string="${url.path}" ref="nowplaylist" re="#(?:grid/user|g/c)/([^/]+)$" />
+
+				<rule id="youtube-channel-playing">
+					<ifnot_equal a="${optional:nowplaying.1}_" b="_" />
+					<download url="http://www.youtube.com/watch?v=${jsdecode:nowplaying.1}">
+						<rule goto="youtube-single" />
+					</download>
+				</rule>
+				<rule id="youtube-channel-playlist">
+					<ifnot_equal a="${optional:nowplaylist.1}_" b="_" />
+					<optional_re ref="session" re="window.ajax_session_info = 'session_token=(.*?)';" />
+					<download url="http://www.youtube.com/profile_ajax?action_ajax=1&amp;user=${urlencode:username.1}&amp;new=1&amp;box_method=load_playlist&amp;box_name=user_playlist_navigator&amp;playlistName=uploads&amp;sort=default" post="session_token=${optional:urlencode:session.1}&amp;messages=%5B%7B%22type%22%3A%22box_method%22%2C%22request%22%3A%7B%22name%22%3A%22user_playlist_navigator%22%2C%22method%22%3A%22load_playlist%22%2C%22params%22%3A%7B%22encrypted_playlist_id%22%3A%22${nowplaylist.1}%22%2C%22playlist_name%22%3A%22user%22%2C%22view%22%3A%22play%22%2C%22playlist_sort%22%3A%22date%22%2C%22playlist_sort_direction%22%3A%22desc%22%7D%7D%7D%5D">
+						<each_re ref="link" re="&lt;a href=\\&quot;\\/(watch\?v=[^&quot;]+)\\&quot; class=\\&quot;playnav-item-title">
+							<download url="http://www.youtube.com/${jsdecode:link.1}">
+								<rule goto="youtube-single" />
+							</download>
+						</each_re>
+					</download>
+				</rule>
+				<rule id="youtube-channel-everything">
+					<!-- default behaviour if we can't think of anything else to do -->
+					<if_equal a="${optional:nowplaying.1}_" b="_" />
+					<if_equal a="${optional:nowplaylist.1}_" b="_" />
+					<!-- click the "see all uploads" link -->
+					<optional_re ref="session" re="window.ajax_session_info = 'session_token=(.*?)';" />
+					<download url="http://www.youtube.com/profile_ajax?action_ajax=1&amp;user=${urlencode:username.1}&amp;new=1&amp;box_method=load_playlist&amp;box_name=user_playlist_navigator&amp;playlistName=uploads&amp;sort=default" post="session_token=${optional:urlencode:session.1}&amp;messages=%5B%7B%22type%22%3A%22box_method%22%2C%22request%22%3A%7B%22name%22%3A%22user_playlist_navigator%22%2C%22x_position%22%3A1%2C%22y_position%22%3A-2%2C%22palette%22%3A%22default%22%2C%22method%22%3A%22load_playlist%22%2C%22params%22%3A%7B%22playlist_name%22%3A%22uploads%22%2C%22view%22%3A%22play%22%2C%22playlist_sort%22%3A%22default%22%7D%7D%7D%5D">
+						<each_re re="&lt;div id=\\&quot;playnav\-play\-uploads\-page\-(\d+)\\&quot;" ref="pagenum">
+							<!-- lets limit this to top few pages so we don't get an insane (or unlimited!) number of results (although we hit our download limit eventually...) -->
+							<if_re string="_${pagenum.1}_" re="_[0-3]_" />
+							<download url="http://www.youtube.com/profile_ajax?action_ajax=1&amp;user=${urlencode:username.1}&amp;new=1&amp;box_method=load_playlist_page&amp;box_name=user_playlist_navigator" post="session_token=${optional:session.1}&amp;messages=%5B%7B%22type%22%3A%22box_method%22%2C%22request%22%3A%7B%22name%22%3A%22user_playlist_navigator%22%2C%22x_position%22%3A1%2C%22y_position%22%3A-2%2C%22palette%22%3A%22default%22%2C%22method%22%3A%22load_playlist_page%22%2C%22params%22%3A%7B%22playlist_name%22%3A%22uploads%22%2C%22encrypted_playlist_id%22%3A%22uploads%22%2C%22query%22%3A%22%22%2C%22encrypted_shmoovie_id%22%3A%22uploads%22%2C%22page_num%22%3A${pagenum.1}%2C%22view%22%3A%22play%22%2C%22playlist_sort%22%3A%22default%22%7D%7D%7D%5D">
+								<each_re ref="link" re="&lt;a href=\\&quot;\\/(watch\?v=[^&quot;]+)\\&quot; class=\\&quot;playnav-item-title">
+									<download url="http://www.youtube.com/${jsdecode:link.1}">
+										<rule goto="youtube-single" />
+									</download>
+								</each_re>
+							</download>
+						</each_re>
+					</download>
+				</rule>
 			</rule>
 			<rule id="youtube-walk">
 				<if_re ref="vidid" re="'VIDEO_ID':\s*'([^']+)'," />
