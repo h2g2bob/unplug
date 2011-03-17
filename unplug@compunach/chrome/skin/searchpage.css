@@ -1,14 +1,12 @@
 .unplug-result {
 }
 
-.unplug-result.will-download {
+.unplug-result.will-download .box {
 	background: #ccffcc;
-	border: 3px green solid;
 }
 
-.unplug-result.will-not-download {
+.unplug-result.will-not-download .box {
 	background: #ffcccc;
-	border: 3px red solid;
 }
 
 .unplug-result image.ur-thumbnail {

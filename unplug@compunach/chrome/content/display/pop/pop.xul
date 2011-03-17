@@ -99,16 +99,18 @@
 	<!-- this is the form of the result itself. We'll clone this to use in our display -->
 	<vbox id="unplug_result_template" flex="0" collapsed="true">
 		<toolbar flex="1">
-			<checkbox checked="true" />
-			<image class="ur-thumbnail" />
-			<vbox flex="1" style="overflow: hidden;">
-				<label class="ur-name" />
-				<label class="ur-description" />
-				<hbox>
-					<label class="ur-protocol" />
-					<label class="ur-host" />
-				</hbox>
-			</vbox>
+			<hbox class="box" flex="1">
+				<checkbox checked="true" />
+				<image class="ur-thumbnail" />
+				<vbox flex="1" style="overflow: hidden;">
+					<label class="ur-name" />
+					<label class="ur-description" />
+					<hbox>
+						<label class="ur-protocol" />
+						<label class="ur-host" />
+					</hbox>
+				</vbox>
+			</hbox>
 			<!--
 				we want these to be drop-down buttons
 				ie Open / Open in a new window

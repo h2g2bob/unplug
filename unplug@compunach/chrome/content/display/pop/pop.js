@@ -512,6 +512,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		var callback = (function (that) {
 			return (function (evt) {
 				that.auto_checked = false;
+				that.element.className = that.basic_css;
 				var f = that.root().signal_user_change_checkbox;
 				if (f) {
 					window.setTimeout(f, 10); // tickbox change hasn't been applied at this point
