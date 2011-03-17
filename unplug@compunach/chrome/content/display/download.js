@@ -204,7 +204,7 @@ var UnPlug2DownloadMethods = {
 			 * sufficient).
 			 */
 			var filename = folder.clone();
-			filename.append(res.details.name);
+			filename.append(res.details.name + "." + res.details.file_ext);
 			filename.createUnique(nsifile.NORMAL_FILE_TYPE, 0600);
 			if (info.exec_fp) {
 				info.exec_fp(res, filename);
