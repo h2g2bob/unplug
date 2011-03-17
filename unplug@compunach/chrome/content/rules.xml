@@ -686,7 +686,7 @@
 			<rule id="youtube-single" target="youtube-single">
 				<if_re ref="fmt_stream_map" re="&quot;fmt_stream_map&quot;\s*:\s*&quot;([^&quot;]+)&quot;" />
 				<optional_re ref="title" re="&lt;title&gt;\s*YouTube\s+\-\s+(.*)\s*&lt;/title&gt;" />
-				<optional_re ref="video_id" re="&lt;input type=&quot;hidden&quot; name=&quot;video_id&quot; value=&quot;([^&quot;]+)&quot; /&gt;" />
+				<optional_re ref="video_id" re="&lt;link rel=&quot;canonical&quot; href=&quot;/watch\?v=([^&quot;#]+)&quot;&gt;" />
 				<each_re ref="fmt_part" string="${jsdecode:fmt_stream_map.1}" re="([^,]+)">
 					<rule id="youtube-http">
 						<if_re ref="fmt_url" re="^(\d+)\|(http[^\|]+)(?:\|.*)?$" string="${fmt_part.1}" />
@@ -698,6 +698,7 @@
 								k4="22" v4="very-high"
 								k5="34" v5="mid"
 								k6="35" v6="high"
+								k7="37" v7="very-high"
 							/>
 							<optional_switch ref="description" input="${fmt_url.1}"
 								k1="4" v1="${translate:mid_quality}"
@@ -706,6 +707,7 @@
 								k4="22" v4="${translate:hd_quality}"
 								k5="34" v5="${translate:mid_quality}"
 								k6="35" v6="${translate:high_quality}"
+								k7="37" v7="${translate:hd_quality} (very high)"
 								default="Unknown quality code ${fmt_url.1}"
 							/>
 							<optional_switch ref="type" input="${fmt_url.1}"
