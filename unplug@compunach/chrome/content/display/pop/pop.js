@@ -572,17 +572,9 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		for (var i = 0; i < button_names.length; ++i) {
 			var name = button_names[i];
 			var info = UnPlug2DownloadMethods.getinfo(name);
-			if (info.avail(this.result)) {
-				if (prev_elem_group != info.group && avail_elements.length != 0) {
-					popup.appendChild(
-						document.createElement("menuseparator"));
-				}
-				prev_elem_group = info.group;
-				avail_elements.push(name);
-				prev_elem_is_spacer = false;
-				var elem = make_elem("dmethod." + name, UnPlug2DownloadMethods.callback(name, this.result))
-				elem.className = "menuitem-iconic " + info.css;
-				popup.appendChild(elem);
+			if (prev_elem_group != info.group && avail_elements.length != 0) {
+				popup.appendChild(
+					document.createElement("menuseparator"));
 			}
 			prev_elem_group = info.group;
 			avail_elements.push(name);
