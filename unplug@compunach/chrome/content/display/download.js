@@ -192,6 +192,7 @@ var UnPlug2DownloadMethods = {
 			return;
 		}
 
+		var result_file_pairs = [];
 		for (var i = 0; i < result_list.length; ++i) {
 			var res = result_list[i];
 			if (!info.avail(res)) {
@@ -206,13 +207,18 @@ var UnPlug2DownloadMethods = {
 			var filename = folder.clone();
 			filename.append(res.details.name + "." + res.details.file_ext);
 			filename.createUnique(nsifile.NORMAL_FILE_TYPE, 0600);
-			if (info.exec_fp) {
+			if (info.exec_fp_multiple) {
+				result_file_pairs.push([res, filename]);
+			} else if (info.exec_fp) {
 				info.exec_fp(res, filename);
 			} else if (info.signal_get_argv) {
 				alert("info.signal_get_argv() for exec_multiple() is not implemented") // TODO
 			} else {
 				alert("Unable to download file with method " + method);
 			}
+		}
+		if (result_file_pairs) {
+			info.exec_fp_multiple(result_file_pairs);
 		}
 	}),
 	
@@ -417,6 +423,7 @@ UnPlug2DownloadMethods.add_button("saveas", {
 });
 
 UnPlug2DownloadMethods.add_button("dta", {
+	// downthemall
 	avail : (function (res) {
 		if (!window.opener.DTA_AddingFunctions && !window.DTA) {
 			return false;
@@ -430,33 +437,46 @@ UnPlug2DownloadMethods.add_button("dta", {
 		return true;
 	}),
 	exec_fp : (function (res, file) {
-		if (file.leafName.indexOf("*") >= 0) {
-			// we use the renaming mask, which treats *name*, etc as special.
-			throw "Filename contains star";
+		this.exec_fp_multiple([res, file]);
+	}),
+	exec_fp_multiple : (function (result_file_pairs) {
+		var links = [];
+		for (var i = 0; i < result_file_pairs.length; ++i) {
+			var res = result_file_pairs[i][0];
+			var file = result_file_pairs[i][1];
+
+			// downthemall doesn't like to overwrite any existing files, so we clean them up here.
+			// (note: we created empty files while determining what names were available)
+			file.remove(false);
+
+			if (file.leafName.indexOf("*") >= 0) {
+				// we use the renaming mask, which treats *name*, etc as special.
+				throw "Filename contains star";
+			}
+			
+			// IMPORTANT: call String() explicitly as DTA alters string
+			links.push({
+				"url" : res.download.url, // string
+				"postData" : null,
+				"referrer" : String(res.download.referer || ""), // an object with toURL
+				"dirSave" : String(file.parent.path), // an object with addFinalSlash
+
+				// mask is the only reliable way of renaming: the other
+				// methods clear the file name following a http 3xx redirect
+				"mask" : String(file.leafName), // string. renaming mask == file name
+
+				// these other file naming methods are less useful:
+				"fileName" : String(file.leafName), // string
+				"description" : String(file.leafName) }) // string
 		}
-		
-		// IMPORTANT: call String() explicitly as DTA alters string
-		link = {
-			"url" : res.download.url, // string
-			"postData" : null,
-			"referrer" : String(res.download.referer || ""), // an object with toURL
-			"dirSave" : String(file.parent.path), // an object with addFinalSlash
 
-			// mask is the only reliable way of renaming: the other
-			// methods clear the file name following a http 3xx redirect
-			"mask" : String(file.leafName), // string. renaming mask == file name
-
-			// these other file naming methods are less useful:
-			"fileName" : String(file.leafName), // string
-			"description" : String(file.leafName) } // string
-
-		UnPlug2.log("Hello DTA, I'm sending you: " + link.toSource());
+		UnPlug2.log("Hello DTA, I'm sending you: " + links.toSource());
 		if (window.DTA) {
 			// DTA 2.0
-			DTA.sendLinksToManager(window, true, [link]);
+			DTA.sendLinksToManager(window, true, links);
 		} else {
 			// DTA 1.0
-			window.opener.DTA_AddingFunctions.sendToDown(true, [link]);
+			window.opener.DTA_AddingFunctions.sendToDown(true, link);
 		}
 	}),
 	obscurity : 25,
