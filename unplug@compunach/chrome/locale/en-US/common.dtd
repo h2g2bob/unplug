@@ -30,6 +30,3 @@
 <!ENTITY header.title         "UnPlug">
 <!ENTITY header.subtitle      "Media download tool">
 
-<!ENTITY configure            "Configure">
-<!ENTITY configure.a          "C">
-

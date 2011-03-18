@@ -90,7 +90,7 @@
 	<spacer height="0.5em" />
 	<hbox>
 		<button tabindex="2" label="Close" accesskey="C" oncommand="window.close();" />
-		<button tabindex="3" label="&configure;" accesskey="&configure.a;" oncommand="window.openDialog(&quot;chrome://unplug/content/config/config.xul&quot;);" />
+		<button tabindex="3" label="&config.label;" accesskey="&config.accesskey;" tooltip="&config.tooltip;" oncommand="window.openDialog(&quot;chrome://unplug/content/config/config.xul&quot;);" />
 		<button tabindex="4" id="stop_button" label="&stop.label;"  accesskey="&stop.accesskey;" oncommand="UnPlug2SearchPage.abort();" />
 		<spacer flex="1" />
 		<button tabindex="1" id="download_all" label="Download selected" accesskey="D" oncommand="UnPlug2SearchPage.do_saveall();" />
