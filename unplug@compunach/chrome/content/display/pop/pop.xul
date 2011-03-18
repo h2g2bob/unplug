@@ -62,17 +62,6 @@
 	<dialogheader title="&header.title;" description="&header.subtitle;" style="margin: 0; margin-bottom: 0.5em;" />
 	<vbox id="results-container" style="overflow: -moz-scrollbars-vertical; border: 1px #666666 solid; margin: 0;" flex="1">
 		<vbox id="results" />
-		<spacer style="height: 0.5em;" />
-		<hbox>
-			<progressmeter id="search_progress" mode="determined" value="0" style="width: 30%;" />
-			<label id="dynamic_results" value="" />
-			<spacer flex="1" />
-			<label id="dynamic_download" value="" />
-		</hbox>
-		<hbox>
-			<spacer flex="1" />
-			<label oncommand="UnPlug2SearchPage.send_nothing_found_msg();" id="notfound_button" value="&notfound.label;"  accesskey="&notfound.accesskey;" class="text-link" />
-		</hbox>
 	</vbox>
 	<groupbox>
 		<caption label="Download selected results" />
@@ -91,8 +80,18 @@
 	<hbox>
 		<button tabindex="2" label="&close.label;" accesskey="&close.accesskey;" oncommand="window.close();" />
 		<button tabindex="3" label="&config.label;" accesskey="&config.accesskey;" tooltip="&config.tooltip;" oncommand="window.openDialog(&quot;chrome://unplug/content/config/config.xul&quot;);" />
-		<button tabindex="4" id="stop_button" label="&stop.label;"  accesskey="&stop.accesskey;" oncommand="UnPlug2SearchPage.abort();" />
-		<spacer flex="1" />
+		<hbox id="search_active_buttons" flex="1">
+			<vbox flex="1" valign="middle">
+				<progressmeter id="search_progress" mode="determined" value="0" style="width: 30%;" />
+			</vbox>
+			<button tabindex="4" id="stop_button" label="&stop.label;"  accesskey="&stop.accesskey;" oncommand="UnPlug2SearchPage.abort();" />
+		</hbox>
+		<hbox id="search_finished_buttons" flex="1" collapsed="true">
+			<vbox valign="middle">
+				<label oncommand="UnPlug2SearchPage.send_nothing_found_msg();" id="notfound_button" value="&notfound.label;"  accesskey="&notfound.accesskey;" class="text-link" />
+			</vbox>
+			<spacer flex="1" />
+		</hbox>
 		<button tabindex="1" id="download_all" label="&dlselected.label;" accesskey="&dlselected.accesskey;" oncommand="UnPlug2SearchPage.do_saveall();" />
 	</hbox>
 

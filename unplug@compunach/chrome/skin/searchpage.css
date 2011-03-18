@@ -3,10 +3,12 @@
 
 .unplug-result.will-download .box {
 	background: #ccffcc;
+	color: #000000;
 }
 
 .unplug-result.will-not-download .box {
 	background: #ffcccc;
+	color: #000000;
 }
 
 .unplug-result image.ur-thumbnail {
@@ -106,11 +108,6 @@
 .unplug-result toolbarbutton > toolbarbutton > label {
 	/* this aligns the label on the drop-down buttons correctly (ie: not just on the top) */
 	max-height : 1em;
-}
-
-#dynamic_results.failed {
-	color: #cc0000;
-	font-weight: bold;
 }
 
 #stop_button {

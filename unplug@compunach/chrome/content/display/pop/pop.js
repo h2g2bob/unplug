@@ -73,9 +73,6 @@ UnPlug2SearchPage = {
 	 * search the parent window for media, returning search result objects
 	 */
 	do_search : function () {
-		document.getElementById("dynamic_download").value = UnPlug2.str("search_busy");
-		document.getElementById("dynamic_results").value = UnPlug2.str("search_no_results_yet");
-		
 		try {
 			UnPlug2Search._reset(); // this may not be needed because we always start from a fresh window
 			UnPlug2Search.search(this._win, this._search_callback)
@@ -120,30 +117,14 @@ UnPlug2SearchPage = {
 	_search_callback_progress : (function (info) {
 		try {
 			var searchbar = document.getElementById("search_progress");
-			var status_label = document.getElementById("dynamic_download");
 			if (info.finished) {
 				searchbar.mode = "determined";
 				searchbar.value = "100";
-				status_label.value = UnPlug2.str("search_done");
 				
-				var num_results = UnPlug2SearchPage.results_lookup_length;
 				document.getElementById("stop_button").disabled = true;
-				if (num_results == 0) {
-					document.getElementById("dynamic_results").value = UnPlug2.str("search_no_results");
-					document.getElementById("dynamic_results").className = "failed";
-				} else if (num_results == 1) {
-					document.getElementById("dynamic_results").value = UnPlug2.str("search_1_result");
-				} else {
-					document.getElementById("dynamic_results").value = UnPlug2.str("search_n_results").replace("#", num_results);
-				}
+				document.getElementById("search_active_buttons").collapsed = true;
+				document.getElementById("search_finished_buttons").collapsed = false;
 			} else {
-				if (info.downloads == 1){
-					status_label.value.value = UnPlug2.str("search_1_active_download");
-				} else {
-					// note: info.downloads can be zero if we've downloaded the last page,
-					// but there are items which have been marked "defer" scheduled to be run.
-					status_label.value.value = UnPlug2.str("search_n_active_downloads").replace("#", info.downloads);
-				}
 				if (info.percent == 0 || info.percent == 100) {
 					searchbar.mode = "undetermined";
 				} else {
@@ -153,8 +134,6 @@ UnPlug2SearchPage = {
 			}
 		} catch (e) {
 			UnPlug2.log(e.toSource());
-			var e = document.getElementById("dynamic_results");
-			e.value = "Have errors";
 		}
 	}),
 	
