@@ -35,4 +35,8 @@
 <!ENTITY config.tooltip       "Modifier les réglages d'UnPlug.">
 <!ENTITY dl.label             " Télécharger">
 <!ENTITY dl.accesskey         "T">
+<!ENTITY dlselected.label     "Download selected">
+<!ENTITY dlselected.accesskey "D">
+<!ENTITY close.label          "Close">
+<!ENTITY close.accesskey      "C">
 
