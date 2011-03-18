@@ -515,7 +515,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		});
 		this.element.getElementsByTagName("checkbox")[0].addEventListener("click", callback(this), false);
 
-		var downloadbutton = this.element.getElementsByTagName("toolbarbutton")[1];
+		var downloadbutton = this.element.getElementsByTagName("toolbarbutton")[0];
 		this.element.addEventListener("click", (function (evt) {
 			if (evt.button == 2) {
 				downloadbutton.open = true;
@@ -573,20 +573,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		popup.appendChild(
 			make_elem("trace", UnPlug2SearchPage.report_status_cb(null, this)));
 
-		var copy_button = this.element.getElementsByTagName("toolbarbutton")[0];
-		copy_button.setAttribute("label", UnPlug2.str("dmethod.copyurl"));
-		copy_button.setAttribute("accesskey", UnPlug2.str("dmethod.copyurl.a"));
-		copy_button.setAttribute("tooltiptext", UnPlug2.str("dmethod.copyurl.tip"));
-		
-		var copy_info = UnPlug2DownloadMethods.getinfo("copyurl");
-		if (copy_info && copy_info.avail(this.result)) {
-			copy_button.addEventListener("command", UnPlug2DownloadMethods.callback("copyurl", this.result), false);
-			copy_button.setAttribute("disabled", false);
-		} else {
-			copy_button.setAttribute("disabled", true);
-		}
-		
-		var main_button = this.element.getElementsByTagName("toolbarbutton")[1];
+		var main_button = this.element.getElementsByTagName("toolbarbutton")[0];
 		if (avail_elements.length == 0) {
 			main_button.setAttribute("disabled", true);
 			main_button.className = "menuitem-icon unavailable"

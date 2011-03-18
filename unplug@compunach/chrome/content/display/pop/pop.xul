@@ -118,13 +118,6 @@
 			-->
 			<!-- aternative is type="menu" -->
 			<toolbarbutton
-				label="(copy)"
-				class="menuitem-iconic copyurl"
-				type="button"
-				disabled="true"
-				tabindex="1"
-				/>
-			<toolbarbutton
 				accesskey="&dl.accesskey;"
 				label="&dl.label;"
 				type="menu-button"
