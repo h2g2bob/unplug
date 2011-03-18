@@ -59,6 +59,10 @@ dmethod.vlc.tip=Verwenden Sie ein Software-Tool zum Download dieser Datei.
 
 dmethod.unavailable.tip=Kein Downloader
 
+trace=Debug
+trace.a=g
+trace.tip=Show information which can be used for debugging
+
 proc.status.error=Fehler
 proc.status.running=Läufen
 proc.status.done=Fertig

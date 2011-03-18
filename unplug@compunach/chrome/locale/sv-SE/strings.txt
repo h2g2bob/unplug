@@ -59,6 +59,10 @@ dmethod.vlc.tip=Hämta eller kör VLC
 
 dmethod.unavailable.tip=Kan inte ladda ner den här filen.
 
+trace=Debug
+trace.a=g
+trace.tip=Show information which can be used for debugging
+
 proc.status.error=Fel
 proc.status.running=Körs...
 proc.status.done=Slutförd

@@ -238,7 +238,7 @@ UnPlug2Variables.prototype = {
 	 * Return traceback as a string
 	 */
 	trace : function () {
-		return "<Trace " + this.traceback().join("/") + ">";
+		return this.traceback().join("::")
 	},
 	
 	/**
@@ -246,7 +246,7 @@ UnPlug2Variables.prototype = {
 	 */
 	traceback : function (partial_list) {
 		if (!partial_list)
-			partial_list = Array("");
+			partial_list = [];
 		if (this._parent)
 			this._parent.traceback(partial_list);
 		if (this._vars[".trace"])
@@ -972,10 +972,10 @@ UnPlug2Search = {
 		
 		// add special variables
 		variables = new UnPlug2Variables(variables, {
-			".url"              : url.spec,
+			".url"              : url.spec,   // XXX remove these?
 			".url.protocol"     : url.protocol,
 			".has_doc"          : doc ? true : false,
-			".trace"            : rules_xml.getAttribute("id") || "" })
+			".trace"            : rules_xml.getAttribute("id") ? "#" + rules_xml.getAttribute("id") : "" })
 		
 		// the if_* statements add variables, which are available to deeper levels in rules.xml
 		var updated_variables = new UnPlug2Variables(variables, {})
@@ -1139,7 +1139,7 @@ UnPlug2Search = {
 								abs_url,
 								post,
 								node,
-								updated_variables,
+								new UnPlug2Variables(updated_variables, { ".trace" : "@" + escape(abs_url.spec) }),
 								UnPlug2Search.default_timeout)
 							break;
 						case "media":

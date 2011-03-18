@@ -435,14 +435,21 @@ UnPlug2DownloadMethods.add_button("dta", {
 			throw "Filename contains star";
 		}
 		
-		// call String() explicitly as DTA alters string
+		// IMPORTANT: call String() explicitly as DTA alters string
 		link = {
 			"url" : res.download.url, // string
 			"postData" : null,
 			"referrer" : String(res.download.referer || ""), // an object with toURL
 			"dirSave" : String(file.parent.path), // an object with addFinalSlash
+
+			// mask is the only reliable way of renaming: the other
+			// methods clear the file name following a http 3xx redirect
+			"mask" : String(file.leafName), // string. renaming mask == file name
+
+			// these other file naming methods are less useful:
 			"fileName" : String(file.leafName), // string
 			"description" : String(file.leafName) } // string
+
 		UnPlug2.log("Hello DTA, I'm sending you: " + link.toSource());
 		if (window.DTA) {
 			// DTA 2.0

@@ -212,7 +212,18 @@ UnPlug2SearchPage = {
 				10000);
 		dl.start()
 	},
-	
+
+	report_status_cb : (function (working, result_item) {
+		return (function (evt) {
+			if (working === null) {
+				alert("The following information can be used for debugging:\n\nTraceback:\n" + result_item.trace() + "\n\nKeychain:\n" + result_item.keychain.toSource() + "\n\nHistory:\n" + result_item.history.toSource());
+			} else {
+				alert("NOT IMPLEMENTED: Send this to server:\n\n" + working + "\n" + result_item.trace());
+			}
+			evt.stopPropagation();
+		});
+	}),
+
 	done_nothing_found_msg : function () {
 		var el = document.getElementById("notfound_button");
 		el.label = UnPlug2.str("nothing_found_done");
@@ -490,7 +501,10 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 UnPlug2SearchPage.MediaResult = (function (result) {
 	this.parent = null;
 	this.result = result;
-	this.history = [result.details];
+
+	// history stores the results we were passed.
+	// NOTE: It is not accurate because update() copies data over unset fields
+	this.history = [];
 	this.auto_checked = true;
 
 	this.check_keychain_changed();
@@ -509,6 +523,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		var orig = document.getElementById("unplug_result_template");
 		this.element = orig.cloneNode(true);
 		this.element.collapsed = false;
+
 		var callback = (function (that) {
 			return (function (evt) {
 				that.auto_checked = false;
@@ -520,6 +535,13 @@ UnPlug2SearchPage.MediaResult.prototype = {
 			});
 		});
 		this.element.getElementsByTagName("checkbox")[0].addEventListener("click", callback(this), false);
+
+		var downloadbutton = this.element.getElementsByTagName("toolbarbutton")[1];
+		this.element.addEventListener("click", (function (evt) {
+			if (evt.button == 2) {
+				downloadbutton.open = true;
+			}
+		}), false);
 	}),
 	
 	/*
@@ -534,6 +556,15 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		var prev_elem_group = null;
 		var avail_elements = [];
 		
+		var make_elem = (function (name, callback) {
+			var elem = document.createElement("menuitem");
+			elem.setAttribute("accesskey", UnPlug2.str(name + ".a"))
+			elem.setAttribute("label", UnPlug2.str(name));
+			elem.setAttribute("tooltiptext", UnPlug2.str(name + ".tip"));
+			elem.addEventListener("command", callback, false);
+			return elem
+		});
+
 		// we want to replace the old callbacks with new callbacks
 		while (popup.firstChild) {
 			popup.removeChild(popup.firstChild);
@@ -541,9 +572,17 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		for (var i = 0; i < button_names.length; ++i) {
 			var name = button_names[i];
 			var info = UnPlug2DownloadMethods.getinfo(name);
-			if (prev_elem_group != info.group && avail_elements.length != 0) {
-				var spacer = document.createElement("menuseparator");
-				popup.appendChild(spacer);
+			if (info.avail(this.result)) {
+				if (prev_elem_group != info.group && avail_elements.length != 0) {
+					popup.appendChild(
+						document.createElement("menuseparator"));
+				}
+				prev_elem_group = info.group;
+				avail_elements.push(name);
+				prev_elem_is_spacer = false;
+				var elem = make_elem("dmethod." + name, UnPlug2DownloadMethods.callback(name, this.result))
+				elem.className = "menuitem-iconic " + info.css;
+				popup.appendChild(elem);
 			}
 			prev_elem_group = info.group;
 			avail_elements.push(name);
@@ -557,6 +596,12 @@ UnPlug2SearchPage.MediaResult.prototype = {
 			popup.appendChild(elem);
 		}
 		
+
+		popup.appendChild(
+			document.createElement("menuseparator"));
+		popup.appendChild(
+			make_elem("trace", UnPlug2SearchPage.report_status_cb(null, this)));
+
 		var copy_button = this.element.getElementsByTagName("toolbarbutton")[0];
 		copy_button.setAttribute("label", UnPlug2.str("dmethod.copyurl"));
 		copy_button.setAttribute("accesskey", UnPlug2.str("dmethod.copyurl.a"));
@@ -623,6 +668,12 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		this.element.className = this.basic_css + (yesno ? " will-download" : " will-not-download");
 	}),
 
+	trace : (function () {
+		return this.history.map((function (h) {
+			return h.trace;
+		})).join("\n");
+	}),
+
 	root : (function () {
 		if (this.parent === null) {
 			UnPlug2.log("MediaResult.root() returned a non-group item");
@@ -670,8 +721,12 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		// should assert that result.download is the same
 		this.history.push(result.details);
 		if (this.certainty === undefined || result.details.certainty > this.certainty) {
-			// XXX TODO: can copy some fields (eg: default title) iff they are unset, even if less certain
-			
+			// can copy some fields (eg: default title) if they are unset, even if less certain
+			// NOTE: this is destructive to history!
+			result.name = result.name || this.result.name;
+			result.description = result.description || this.result.description;
+			result.thumbnail = result.thumbnail || this.result.thumbnail;
+
 			// update values we keep track of
 			this.result = result;
 
@@ -694,6 +749,12 @@ UnPlug2SearchPage.MediaResult.prototype = {
 					this.parent.update_sorting_keys(this);
 				}
 			}
+		} else if (!this.result.name || !this.result.description || !this.result.thumbnail) {
+			// can copy some fields (eg: default title) if they are unset, even if less certain
+			// NOTE: this is destructive to history!
+			this.result.name = this.result.name || result.name;
+			this.result.description = this.result.description || result.description;
+			this.result.thumbnail = this.result.thumbnail || result.thumbnail;
 		}
 	})
 }

@@ -59,6 +59,10 @@ dmethod.vlc.tip=Eszköz (vlc) beszerzése vagy futtatása.
 
 dmethod.unavailable.tip=Nem lehet letölteni ezt a fájlt.
 
+trace=Debug
+trace.a=g
+trace.tip=Show information which can be used for debugging
+
 proc.status.error=Error
 proc.status.running=Running
 proc.status.done=Done
