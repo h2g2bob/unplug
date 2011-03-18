@@ -9,14 +9,14 @@ nothing_found_done=Thanks!
 nothing_found_failed=Failed
 
 # for below the search box
-search_done=Finished
-search_busy=Busy
-search_1_active_download=Searching 1 page
-search_n_active_downloads=Searching # pages
-search_no_results_yet=No results yet
-search_1_result=1 result
-search_n_results=# results
-search_no_results=No results
+# search_done=Finished
+# search_busy=Busy
+# search_1_active_download=Searching 1 page
+# search_n_active_downloads=Searching # pages
+# search_no_results_yet=No results yet
+# search_1_result=1 result
+# search_n_results=# results
+# search_no_results=No results
 cannot_download_this_kind=Cannot download this kind of file
 
 # for rules.xml

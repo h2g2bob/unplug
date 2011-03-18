@@ -9,14 +9,14 @@ nothing_found_done=Köszönet!
 nothing_found_failed=Hiba
 
 # for below the search box
-search_done=Kész
-search_busy=Dolgozik
-search_1_active_download=1 oldal keresés
-search_n_active_downloads=# oldal keresés
-search_no_results_yet=Nincs találat
-search_1_result=1 találat
-search_n_results=# találat
-search_no_results=Nincs találat
+# search_done=Kész
+# search_busy=Dolgozik
+# search_1_active_download=1 oldal keresés
+# search_n_active_downloads=# oldal keresés
+# search_no_results_yet=Nincs találat
+# search_1_result=1 találat
+# search_n_results=# találat
+# search_no_results=Nincs találat
 cannot_download_this_kind=Nem lehet letölteni ezt a típusú fájlt
 
 # for rules.xml

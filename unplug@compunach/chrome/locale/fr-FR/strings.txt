@@ -9,14 +9,14 @@ nothing_found_done=Merci !
 nothing_found_failed=Échec
 
 # for below the search box
-search_done=Terminé
-search_busy=Occupé
-search_1_active_download=Recherche 1 page
-search_n_active_downloads=Recherche # pages
-search_no_results_yet=Pas encore de résultat
-search_1_result=1 résultat
-search_n_results=# résultats
-search_no_results=Aucun résultat
+# search_done=Terminé
+# search_busy=Occupé
+# search_1_active_download=Recherche 1 page
+# search_n_active_downloads=Recherche # pages
+# search_no_results_yet=Pas encore de résultat
+# search_1_result=1 résultat
+# search_n_results=# résultats
+# search_no_results=Aucun résultat
 cannot_download_this_kind=Impossible de télécharger ce type de fichier
 
 # for rules.xml

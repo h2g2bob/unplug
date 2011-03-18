@@ -9,14 +9,14 @@ nothing_found_done=Danke!
 nothing_found_failed=Fehlgeschlagen
 
 # for below the search box
-search_done=Fertig
-search_busy=Arbeitet
-search_1_active_download=1 aktiver Download
-search_n_active_downloads=# aktive Downloads
-search_no_results_yet=Keine Ergebnisse bis jetzt
-search_1_result=1 Ergebnis
-search_n_results=# Ergebnisse
-search_no_results=keine Ergebnisse
+# search_done=Fertig
+# search_busy=Arbeitet
+# search_1_active_download=1 aktiver Download
+# search_n_active_downloads=# aktive Downloads
+# search_no_results_yet=Keine Ergebnisse bis jetzt
+# search_1_result=1 Ergebnis
+# search_n_results=# Ergebnisse
+# search_no_results=keine Ergebnisse
 cannot_download_this_kind=Kann diese Datei nicht herunterladen Typ
 
 # for rules.xml
