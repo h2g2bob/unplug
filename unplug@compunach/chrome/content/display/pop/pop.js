@@ -60,6 +60,7 @@ UnPlug2SearchPage = {
 
 		window.addEventListener("load", (function () {
 			document.getElementById("results").appendChild(UnPlug2SearchPage.main_group.element);
+			document.getElementById("notfound_button").addEventListener("click", UnPlug2SearchPage.send_nothing_found_msg, false);
 		}), true);
 	},
 	
