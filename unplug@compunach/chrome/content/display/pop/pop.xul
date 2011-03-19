@@ -92,7 +92,7 @@
 			</vbox>
 			<spacer flex="1" />
 		</hbox>
-		<button tabindex="1" id="download_all" label="&dlselected.label;" accesskey="&dlselected.accesskey;" oncommand="UnPlug2SearchPage.do_saveall();" />
+		<button tabindex="1" id="download_all" label="&dlselected.label;" accesskey="&dlselected.accesskey;" oncommand="UnPlug2SearchPage.do_saveall();" disabled="true" />
 	</hbox>
 
 	<!-- this is the form of the result itself. We'll clone this to use in our display -->
