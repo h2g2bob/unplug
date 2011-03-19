@@ -64,7 +64,7 @@
 		<vbox id="results" />
 	</vbox>
 	<groupbox>
-		<caption label="Download selected results" />
+		<caption label="&dlselected.heading;" />
 		<hbox>
 			<vbox flex="1">
 				<vbox id="selected_methods_enabled" />

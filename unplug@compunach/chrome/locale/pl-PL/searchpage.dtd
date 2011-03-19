@@ -37,6 +37,7 @@
 <!ENTITY dl.accesskey         "D">
 <!ENTITY dlselected.label     "Download selected">
 <!ENTITY dlselected.accesskey "D">
+<!ENTITY dlselected.heading   "Download selected results">
 <!ENTITY close.label          "Close">
 <!ENTITY close.accesskey      "C">
 
