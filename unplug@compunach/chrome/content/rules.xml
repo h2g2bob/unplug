@@ -798,8 +798,8 @@
 				</rule>
 			</rule>
 			<rule id="youtube-walk">
-				<if_re ref="vidid" re="'VIDEO_ID':\s*'([^']+)'," />
-				<if_re ref="user" re="'VIDEO_USERNAME':\s*'([^']+)'," />
+				<if_re ref="vidid" re="['&quot;]VIDEO_ID['&quot;]\s*:\s*['&quot;]([^'&quot;]+)['&quot;]," />
+				<if_re ref="user" re="['&quot;]VIDEO_USERNAME['&quot;]\s*:\s*['&quot;]([^'&quot;]+)['&quot;]," />
 				<download url="http://www.youtube.com/watch_ajax?user=${user.1}&amp;video_id=${vidid.1}&amp;action_channel_videos=1">
 					<if_re ref="primary" re="class=&quot;video-list-item-link selected&quot;&gt;[\s\S]*?&lt;span [^&gt;]*class=&quot;title&quot;[^&gt;]*&gt;([^&lt;]+)&lt;/span&gt;" />
 					<rule>
