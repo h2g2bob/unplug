@@ -58,6 +58,8 @@ dmethod.vlc.a=V
 dmethod.vlc.tip=Hämta eller kör VLC
 
 dmethod.unavailable.tip=Kan inte ladda ner den här filen.
+plus_n_extra_results=Plus %s results which will not be downloaded
+n_files=%s files
 
 trace=Debug
 trace.a=g

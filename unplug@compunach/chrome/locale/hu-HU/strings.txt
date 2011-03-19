@@ -58,6 +58,8 @@ dmethod.vlc.a=V
 dmethod.vlc.tip=Eszköz (vlc) beszerzése vagy futtatása.
 
 dmethod.unavailable.tip=Nem lehet letölteni ezt a fájlt.
+plus_n_extra_results=Plus %s results which will not be downloaded
+n_files=%s files
 
 trace=Debug
 trace.a=g

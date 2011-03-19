@@ -232,7 +232,7 @@ UnPlug2SearchPage = {
 			var elem = document.createElement("checkbox");
 			var label = UnPlug2.str("dmethod." + name);
 			if (count) {
-				label += " (" + count + " files)";
+				label += " (" + UnPlug2.str("n_files").replace("%s", count) + ")";
 				checked = true;
 			} else {
 				checked = false;
@@ -251,7 +251,7 @@ UnPlug2SearchPage = {
 			var count = result_items_enabled.length;
 			if (name === null) {
 				var elem = document.createElement("label");
-				elem.setAttribute("value", "Plus " + count + " results which will not be downloaded");
+				elem.setAttribute("value", UnPlug2.str("plus_n_extra_results").replace("%s", count));
 				enabled_container.appendChild(elem);
 			} else {
 				can_download_all = true;

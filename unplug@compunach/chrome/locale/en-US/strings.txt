@@ -58,6 +58,8 @@ dmethod.vlc.a=V
 dmethod.vlc.tip=Download with VLC media player
 
 dmethod.unavailable.tip=Cannot download this file.
+plus_n_extra_results=Plus %s results which will not be downloaded
+n_files=%s files
 
 trace=Debug
 trace.a=g
