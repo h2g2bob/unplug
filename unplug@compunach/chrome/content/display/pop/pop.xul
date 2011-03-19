@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://unplug/skin/searchpage.css" type="text/css"?>
-<!DOCTYPE dialog [
+<!DOCTYPE window [
 	<!ENTITY % dtdcommon SYSTEM "chrome://unplug/locale/common.dtd">
 	%dtdcommon;
 	<!ENTITY % dtdlocal SYSTEM "chrome://unplug/locale/searchpage.dtd">
@@ -34,22 +34,17 @@
  *
  */
 -->
-<dialog id="cn_unplug2_search"
+<window id="cn_unplug2_search"
   title="&dialog.title;"
   flex="1"
-  buttons="extra1,accept"
-  defaultButton="accept"
 
   width="600"
   height="500"
   
-  buttonlabelextra1="&configure;"
-  buttonaccesskeyextra1="&configure.a;"
-  
-  onload="UnPlug2SearchPage.do_search();"
-  ondialogaccept=""
-  ondialogextra1="window.openDialog(&quot;chrome://unplug/content/config/config.xul&quot;)"
+  onload="UnPlug2SearchPage.done_load();"
   onbeforeunload="UnPlug2SearchPage.abort();"
+
+  style="padding: 0.5em;"
   
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 	
@@ -64,34 +59,57 @@
 	<!-- DTA object in DTA 2.0 -->
 	<script type="application/javascript" src="chrome://dta/content/common/internalFunctions.js"/>
 	
-	<dialogheader title="&header.title;" description="&header.subtitle;"/>
-	<vbox id="results" style="overflow: -moz-scrollbars-vertical; border: 1px #666666 solid;" flex="1" />
-	<spacer height="0.5em;" />
+	<dialogheader title="&header.title;" description="&header.subtitle;" style="margin: 0; margin-bottom: 0.5em;" />
+	<vbox id="results-container" style="overflow: -moz-scrollbars-vertical; border: 1px #666666 solid; margin: 0;" flex="1">
+		<vbox id="results" />
+	</vbox>
+	<groupbox>
+		<caption label="Download selected results" />
+		<hbox>
+			<vbox flex="1">
+				<vbox id="selected_methods_enabled" />
+				<spacer flex="1" />
+			</vbox>
+			<vbox flex="1">
+				<vbox id="selected_methods_disabled" />
+				<spacer flex="1" />
+			</vbox>
+		</hbox>
+	</groupbox>
+	<spacer height="0.5em" />
 	<hbox>
-		<label id="dynamic_download" value="" />
-		<spacer flex="1" />
-		<label id="dynamic_results" value="" />
+		<button tabindex="2" label="&close.label;" accesskey="&close.accesskey;" oncommand="window.close();" />
+		<button tabindex="3" label="&config.label;" accesskey="&config.accesskey;" tooltip="&config.tooltip;" oncommand="window.openDialog(&quot;chrome://unplug/content/config/config.xul&quot;);" />
+		<hbox id="search_active_buttons" flex="1">
+			<vbox flex="1" valign="middle">
+				<progressmeter id="search_progress" mode="determined" value="0" style="width: 30%;" />
+			</vbox>
+			<button tabindex="4" id="stop_button" label="&stop.label;"  accesskey="&stop.accesskey;" oncommand="UnPlug2SearchPage.abort();" />
+		</hbox>
+		<hbox id="search_finished_buttons" flex="1" collapsed="true">
+			<vbox valign="middle">
+				<label id="notfound_button" value="&notfound.label;"  accesskey="&notfound.accesskey;" class="text-link" />
+			</vbox>
+			<spacer flex="1" />
+		</hbox>
+		<button tabindex="1" id="download_all" label="&dlselected.label;" accesskey="&dlselected.accesskey;" oncommand="UnPlug2SearchPage.do_saveall();" />
 	</hbox>
-	<hbox>
-		<button oncommand="UnPlug2SearchPage.abort();" id="stop_button" label="&stop.label;"  accesskey="&stop.accesskey;" />
-		<spacer flex="1" />
-		<button oncommand="UnPlug2SearchPage.send_nothing_found_msg();" id="notfound_button" label="&notfound.label;"  accesskey="&notfound.accesskey;" />
-	</hbox>
-	<spacer height="0.5em;" />
-	<progressmeter id="search_progress" mode="determined" value="0"/>
-	
+
 	<!-- this is the form of the result itself. We'll clone this to use in our display -->
 	<vbox id="unplug_result_template" flex="0" collapsed="true">
 		<toolbar flex="1">
-			<image class="ur-thumbnail" />
-			<vbox flex="1" style="overflow: hidden;">
-				<label class="ur-name" />
-				<label class="ur-description" />
-				<hbox>
-					<label class="ur-protocol" />
-					<label class="ur-host" />
-				</hbox>
-			</vbox>
+			<hbox class="box" flex="1">
+				<checkbox checked="true" />
+				<image class="ur-thumbnail" />
+				<vbox flex="1" style="overflow: hidden;">
+					<label class="ur-name" />
+					<label class="ur-description" />
+					<hbox>
+						<label class="ur-protocol" />
+						<label class="ur-host" />
+					</hbox>
+				</vbox>
+			</hbox>
 			<!--
 				we want these to be drop-down buttons
 				ie Open / Open in a new window
@@ -99,13 +117,6 @@
 				and Play / Play in vlc / Play in totem / Look for media players
 			-->
 			<!-- aternative is type="menu" -->
-			<toolbarbutton
-				label="(copy)"
-				class="menuitem-iconic copyurl"
-				type="button"
-				disabled="true"
-				tabindex="1"
-				/>
 			<toolbarbutton
 				accesskey="&dl.accesskey;"
 				label="&dl.label;"
@@ -119,5 +130,5 @@
 			</toolbarbutton>
 		</toolbar>
 	</vbox>
-</dialog>
+</window>
 

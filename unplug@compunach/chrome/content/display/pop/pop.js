@@ -46,6 +46,8 @@ UnPlug2SearchPage = {
 		this.preferred_downloaders.push("saveas");
 		// this.preferred_downloaders.push("openover");
 		this.preferred_downloaders.push("fallback");
+
+		this.selected_methods_excluded = [];
 		
 		// set this to true to stop everything
 		this._stopped = false;
@@ -54,18 +56,24 @@ UnPlug2SearchPage = {
 		this.results_lookup = {}; // { download.toSource() : MediaResult }
 		this.results_lookup_length = 0; // equivalent to this.results_lookup.keys().length (which would need FF >= 4.0)
 		this.main_group = new UnPlug2SearchPage.MediaResultGroup([]);
+		this.main_group.signal_user_change_checkbox = UnPlug2SearchPage.refresh_selected_methods;
+
 		window.addEventListener("load", (function () {
 			document.getElementById("results").appendChild(UnPlug2SearchPage.main_group.element);
+			document.getElementById("notfound_button").addEventListener("click", UnPlug2SearchPage.send_nothing_found_msg, false);
 		}), true);
 	},
+	
+	done_load : (function () {
+		// now start the search automatically
+		UnPlug2SearchPage.do_search();
+		document.getElementById("download_all").focus();
+	}),
 	
 	/**
 	 * search the parent window for media, returning search result objects
 	 */
 	do_search : function () {
-		document.getElementById("dynamic_download").value = UnPlug2.str("search_busy");
-		document.getElementById("dynamic_results").value = UnPlug2.str("search_no_results_yet");
-		
 		try {
 			UnPlug2Search._reset(); // this may not be needed because we always start from a fresh window
 			UnPlug2Search.search(this._win, this._search_callback)
@@ -73,6 +81,22 @@ UnPlug2SearchPage = {
 			UnPlug2.log(e.toSource());
 		}
 	},
+	
+	/* clicked "save all" button */
+	do_saveall : (function () {
+		var solution = UnPlug2SearchPage.selected_methods_solution();
+		var folder = UnPlug2DownloadMethods.folder_picker();
+		if (!folder) {
+			return;
+		}
+		for (var i = 0; i < solution["method_names"].length; ++i) {
+			var method = solution["method_names"][i];
+			var resultitem_list = solution["result_item_by_method"][method];
+			var result_list = resultitem_list.map((function (x) { return x.result; }));
+			UnPlug2DownloadMethods.exec_multiple(method, result_list, folder);
+		}
+		window.close();
+	}),
 	
 	/**
 	 * Callback for UnPlug2Rules.search
@@ -94,30 +118,14 @@ UnPlug2SearchPage = {
 	_search_callback_progress : (function (info) {
 		try {
 			var searchbar = document.getElementById("search_progress");
-			var status_label = document.getElementById("dynamic_download");
 			if (info.finished) {
 				searchbar.mode = "determined";
 				searchbar.value = "100";
-				status_label.value = UnPlug2.str("search_done");
 				
-				var num_results = UnPlug2SearchPage.results_lookup_length;
 				document.getElementById("stop_button").disabled = true;
-				if (num_results == 0) {
-					document.getElementById("dynamic_results").value = UnPlug2.str("search_no_results");
-					document.getElementById("dynamic_results").className = "failed";
-				} else if (num_results == 1) {
-					document.getElementById("dynamic_results").value = UnPlug2.str("search_1_result");
-				} else {
-					document.getElementById("dynamic_results").value = UnPlug2.str("search_n_results").replace("#", num_results);
-				}
+				document.getElementById("search_active_buttons").collapsed = true;
+				document.getElementById("search_finished_buttons").collapsed = false;
 			} else {
-				if (info.downloads == 1){
-					status_label.value.value = UnPlug2.str("search_1_active_download");
-				} else {
-					// note: info.downloads can be zero if we've downloaded the last page,
-					// but there are items which have been marked "defer" scheduled to be run.
-					status_label.value.value = UnPlug2.str("search_n_active_downloads").replace("#", info.downloads);
-				}
 				if (info.percent == 0 || info.percent == 100) {
 					searchbar.mode = "undetermined";
 				} else {
@@ -127,8 +135,6 @@ UnPlug2SearchPage = {
 			}
 		} catch (e) {
 			UnPlug2.log(e.toSource());
-			var e = document.getElementById("dynamic_results");
-			e.value = "Have errors";
 		}
 	}),
 	
@@ -149,6 +155,7 @@ UnPlug2SearchPage = {
 			} else {
 				existing_mediaresult.update(result);
 			}
+			UnPlug2SearchPage.refresh_selected_methods();
 		} catch(e) {
 			UnPlug2.log("ERROR displaying result " + e.toSource());
 		}
@@ -207,7 +214,116 @@ UnPlug2SearchPage = {
 		el.label = UnPlug2.str("nothing_found_failed");
 		el.disabled = "false";
 	},
-	
+
+	refresh_selected_methods : (function () {
+		var enabled_container = document.getElementById("selected_methods_enabled");
+		var disabled_container = document.getElementById("selected_methods_disabled");
+		var solution = UnPlug2SearchPage.selected_methods_solution();
+
+		while (enabled_container.firstChild) {
+			enabled_container.removeChild(enabled_container.firstChild);
+		}
+		while (disabled_container.firstChild) {
+			disabled_container.removeChild(disabled_container.firstChild);
+		}
+
+		var can_download_all = false;
+		var new_checkbox = (function (container, method, count) {
+			var elem = document.createElement("checkbox");
+			var label = UnPlug2.str("dmethod." + name);
+			if (count) {
+				label += " (" + count + " files)";
+				checked = true;
+			} else {
+				checked = false;
+			}
+			elem.setAttribute("label", label);
+			elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a"));
+			elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
+			elem.setAttribute("checked", checked);
+			container.appendChild(elem);
+			return elem;
+		});
+		
+		for (var i = 0; i < solution["method_names"].length; ++i) {
+			var name = solution["method_names"][i];
+			var result_items_enabled = solution["result_item_by_method"][name];
+			var count = result_items_enabled.length;
+			if (name === null) {
+				var elem = document.createElement("label");
+				elem.setAttribute("value", "Plus " + count + " results which will not be downloaded");
+				enabled_container.appendChild(elem);
+			} else {
+				can_download_all = true;
+				new_checkbox(enabled_container, name, count).addEventListener("command", (function (name) {
+					return (function (evt) {
+						if (UnPlug2SearchPage.selected_methods_excluded.indexOf(name) < 0) {
+							UnPlug2SearchPage.selected_methods_excluded.push(name);
+						}
+						UnPlug2SearchPage.refresh_selected_methods();
+					});
+				})(name), false);
+			}
+			for (var j = 0; j < result_items_enabled.length; ++j) {
+				result_items_enabled[j].style_will_download(name !== null);
+			}
+		}
+
+		for (var i = 0; i < UnPlug2SearchPage.selected_methods_excluded.length; ++i) {
+			var name = UnPlug2SearchPage.selected_methods_excluded[i];
+			new_checkbox(disabled_container, name, null).addEventListener("command", (function (name) {
+				return (function (evt) {
+					var idx = UnPlug2SearchPage.selected_methods_excluded.indexOf(name);
+					if (idx >= 0) {
+						UnPlug2SearchPage.selected_methods_excluded.splice(idx, 1);
+					}
+					UnPlug2SearchPage.refresh_selected_methods();
+				});
+			})(name), false);
+		}
+		
+		if (can_download_all) {
+			document.getElementById("download_all").removeAttribute("disabled");
+		} else {
+			document.getElementById("download_all").setAttribute("disabled", true);
+		}
+	}),
+
+	selected_methods_solution : (function () {
+		var solution = {
+			"result_item_by_method" : {},
+			"method_names" : []
+		};
+		var resultitem_list = UnPlug2SearchPage.main_group.list_checked_items();
+		for (var i = 0; i < resultitem_list.length; ++i) {
+			var methods = UnPlug2DownloadMethods.methods_for_result_multiple(resultitem_list[i].result);
+			var best_method = null;
+			for (var j = 0; j < methods.length; ++j) {
+				if (UnPlug2SearchPage.selected_methods_excluded.indexOf(methods[j]) < 0) {
+					best_method = methods[j];
+					break;
+				}
+			}
+			if (solution["method_names"].indexOf(best_method) < 0) {
+				solution["method_names"].push(best_method);
+				solution["result_item_by_method"][best_method] = [];
+			}
+			solution["result_item_by_method"][best_method].push(resultitem_list[i])
+		}
+
+		solution["method_names"].sort((function (a, b) {
+			if (a === null) {
+				return +1;
+			} else if (b === null) {
+				return -1;
+			} else {
+				return solution["result_item_by_method"][b].length - solution["result_item_by_method"][a].length;
+			}
+		}));
+
+		return solution;
+	}),
+
 	/*
 	 * Stop downloading/searching pages!
 	 */
@@ -249,6 +365,7 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 		this.lookup[key] = child;
 		this.element.appendChild(child.element);
 		this.sort(); // could be more efficient by inserting in the correct place to begin with
+		this.update_auto_ticked(); // sort doesn't always call this
 		child.parent = this;
 	}),
 
@@ -264,7 +381,35 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 		if (this.parent === null) {
 			return this;
 		} else {
-			return this.root();
+			return this.parent.root();
+		}
+	}),
+
+	list_checked_items : (function () {
+		var rtn = [];
+		for (var i = 0; i < this.children.length; ++i) {
+			if (this.children[i].list_checked_items) {
+				rtn = rtn.concat(this.children[i].list_checked_items());
+			} else if (this.children[i].is_checked()) {
+				rtn.push(this.children[i]);
+			}
+		}
+		return rtn;
+	}),
+
+	update_auto_ticked : (function () {
+		// assumes .sort() has been called and ignore subgroups
+		for (var i = 0; i < this.children.length; ++i) {
+			if (this.children[i].update_auto_ticked) {
+				return; // leave it alone
+			}
+			if (!this.children[i].auto_checked) {
+				return; // user edited checkboxes
+			}
+		}
+		for (var i = 0; i < this.children.length; ++i) {
+			// XXX also check for certainty value
+			this.children[i].set_checked(i == 0 && this.children[i].certainty >= 10); // assumes sorted results
 		}
 	}),
 
@@ -313,6 +458,7 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 			var c = this.element.removeChild(this.children[i].element);
 			this.element.appendChild(c);
 		}
+		this.update_auto_ticked();
 	}),
 
 	update_sorting_keys : (function (child) {
@@ -339,6 +485,7 @@ UnPlug2SearchPage.MediaResult = (function (result) {
 	// history stores the results we were passed.
 	// NOTE: It is not accurate because update() copies data over unset fields
 	this.history = [];
+	this.auto_checked = true;
 
 	this.check_keychain_changed();
 
@@ -356,7 +503,20 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		var orig = document.getElementById("unplug_result_template");
 		this.element = orig.cloneNode(true);
 		this.element.collapsed = false;
-		var downloadbutton = this.element.getElementsByTagName("toolbarbutton")[1];
+
+		var callback = (function (that) {
+			return (function (evt) {
+				that.auto_checked = false;
+				that.element.className = that.basic_css;
+				var f = that.root().signal_user_change_checkbox;
+				if (f) {
+					window.setTimeout(f, 10); // tickbox change hasn't been applied at this point
+				}
+			});
+		});
+		this.element.getElementsByTagName("checkbox")[0].addEventListener("click", callback(this), false);
+
+		var downloadbutton = this.element.getElementsByTagName("toolbarbutton")[0];
 		this.element.addEventListener("click", (function (evt) {
 			if (evt.button == 2) {
 				downloadbutton.open = true;
@@ -372,7 +532,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 	 */
 	_create_download_buttons : (function () {
 		var popup = this.element.getElementsByTagName("menupopup")[0];
-		var button_names = UnPlug2DownloadMethods.button_names();
+		var button_names = UnPlug2DownloadMethods.methods_for_result(this.result);
 		var prev_elem_group = null;
 		var avail_elements = [];
 		
@@ -392,18 +552,20 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		for (var i = 0; i < button_names.length; ++i) {
 			var name = button_names[i];
 			var info = UnPlug2DownloadMethods.getinfo(name);
-			if (info.avail(this.result)) {
-				if (prev_elem_group != info.group && avail_elements.length != 0) {
-					popup.appendChild(
-						document.createElement("menuseparator"));
-				}
-				prev_elem_group = info.group;
-				avail_elements.push(name);
-				prev_elem_is_spacer = false;
-				var elem = make_elem("dmethod." + name, UnPlug2DownloadMethods.callback(name, this.result))
-				elem.className = "menuitem-iconic " + info.css;
-				popup.appendChild(elem);
+			if (prev_elem_group != info.group && avail_elements.length != 0) {
+				popup.appendChild(
+					document.createElement("menuseparator"));
 			}
+			prev_elem_group = info.group;
+			avail_elements.push(name);
+			var elem = document.createElement("menuitem");
+			prev_elem_is_spacer = false;
+			elem.setAttribute("accesskey", UnPlug2.str("dmethod." + name + ".a"))
+			elem.setAttribute("label", UnPlug2.str("dmethod." + name));
+			elem.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
+			elem.className = "menuitem-iconic " + info.css;
+			elem.addEventListener("command", UnPlug2DownloadMethods.callback(name, this.result), false);
+			popup.appendChild(elem);
 		}
 		
 
@@ -412,20 +574,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		popup.appendChild(
 			make_elem("trace", UnPlug2SearchPage.report_status_cb(null, this)));
 
-		var copy_button = this.element.getElementsByTagName("toolbarbutton")[0];
-		copy_button.setAttribute("label", UnPlug2.str("dmethod.copyurl"));
-		copy_button.setAttribute("accesskey", UnPlug2.str("dmethod.copyurl.a"));
-		copy_button.setAttribute("tooltiptext", UnPlug2.str("dmethod.copyurl.tip"));
-		
-		var copy_info = UnPlug2DownloadMethods.getinfo("copyurl");
-		if (copy_info && copy_info.avail(this.result)) {
-			copy_button.addEventListener("command", UnPlug2DownloadMethods.callback("copyurl", this.result), false);
-			copy_button.setAttribute("disabled", false);
-		} else {
-			copy_button.setAttribute("disabled", true);
-		}
-		
-		var main_button = this.element.getElementsByTagName("toolbarbutton")[1];
+		var main_button = this.element.getElementsByTagName("toolbarbutton")[0];
 		if (avail_elements.length == 0) {
 			main_button.setAttribute("disabled", true);
 			main_button.className = "menuitem-icon unavailable"
@@ -433,7 +582,6 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		} else {
 			var name = avail_elements[0];
 			var info = UnPlug2DownloadMethods.getinfo(name);
-			main_button.setAttribute("disabled", false);
 			main_button.className = "menuitem-iconic " + info.css;
 			main_button.addEventListener("command", UnPlug2DownloadMethods.callback(name, this.result), false);
 			main_button.setAttribute("tooltiptext", UnPlug2.str("dmethod." + name + ".tip"));
@@ -468,10 +616,15 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		var thumbnail = this.element.getElementsByTagName("image")[0];
 		thumbnail.setAttribute("src", details.thumbnail);
 		
-		this.element.className = [
+		this.basic_css = [
 			"file-ext-" + (details.file_ext || "unknown"),
 			"certainty-" + (details.certainty < 0 ? "low" : "high"),
 			"unplug-result" ].join(" ")
+		this.element.className = this.basic_css;
+	}),
+
+	style_will_download : (function (yesno) {
+		this.element.className = this.basic_css + (yesno ? " will-download" : " will-not-download");
 	}),
 
 	trace : (function () {
@@ -485,8 +638,25 @@ UnPlug2SearchPage.MediaResult.prototype = {
 			UnPlug2.log("MediaResult.root() returned a non-group item");
 			return this;
 		} else {
-			return this.root();
+			return this.parent.root();
 		}
+	}),
+
+	is_checked : (function () {
+		return this.element.getElementsByTagName("checkbox")[0].checked;
+	}),
+
+	set_checked : (function (yesno) {
+		var elem = this.element.getElementsByTagName("checkbox")[0];
+		if (yesno == elem.hasAttribute("checked")) {
+			return; // no change
+		}
+		if (yesno) {
+			elem.setAttribute("checked", true);
+		} else {
+			elem.removeAttribute("checked");
+		}
+		this.element.className = this.basic_css;
 	}),
 
 	check_keychain_changed : (function () {

@@ -35,5 +35,9 @@
 <!ENTITY config.tooltip       "UnPlug beállítások szerkesztése">
 <!ENTITY dl.label             "Letöltés">
 <!ENTITY dl.accesskey         "L">
+<!ENTITY dlselected.label     "Download selected">
+<!ENTITY dlselected.accesskey "D">
+<!ENTITY close.label          "Close">
+<!ENTITY close.accesskey      "C">
 
 

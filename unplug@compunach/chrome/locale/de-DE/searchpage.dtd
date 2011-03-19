@@ -35,4 +35,8 @@
 <!ENTITY config.tooltip       "">
 <!ENTITY dl.label             "Download">
 <!ENTITY dl.accesskey         "D">
+<!ENTITY dlselected.label     "Download selected">
+<!ENTITY dlselected.accesskey "D">
+<!ENTITY close.label          "Close">
+<!ENTITY close.accesskey      "C">
 
