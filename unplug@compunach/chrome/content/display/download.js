@@ -83,7 +83,7 @@ var UnPlug2DownloadMethods = {
 		var that = this;
 		return this.methods_for_result(result).filter(function (val) {
 			var info = that._button_lookup[val];
-			return (info.exec_fp || info.signal_get_argv);
+			return (info.exec_fp || info.exec_fp_multiple || info.signal_get_argv);
 		});
 	}),
 
@@ -114,44 +114,22 @@ var UnPlug2DownloadMethods = {
 		});
 	}),
 	exec : (function (name, result) {
-		var data = this._button_lookup[name];
-		if (!data) {
-			throw "Unknown button name " + name;
+		// This function is called when clicking to download an individual item
+
+		// Sometimes the concept of a name is not valid, for example
+		// when opening in a new tab. In these cases, the
+		// DownloadMethod implements only exec()
+		var info = this._button_lookup[method];
+		if (!info) {
+			throw "Invalid DownloadMethod " + method;
 		}
-		if (!data.avail(result)) {
-			throw "Cannot use DownloadMethod " + name + " with " + result.toSource();
+		if (info.exec) {
+			return info.exec(result);
 		}
-		if (data.signal_get_argv) {
-			// check nsiProcess supports runwAsync -- see below
-			// this will avoid disapointment of downloading rtmpdump before being
-			// told there was no point
-			var process = Components.classes["@mozilla.org/process/util;1"]
-				.createInstance(Components.interfaces.nsIProcess);
-			if (!process.runwAsync) {
-				alert("Firefox 4 required");
-				throw "nsIProcess.runwAsync is not implemented";
-			}
-			// work out where rtmpdump lives
-			var exec_file = UnPlug2.get_pref("dmethod." + name);
-			if (!this._nsifile_if_exec(exec_file)) {
-				window.openDialog("chrome://unplug/content/config/extern.xul", "chrome,modal", "unplug_extern", name);
-				return; // note: signal to downloader won't get sent
-			}
-			// open download window and get it to call exec_from_siganl
-			UnPlug2ExternDownloader.signal({
-				result: result,
-				name : name });
-		} else if (data.exec_fp) {
-			// if a method implements exec_fp, it wishes to use the "normal" file-picker code
-			// and we'll pass them the appropriate file object in the arguments
-			var file = this._save_as_box(result.details.name, result.details.file_ext);
-			if (!file) {
-				return;
-			}
-			data.exec_fp(result, file);
-		} else {
-			data.exec(result);
-		}
+
+		// Otherwise share code with exec_multiple
+		var file = this._save_as_box(result.details.name, result.details.file_ext);
+		return this.exec_multiple_fp(method, [result, file]);
 	}),
 	
 	folder_picker : (function () {
@@ -187,7 +165,6 @@ var UnPlug2DownloadMethods = {
 
 	exec_multiple : (function (method, result_list, folder) {
 		const nsifile = Components.interfaces.nsIFile;
-		var info = this._button_lookup[method];
 		if (folder === null) {
 			return;
 		}
@@ -207,18 +184,52 @@ var UnPlug2DownloadMethods = {
 			var filename = folder.clone();
 			filename.append(res.details.name + "." + res.details.file_ext);
 			filename.createUnique(nsifile.NORMAL_FILE_TYPE, 0600);
-			if (info.exec_fp_multiple) {
-				result_file_pairs.push([res, filename]);
-			} else if (info.exec_fp) {
-				info.exec_fp(res, filename);
-			} else if (info.signal_get_argv) {
-				alert("info.signal_get_argv() for exec_multiple() is not implemented") // TODO
-			} else {
-				alert("Unable to download file with method " + method);
-			}
+			result_file_pairs.push([res, filename]);
 		}
-		if (result_file_pairs) {
+	}),
+
+	exec_multiple_fp : (function (method, result_file_pairs) {
+		var info = this._button_lookup[method];
+		if (!info) {
+			throw "Invalid DownloadMethod " + method;
+		}
+
+		if (info.exec_fp_multiple) {
+			// DownloadMethod supports multiple downloads at the same time
 			info.exec_fp_multiple(result_file_pairs);
+		} else if (info.exec_fp) {
+			// DownloadMethod supports downloads one at a time
+			for (var i = 0; i < result_file_pairs.length; ++i) {
+				info.exec_fp(result_file_pairs[i][0], result_file_pairs[i][0]);
+			}
+		} else if (info.signal_get_argv) {
+			// DownloadMethod uses extern.xul to run an external process
+
+			// check nsiProcess supports runwAsync -- see below
+			// this will avoid disapointment of downloading rtmpdump before being
+			// told there was no point
+			var process = Components.classes["@mozilla.org/process/util;1"]
+				.createInstance(Components.interfaces.nsIProcess);
+			if (!process.runwAsync) {
+				alert("Firefox 4 required");
+				throw "nsIProcess.runwAsync is not implemented";
+			}
+			// work out where rtmpdump lives
+			var exec_file = UnPlug2.get_pref("dmethod." + name);
+			if (!this._nsifile_if_exec(exec_file)) {
+				window.openDialog("chrome://unplug/content/config/extern.xul", "chrome,modal", "unplug_extern", name);
+				return; // note: signal to downloader won't get sent
+			}
+			// open download window and get it to call exec_from_siganl
+			alert("TODO: need to use result_file_pairs for extern.xul"); // TODO
+			UnPlug2ExternDownloader.signal({
+				result: result, // XXX TODO WRONG need to pass result_filename pairs in jsonable format! Then un-JSON-ify and start download in exec_from_signal, below
+				name : name });
+		} else {
+			// DownloadMethod does none of these
+			var msg = "Unable to download file with method " + method;
+			alert(msg);
+			throw msg;
 		}
 	}),
 	
@@ -436,9 +447,6 @@ UnPlug2DownloadMethods.add_button("dta", {
 		}
 		return true;
 	}),
-	exec_fp : (function (res, file) {
-		this.exec_fp_multiple([res, file]);
-	}),
 	exec_fp_multiple : (function (result_file_pairs) {
 		var links = [];
 		for (var i = 0; i < result_file_pairs.length; ++i) {
@@ -495,7 +503,7 @@ UnPlug2DownloadMethods.add_button("flashgot", {
 			res.download.url.indexOf("http://") == 0
 			|| res.download.url.indexOf("https://") == 0))
 	}),
-	exec  : (function (res) {
+	exec  : (function (res) { // TODO use exec_fp
 		var flashgot_service = Components.classes["@maone.net/flashgot-service;1"]
 			.getService(Components.interfaces.nsISupports)
 			.wrappedJSObject;
