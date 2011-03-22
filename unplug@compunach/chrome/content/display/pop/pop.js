@@ -61,6 +61,9 @@ UnPlug2SearchPage = {
 		window.addEventListener("load", (function () {
 			document.getElementById("results").appendChild(UnPlug2SearchPage.main_group.element);
 			document.getElementById("notfound_button").addEventListener("click", UnPlug2SearchPage.send_nothing_found_msg, false);
+			document.getElementById("views").value = "multiple";
+			document.getElementById("views").addEventListener("command", UnPlug2SearchPage.updated_view_setting, false);
+			UnPlug2SearchPage.updated_view_setting();
 		}), true);
 	},
 	
@@ -69,7 +72,7 @@ UnPlug2SearchPage = {
 		UnPlug2SearchPage.do_search();
 		document.getElementById("download_all").focus();
 	}),
-	
+
 	/**
 	 * search the parent window for media, returning search result objects
 	 */
@@ -98,6 +101,11 @@ UnPlug2SearchPage = {
 		window.close();
 	}),
 	
+	updated_view_setting : (function () {
+		var view_setting = document.getElementById("views").value;
+		document.getElementById("unplug_search_window").className = "view-" + view_setting;
+	}),
+
 	/**
 	 * Callback for UnPlug2Rules.search
 	 * Called for each result found. This may be asynchromous (ie, after additional files are downloaded).

@@ -40,4 +40,8 @@
 <!ENTITY dlselected.heading   "Download selected results">
 <!ENTITY close.label          "Close">
 <!ENTITY close.accesskey      "C">
+<!ENTITY view.single          "Single view">
+<!ENTITY view.single.a        "v">
+<!ENTITY view.multiple        "Multiple view">
+<!ENTITY view.multiple.a      "v">
 

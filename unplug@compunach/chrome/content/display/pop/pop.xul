@@ -34,7 +34,7 @@
  *
  */
 -->
-<window id="cn_unplug2_search"
+<window id="unplug_search_window"
   title="&dialog.title;"
   flex="1"
 
@@ -60,10 +60,17 @@
 	<script type="application/javascript" src="chrome://dta/content/common/internalFunctions.js"/>
 	
 	<dialogheader title="&header.title;" description="&header.subtitle;" style="margin: 0; margin-bottom: 0.5em;" />
-	<vbox id="results-container" style="overflow: -moz-scrollbars-vertical; border: 1px #666666 solid; margin: 0;" flex="1">
+	<vbox id="results-container" flex="1">
 		<vbox id="results" />
 	</vbox>
-	<groupbox>
+	<radiogroup id="views">
+		<hbox>
+			<spacer flex="1" />
+			<radio label="&view.single;" accesskey="&view.multiple.a;" value="single" />
+			<radio label="&view.multiple;"  accesskey="&view.single.a;" value="multiple" />
+		</hbox>
+	</radiogroup>
+	<groupbox id="downlad_selected_methods">
 		<caption label="&dlselected.heading;" />
 		<hbox>
 			<vbox flex="1">

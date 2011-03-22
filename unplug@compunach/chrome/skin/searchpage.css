@@ -1,13 +1,19 @@
+#results-container {
+	overflow: -moz-scrollbars-vertical;
+	border: 1px #666666 solid;
+	margin: 0;
+}
+
 .unplug-result {
 }
 
-.unplug-result.will-download .box {
+.view-multiple .unplug-result.will-download .box {
 	background: #ccffcc;
 	color: #000000;
 }
 
-.unplug-result.will-not-download .box {
-	background: #ffcccc;
+.view-multiple .unplug-result.will-not-download .box {
+	background: #ffaaaa;
 	color: #000000;
 }
 
@@ -48,16 +54,29 @@
 	visibility: visible;
 }
 
-.unplug-result toolbarbutton {
+.view-single .unplug-result toolbarbutton {
 	visibility: hidden;
 	font-size: 80%;
 }
-.unplug-result:hover toolbarbutton,
-.unplug-result:first-child toolbarbutton {
+.view-single .unplug-result:hover toolbarbutton,
+.view-single .unplug-result:first-child toolbarbutton {
 	visibility: visible;
 }
-.unplug-result:first-child toolbarbutton {
+.view-single .unplug-result:first-child toolbarbutton {
 	font-size: 100%;
+}
+.view-multiple .unplug-result toolbarbutton {
+	display : none;
+}
+
+.view-single .unplug-result checkbox {
+	visibility: hidden;
+}
+.view-single #downlad_selected_methods {
+	display: none;
+}
+.view-single #download_all {
+	visibility: hidden;
 }
 
 .unplug-result.file-ext-swf,
