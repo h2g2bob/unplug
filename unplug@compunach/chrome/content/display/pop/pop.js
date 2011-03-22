@@ -61,7 +61,7 @@ UnPlug2SearchPage = {
 		window.addEventListener("load", (function () {
 			document.getElementById("results").appendChild(UnPlug2SearchPage.main_group.element);
 			document.getElementById("notfound_button").addEventListener("click", UnPlug2SearchPage.send_nothing_found_msg, false);
-			document.getElementById("views").value = "multiple";
+			document.getElementById("views").value = UnPlug2.get_pref("view");
 			document.getElementById("views").addEventListener("command", UnPlug2SearchPage.updated_view_setting, false);
 			UnPlug2SearchPage.updated_view_setting();
 		}), true);
@@ -104,6 +104,7 @@ UnPlug2SearchPage = {
 	updated_view_setting : (function () {
 		var view_setting = document.getElementById("views").value;
 		document.getElementById("unplug_search_window").className = "view-" + view_setting;
+		UnPlug2.set_pref("view", view_setting);
 	}),
 
 	/**
