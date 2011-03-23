@@ -169,6 +169,7 @@ var UnPlug2DownloadMethods = {
 			return;
 		}
 
+		var info = this._button_lookup[method];
 		var result_file_pairs = [];
 		for (var i = 0; i < result_list.length; ++i) {
 			var res = result_list[i];
@@ -186,6 +187,8 @@ var UnPlug2DownloadMethods = {
 			filename.createUnique(nsifile.NORMAL_FILE_TYPE, 0600);
 			result_file_pairs.push([res, filename]);
 		}
+
+		this.exec_multiple_fp(method, result_file_pairs);
 	}),
 
 	exec_multiple_fp : (function (method, result_file_pairs) {
@@ -200,7 +203,7 @@ var UnPlug2DownloadMethods = {
 		} else if (info.exec_fp) {
 			// DownloadMethod supports downloads one at a time
 			for (var i = 0; i < result_file_pairs.length; ++i) {
-				info.exec_fp(result_file_pairs[i][0], result_file_pairs[i][0]);
+				info.exec_fp(result_file_pairs[i][0], result_file_pairs[i][1]);
 			}
 		} else if (info.signal_get_argv) {
 			// DownloadMethod uses extern.xul to run an external process
@@ -503,21 +506,23 @@ UnPlug2DownloadMethods.add_button("flashgot", {
 			res.download.url.indexOf("http://") == 0
 			|| res.download.url.indexOf("https://") == 0))
 	}),
-	exec  : (function (res) { // TODO use exec_fp
+	exec_fp : (function (res, destfile) {
 		var flashgot_service = Components.classes["@maone.net/flashgot-service;1"]
 			.getService(Components.interfaces.nsISupports)
 			.wrappedJSObject;
-		var name = res.details.name + "." + res.details.file_ext;
 		var links=[{
 			href: res.download.url,
-			description: name,
-			fname : name,
+			description: res.details.name,
+			fname : destfile.leafName,
 			// XXX can we set the save-as thingy?
 			noRedir: false }];
 		links.referrer = res.download.referer || null;
-		links.document = window.document; // origWindow XXX TODO should not be from chrome
-		links.browserWindow = flashgot_service.getBrowserWindow(links.document);
-		flashgot_service.download(links);
+		links.folder = destfile.parent.path;
+
+		// links.document = window.document; // origWindow, but should not be from chrome!
+		// links.browserWindow = flashgot_service.getBrowserWindow(links.document);
+
+		// flashgot_service.download(links);
 		flashgot_service.DMS[flashgot_service.defaultDM].download(links, flashgot_service.OP_ONE)
 	}),
 	obscurity : 20,
