@@ -218,16 +218,17 @@ var UnPlug2DownloadMethods = {
 				throw "nsIProcess.runwAsync is not implemented";
 			}
 			// work out where rtmpdump lives
-			var exec_file = UnPlug2.get_pref("dmethod." + name);
+			var exec_file = UnPlug2.get_pref("dmethod." + method);
 			if (!this._nsifile_if_exec(exec_file)) {
-				window.openDialog("chrome://unplug/content/config/extern.xul", "chrome,modal", "unplug_extern", name);
+				window.openDialog("chrome://unplug/content/config/extern.xul", "chrome,modal", "unplug_extern", method);
 				return; // note: signal to downloader won't get sent
 			}
 			// open download window and get it to call exec_from_siganl
-			alert("TODO: need to use result_file_pairs for extern.xul"); // TODO
 			UnPlug2ExternDownloader.signal({
-				result: result, // XXX TODO WRONG need to pass result_filename pairs in jsonable format! Then un-JSON-ify and start download in exec_from_signal, below
-				name : name });
+				result_list : result_file_pairs.map((function (pair) {
+					return { result : pair[0], dest_file : pair[1].path, description : pair[1].leafName };
+				})),
+				method : method });
 		} else {
 			// DownloadMethod does none of these
 			var msg = "Unable to download file with method " + method;
@@ -242,44 +243,48 @@ var UnPlug2DownloadMethods = {
 		 * and is triggered by sending that window a postMessage.
 		 *
 		 * IMPORTANT
-		 * Currently this shows a save-as dialog, but future versions
-		 * may start a download without asking. In practice this means
-		 * data may be saved to an arbitary location on disk, so this
-		 * should only be called based on a response from priviliged
-		 * code.
+		 * This will start a download, without asking, and save data
+		 * to an arbitary location on disk, so this should only be
+		 * called based on a response from priviliged code.
 		 */
-		var data = this._button_lookup[signal.name];
+		var data = this._button_lookup[signal.method];
 		if (!data) {
-			throw "Unknown button name " + signal.name;
+			throw "Unknown method for exec_from_signal " + signal.method;
 		}
-		var file = this._save_as_box(signal.result.details.name, signal.result.details.file_ext);
-		if (!file) {
-			return null;
+
+		var process_list = [];
+		for (var i = 0; i < signal.result_list.length; ++i) {
+			var result = signal.result_list[i];
+
+			var dest_file = Components.classes["@mozilla.org/file/local;1"]
+				.createInstance(Components.interfaces.nsILocalFile);
+			dest_file.initWithPath(result.dest_file);
+
+			var exec_file = UnPlug2.get_pref("dmethod." + signal.method);
+			exec_file = this._nsifile_if_exec(exec_file);
+			if (!exec_file) {
+				throw "UnPlug display - this is not an exec_file"
+			}
+			var argv = data.signal_get_argv(result.result, dest_file);
+			var process = Components.classes["@mozilla.org/process/util;1"]
+				.createInstance(Components.interfaces.nsIProcess);
+			process.init(exec_file);
+			// we use runwAsync and use utf-16 strings, otherwise you get junk for
+			// filenames due to the unicode encoding conversions
+			if (!process.runwAsync) {
+				alert("Firefox 4 required");
+				throw "nsIProcess.runwAsync is not implemented";
+			}
+			process.runwAsync(
+				argv,
+				argv.length,
+				null, // TODO: we could use an nsIObserver here, but we'll just poll process.isRunning for now
+				false );
+			process_list.push({
+				process : process,
+				file : dest_file })
 		}
-		
-		var exec_file = UnPlug2.get_pref("dmethod." + signal.name);
-		exec_file = this._nsifile_if_exec(exec_file);
-		if (!exec_file) {
-			throw "UnPlug display - this is not an exec_file"
-		}
-		var argv = data.signal_get_argv(signal.result, file);
-		var process = Components.classes["@mozilla.org/process/util;1"]
-			.createInstance(Components.interfaces.nsIProcess);
-		process.init(exec_file);
-		// we use runwAsync and use utf-16 strings, otherwise you get junk for
-		// filenames due to the unicode encoding conversions
-		if (!process.runwAsync) {
-			alert("Firefox 4 required");
-			throw "nsIProcess.runwAsync is not implemented";
-		}
-		process.runwAsync(
-			argv,
-			argv.length,
-			null, // we could use an nsIObserver here, but we'll just poll process.isRunning for now
-			false );
-		return {
-			process : process,
-			file : file }
+		return process_list;
 	}),
 	
 	/**

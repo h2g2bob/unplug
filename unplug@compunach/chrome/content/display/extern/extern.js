@@ -67,9 +67,10 @@ UnPlug2Extern = {
 				return;
 			}
 			var msg = window.JSON.parse(event.data);
-			var rtn = UnPlug2DownloadMethods.exec_from_signal(msg);
-			if (rtn) {
-				rtn.node = extern.add_program_box(msg.name, rtn.file.leafName);
+			var process_list = UnPlug2DownloadMethods.exec_from_signal(msg);
+			for (var i = 0; i < process_list.length; ++i) {
+				var rtn = process_list[i];
+				rtn.node = extern.add_program_box(msg.method, rtn.file.leafName);
 				extern.setup_kill_button(rtn);
 				extern.watching.push(rtn);
 			}

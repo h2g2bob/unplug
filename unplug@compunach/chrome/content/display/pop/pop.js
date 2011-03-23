@@ -98,7 +98,13 @@ UnPlug2SearchPage = {
 			var result_list = resultitem_list.map((function (x) { return x.result; }));
 			UnPlug2DownloadMethods.exec_multiple(method, result_list, folder);
 		}
-		window.close();
+
+		// if opening extern.xul window, we don't want to do window.close imediately
+		// because that will destroy extern_window.addEventListener("load", ...) callback
+		// TODO - need to do this better (some sort of "all done" or "allow/deny close" system?)
+		window.setTimeout((function () {
+			window.close();
+		}), 1000);
 	}),
 	
 	updated_view_setting : (function () {
