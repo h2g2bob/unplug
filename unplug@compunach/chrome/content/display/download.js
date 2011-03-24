@@ -113,7 +113,7 @@ var UnPlug2DownloadMethods = {
 			evt.stopPropagation();
 		});
 	}),
-	exec : (function (name, result) {
+	exec : (function (method, result) {
 		// This function is called when clicking to download an individual item
 
 		// Sometimes the concept of a name is not valid, for example
@@ -129,7 +129,7 @@ var UnPlug2DownloadMethods = {
 
 		// Otherwise share code with exec_multiple
 		var file = this._save_as_box(result.details.name, result.details.file_ext);
-		return this.exec_multiple_fp(method, [result, file]);
+		return this.exec_multiple_fp(method, [[result, file]]);
 	}),
 	
 	folder_picker : (function () {
