@@ -275,6 +275,7 @@ var UnPlug2DownloadMethods = {
 				alert("Firefox 4 required");
 				throw "nsIProcess.runwAsync is not implemented";
 			}
+			UnPlug2.log("Running external program " + exec_file.path + " with arguments " + argv.toSource());
 			process.runwAsync(
 				argv,
 				argv.length,
