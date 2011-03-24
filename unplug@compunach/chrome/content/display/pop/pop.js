@@ -118,14 +118,13 @@ UnPlug2SearchPage = {
 	 * Called for each result found. This may be asynchromous (ie, after additional files are downloaded).
 	 */
 	_search_callback : (function (obj) {
-		UnPlug2.log("callback: " + obj.toSource());
 		switch (obj.type) {
 			case "result":
 				return UnPlug2SearchPage._search_callback_result(obj);
 			case "progress":
 				return UnPlug2SearchPage._search_callback_progress(obj);
 			default:
-				UnPlug2.log("Callback function got a " + result.type + " (not a result)!");
+				UnPlug2.log("Callback function got a " + obj.type + " (not a result)! Full value: " + obj.toSource());
 				return;
 		}
 	}),
@@ -159,6 +158,7 @@ UnPlug2SearchPage = {
 		 * In JavaScript, asking if {"X" : "Y"} == {"X" : "Y"} -> false
 		 *  So convert to source strings and compare to give the correct answer!
 		*/
+		UnPlug2.log("Found result: " + result.toSource());
 		try {
 			result.download_tosource = result.download.toSource();
 			var existing_mediaresult = UnPlug2SearchPage.results_lookup[result.download_tosource];
