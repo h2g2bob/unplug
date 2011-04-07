@@ -64,6 +64,7 @@ UnPlug2SearchPage = {
 			document.getElementById("views").value = UnPlug2.get_pref("view");
 			document.getElementById("views").addEventListener("command", UnPlug2SearchPage.updated_view_setting, false);
 			UnPlug2SearchPage.updated_view_setting();
+			UnPlug2SearchPage.populate_download_folder();
 		}), true);
 	},
 	
@@ -88,8 +89,12 @@ UnPlug2SearchPage = {
 	/* clicked "save all" button */
 	do_saveall : (function () {
 		var solution = UnPlug2SearchPage.selected_methods_solution();
-		var folder = UnPlug2DownloadMethods.folder_picker();
-		if (!folder) {
+		var browsebox = document.getElementById("download_folder");
+		var folder = Components.classes["@mozilla.org/file/local;1"]
+			.createInstance(Components.interfaces.nsILocalFile);
+		folder.initWithPath(browsebox.value);
+		if (!folder.exists() || !folder.isDirectory()) {
+			self.browse_download_folder();
 			return;
 		}
 		for (var i = 0; i < solution["method_names"].length; ++i) {
@@ -111,6 +116,42 @@ UnPlug2SearchPage = {
 		var view_setting = document.getElementById("views").value;
 		document.getElementById("unplug_search_window").className = "view-" + view_setting;
 		UnPlug2.set_pref("view", view_setting);
+	}),
+
+	populate_download_folder : (function () {
+		var path = UnPlug2.get_pref("savepath");
+		if (!path) {
+			path = Components.classes["@mozilla.org/download-manager;1"]
+				.getService(Components.interfaces.nsIDownloadManager)
+				.defaultDownloadsDirectory.path;
+		}
+		document.getElementById("download_folder").value = (path || "");
+	}),
+
+	browse_download_folder : (function () {
+		const nsIFilePicker = Components.interfaces.nsIFilePicker;
+		const nsifile = Components.interfaces.nsIFile;
+		var filepicker = Components.classes["@mozilla.org/filepicker;1"]
+			.createInstance(nsIFilePicker);
+		filepicker.init(window, UnPlug2.str("save_to_directory"), nsIFilePicker.modeGetFolder);
+		var browsebox = document.getElementById("download_folder");
+		var path = browsebox.value;
+		if (path) {
+			try {
+				var f = Components.classes["@mozilla.org/file/local;1"]
+					.createInstance(Components.interfaces.nsILocalFile);
+				f.initWithPath(path);
+				if (f.exists() && f.isDirectory()) {
+					filepicker.displayDirectory = f;
+				}
+			} catch (e) {
+			}
+		}
+		var ret = filepicker.show();
+		if (ret === nsIFilePicker.returnOK) {
+			UnPlug2.set_pref("savepath", filepicker.file.path);
+			browsebox.value = filepicker.file.path;
+		}
 	}),
 
 	/**

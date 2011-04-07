@@ -132,37 +132,6 @@ var UnPlug2DownloadMethods = {
 		return this.exec_multiple_fp(method, [[result, file]]);
 	}),
 	
-	folder_picker : (function () {
-		const nsIFilePicker = Components.interfaces.nsIFilePicker;
-		const nsifile = Components.interfaces.nsIFile;
-		var filepicker = Components.classes["@mozilla.org/filepicker;1"]
-			.createInstance(nsIFilePicker);
-		filepicker.init(window, UnPlug2.str("save_to_directory"), nsIFilePicker.modeGetFolder);
-		
-		// default directory
-		var path = UnPlug2.get_pref("savepath");
-		if (!path) {
-			path = Components.classes["@mozilla.org/download-manager;1"]
-				.getService(Components.interfaces.nsIDownloadManager)
-				.defaultDownloadsDirectory.path;
-		}
-		if (path) {
-			var f = Components.classes["@mozilla.org/file/local;1"]
-				.createInstance(Components.interfaces.nsILocalFile);
-			f.initWithPath(path);
-			if (f.exists() && f.isDirectory()) {
-				filepicker.displayDirectory = f;
-			}
-		}
-		
-		var ret = filepicker.show();
-		if (ret !== nsIFilePicker.returnOK) {
-			return null;
-		}
-		UnPlug2.set_pref("savepath", filepicker.file.path);
-		return filepicker.file;
-	}),
-
 	exec_multiple : (function (method, result_list, folder) {
 		const nsifile = Components.interfaces.nsIFile;
 		if (folder === null) {

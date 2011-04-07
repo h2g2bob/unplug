@@ -82,6 +82,13 @@
 				<spacer flex="1" />
 			</vbox>
 		</hbox>
+		<hbox>
+			<vbox valign="middle">
+				<label control="download_folder" value="Save in:" accesskey="a" />
+			</vbox>
+			<textbox value="" id="download_folder" flex="1" disabled="true" />
+			<button label="Browse" accesskey="B" oncommand="UnPlug2SearchPage.browse_download_folder()" />
+		</hbox>
 	</groupbox>
 	<spacer height="0.5em" />
 	<hbox>
