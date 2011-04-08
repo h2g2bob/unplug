@@ -97,11 +97,13 @@ UnPlug2SearchPage = {
 			self.browse_download_folder();
 			return;
 		}
+		var pause_needed = false; // XXX more hack for window close stuff
 		for (var i = 0; i < solution["method_names"].length; ++i) {
 			var method = solution["method_names"][i];
 			var resultitem_list = solution["result_item_by_method"][method];
 			var result_list = resultitem_list.map((function (x) { return x.result; }));
 			UnPlug2DownloadMethods.exec_multiple(method, result_list, folder);
+			pause_needed = pause_needed || UnPlug2DownloadMethods.getinfo(name).signal_get_argv; // XXX more hack for window.close stuff
 		}
 
 		// if opening extern.xul window, we don't want to do window.close imediately
@@ -109,7 +111,7 @@ UnPlug2SearchPage = {
 		// TODO - need to do this better (some sort of "all done" or "allow/deny close" system?)
 		window.setTimeout((function () {
 			window.close();
-		}), 1000);
+		}), pause_needed ? 1000 : 1);
 	}),
 	
 	updated_view_setting : (function () {
