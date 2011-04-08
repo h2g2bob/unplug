@@ -129,7 +129,9 @@ var UnPlug2DownloadMethods = {
 
 		// Otherwise share code with exec_multiple
 		var file = this._save_as_box(result.details.name, result.details.file_ext);
-		return this.exec_multiple_fp(method, [[result, file]]);
+		if (file) {
+			return this.exec_multiple_fp(method, [[result, file]]);
+		}
 	}),
 	
 	exec_multiple : (function (method, result_list, folder) {
@@ -433,7 +435,9 @@ UnPlug2DownloadMethods.add_button("dta", {
 
 			// downthemall doesn't like to overwrite any existing files, so we clean them up here.
 			// (note: we created empty files while determining what names were available)
-			file.remove(false);
+			try {
+				file.remove(false);
+			} catch (e) {}
 
 			if (file.leafName.indexOf("*") >= 0) {
 				// we use the renaming mask, which treats *name*, etc as special.
