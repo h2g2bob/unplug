@@ -824,6 +824,12 @@
 					</download>
 				</each_re>
 			</rule>
+			<rule id="youtube-iframe-embed">
+				<if_re ref="vidid" re="^/embed/(.*)" string="${url.path}" />
+				<download url="http://www.youtube.com/watch?v=${vidid.1}">
+					<rule goto="youtube-single" />
+				</download>
+			</rule>
 		</rule>
 		<rule id="embed-youtube-2010">
 			<each_re ref="video_id" re="http://(?:www\.)?youtube\.com/v/([a-zA-Z0-9_\-]+)">
