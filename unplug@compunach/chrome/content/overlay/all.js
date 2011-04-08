@@ -100,6 +100,11 @@ UnPlug2Overlay = {
 	get_current_window : function () {
 		var br = getBrowser();
 		var br_tab = br.getBrowserAtIndex(br.mTabContainer.selectedIndex);
+		if (!br_tab) {
+			// can happen for pop-up windows, eg: pop-out radio player
+			UnPlug2.log("overlay.get_current_window() assuming tab 0 because selectedIndex is " + br.mTabContainer.selectedIndex);
+			br_tab = br.getBrowserAtIndex(0);
+		}
 		return br_tab.contentWindow;
 	},
 	
