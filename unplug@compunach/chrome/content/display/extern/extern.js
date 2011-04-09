@@ -178,6 +178,7 @@ UnPlug2Extern = {
 	})
 }
 
+window.addEventListener("load", (function () {window.loaded = true;}), false);
 window.addEventListener("message", UnPlug2Extern.receive_signal_callback(), false);
 window.setInterval((function () { UnPlug2Extern.poll() }), 3000);
 

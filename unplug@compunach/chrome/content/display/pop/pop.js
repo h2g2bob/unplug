@@ -89,29 +89,30 @@ UnPlug2SearchPage = {
 	/* clicked "save all" button */
 	do_saveall : (function () {
 		var solution = UnPlug2SearchPage.selected_methods_solution();
-		var browsebox = document.getElementById("download_folder");
-		var folder = Components.classes["@mozilla.org/file/local;1"]
-			.createInstance(Components.interfaces.nsILocalFile);
-		folder.initWithPath(browsebox.value);
-		if (!folder.exists() || !folder.isDirectory()) {
-			self.browse_download_folder();
-			return;
-		}
-		var pause_needed = false; // XXX more hack for window close stuff
+		var have_prereq = true;
 		for (var i = 0; i < solution["method_names"].length; ++i) {
 			var method = solution["method_names"][i];
-			var resultitem_list = solution["result_item_by_method"][method];
-			var result_list = resultitem_list.map((function (x) { return x.result; }));
-			UnPlug2DownloadMethods.exec_multiple(method, result_list, folder);
-			pause_needed = pause_needed || UnPlug2DownloadMethods.getinfo(name).signal_get_argv; // XXX more hack for window.close stuff
+			have_prereq = have_prereq && UnPlug2DownloadMethods.get_prerequisites(method);
 		}
-
-		// if opening extern.xul window, we don't want to do window.close imediately
-		// because that will destroy extern_window.addEventListener("load", ...) callback
-		// TODO - need to do this better (some sort of "all done" or "allow/deny close" system?)
-		window.setTimeout((function () {
+		if (have_prereq) {
+			var browsebox = document.getElementById("download_folder");
+			var folder = Components.classes["@mozilla.org/file/local;1"]
+				.createInstance(Components.interfaces.nsILocalFile);
+			folder.initWithPath(browsebox.value);
+			if (!folder.exists() || !folder.isDirectory()) {
+				self.browse_download_folder();
+				return;
+			}
+			for (var i = 0; i < solution["method_names"].length; ++i) {
+				var method = solution["method_names"][i];
+				var resultitem_list = solution["result_item_by_method"][method];
+				var result_list = resultitem_list.map((function (x) { return x.result; }));
+				UnPlug2DownloadMethods.exec_multiple(method, result_list, folder);
+			}
 			window.close();
-		}), pause_needed ? 1000 : 1);
+		} else {
+			window.setTimeout(UnPlug2SearchPage.do_saveall, 200);
+		}
 	}),
 	
 	updated_view_setting : (function () {

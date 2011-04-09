@@ -113,6 +113,22 @@ var UnPlug2DownloadMethods = {
 			evt.stopPropagation();
 		});
 	}),
+
+	get_prerequisites : (function  (method) {
+		// returns TRUE if all prerequisites are satisfied, or FALSE if you need to poll again.
+		// extern -- open extern window
+		if (this._button_lookup[method].signal_get_argv) {
+			var extern_window = UnPlug2ExternDownloader.get_window();
+			if (extern_window === null) {
+				window.openDialog(UnPlug2ExternDownloader.url, "", "chrome");
+				return false;
+			}
+			return extern_window.loaded;
+		}
+		// others -- nothing to do
+		return true;
+	}),
+
 	exec : (function (method, result) {
 		// This function is called when clicking to download an individual item
 
@@ -346,17 +362,7 @@ var UnPlug2ExternDownloader = {
 	signal : (function (action) {
 		var action = window.JSON.stringify(action);
 		var extern_window = this.get_window();
-		if (extern_window) {
-			extern_window.postMessage(action, "*");
-		} else {
-			extern_window = window.openDialog(this.url, "", "chrome");
-			var onload = (function (action) {
-				return (function () {
-					this.postMessage(action, "*");
-				});
-			})(action);
-			extern_window.addEventListener("load", onload, false);
-		}
+		extern_window.postMessage(action, "*");
 	})
 }
 
