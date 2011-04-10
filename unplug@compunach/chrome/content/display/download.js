@@ -102,13 +102,13 @@ var UnPlug2DownloadMethods = {
 		return this._button_lookup[name];
 	}),
 	
-	callback : (function (name, result) {
+	callback : (function (method, result) {
 		var that = this;
 		return (function (evt) {
 			try {
-				that.exec(name, result);
+				that.prereq_then_exec(method, result);
 			} catch (e) {
-				UnPlug2.log("Error in UnPlug2DownloadMethods for " + name + " " + result.toSource() + " with error " + e.toSource());
+				UnPlug2.log("Error in UnPlug2DownloadMethods for " + method + " " + result.toSource() + " with error " + e.toSource());
 			}
 			evt.stopPropagation();
 		});
@@ -127,6 +127,20 @@ var UnPlug2DownloadMethods = {
 		}
 		// others -- nothing to do
 		return true;
+	}),
+
+	prereq_then_exec : (function (method, result) {
+		if (this.get_prerequisites(method)) {
+			try {
+				this.exec(method, result);
+			} catch (e) {
+				UnPlug2.log("prerq_then_exec on " + method + " res " + result.toSource() + " error " + e.toSource());
+			}
+		} else {
+			window.setTimeout((function (that, method, result) {
+				return (function () {that.prereq_then_exec(method, result); });
+			})(this, method, result), 200);
+		}
 	}),
 
 	exec : (function (method, result) {
