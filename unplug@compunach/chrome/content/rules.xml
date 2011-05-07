@@ -1093,6 +1093,23 @@
 				</rule>
 			</each_re>
 		</rule>
+		<rule id="wmctv-2011">
+			<if_url host="wmctv.com" />
+			<if_re ref="clipid" re="widgetVideoCanvas[A-Za-z0-9]*\.SetVariable\(&quot;clipId&quot;, &quot;(\d+)&quot;\);" />
+			<download url="http://www.wmctv.com/build.asp?buildtype=buildfeaturexmlrequest&amp;featureType=Clip&amp;featureid=${clipid.1}&amp;affiliateno=59&amp;clientgroupid=1">
+				<optional_re ref="title" re="&lt;HEADLINE&gt;&lt;![CDATA[(.*?)]]&gt;&lt;/HEADLINE&gt;" />
+				<optional_re ref="thumb" re="&lt;!\[CDATA\[(http://[^&lt;&gt;]+_vt\.jpg)\]\]&gt;" />
+				<each_element ref="media" tagname="media:content" require_attrs="url" attrs="filesize,bitrate,width,height,type,platform">
+					<optional_switch ref="qual" input="${media.bitrate}" default="mid"
+						k1="224" v1="very-low"
+						k2="944" v2="low" />
+					<media url="${urldecode:media.url}" mediaid="${clipid.1}"
+						thumbnail="${thumb.1}" title="${either:title.1:origtitle.innerHTML}"
+						description="${optional:media.platform} ${optional:media.width}x${optional:media.height} ${optional:media.type} ${optional:media.filesize}bytes"
+						quality="${qual.1}" />
+				</each_element>
+			</download>
+		</rule>
 	</download><!-- flashblock workaround -->
 	<!--
 	Lower priority
