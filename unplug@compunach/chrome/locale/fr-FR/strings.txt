@@ -1,4 +1,4 @@
-extensions.{unplug@compunach}.description=Télécharger le média intégré
+﻿extensions.{unplug@compunach}.description=Télécharger le média intégré
 
 # Confirmation after clicking on "Nothing found" button
 nothing_found_send_data=Voulez-vous envoyer des informations sur cette page web aux développeurs d'UnPlug ?
@@ -24,11 +24,11 @@ high_quality=Haute qualité
 low_quality=Basse qualité
 mid_quality=Qualité normale
 hd_quality=Haute définition
-embedplayer=Objet intégré (pas une vidéo, possiblement un lecteur)
+embedplayer=Objet intégré (pas une vidéo, probablement un lecteur)
 
 # download methods
-save_to_file=Save As
-save_to_directory=Save to Folder
+save_to_file=Enregistrer sous
+save_to_directory=Enregistrer dans le dossier :
 dmethod.open-tab=Ouvrir dans un nouvel onglet
 dmethod.open-tab.a=o
 dmethod.open-tab.tip=Ouvrir dans un nouvel onglet.
@@ -55,15 +55,15 @@ dmethod.rtmpdump.a=R
 dmethod.rtmpdump.tip=Obtenir ou exécuter rtmpdump.
 dmethod.vlc=VLC
 dmethod.vlc.a=V
-dmethod.vlc.tip=Obtenir ou exécuter VLC
+dmethod.vlc.tip=Obtenir ou exécuter VLC.
 
 dmethod.unavailable.tip=Impossible de télécharger le fichier.
-plus_n_extra_results=Plus %s results which will not be downloaded
-n_files=%s files
+plus_n_extra_results=%s résultat(s) ne sera (seront) pas téléchargé(s).
+n_files=%s fichier(s)
 
-trace=Debug
+trace=Débogage
 trace.a=g
-trace.tip=Show information which can be used for debugging
+trace.tip=Afficher les informations utiles au débogage.
 
 proc.status.error=Erreur
 proc.status.running=En cours
@@ -75,7 +75,7 @@ location_of=Emplacement de %s
 
 extern.cancel.title=UnPlug : arrêt du téléchargement
 extern.cancel.onefile=Voulez-vous interrompre le téléchargement de %s ?
-extern.cancel.manyfile=Voulez-vous interrompre %s tééchargements en cours ?
+extern.cancel.manyfile=Voulez-vous interrompre %s téléchargements en cours ?
 extern.cancel.stop=Arrêter
 extern.cancel.dontstop=Ne pas arrêter
 extern.cancel.deletefile=Supprimer le fichier partiellement téléchargé

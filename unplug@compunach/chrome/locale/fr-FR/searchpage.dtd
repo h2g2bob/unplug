@@ -1,4 +1,4 @@
-<!--
+﻿<!--
 /*
  *         _        ___
  *    /\ / /___    / _ \ /\ /\  _ ___
@@ -35,13 +35,13 @@
 <!ENTITY config.tooltip       "Modifier les réglages d'UnPlug.">
 <!ENTITY dl.label             " Télécharger">
 <!ENTITY dl.accesskey         "T">
-<!ENTITY dlselected.label     "Download selected">
-<!ENTITY dlselected.accesskey "D">
-<!ENTITY dlselected.heading   "Download selected results">
-<!ENTITY close.label          "Close">
-<!ENTITY close.accesskey      "C">
-<!ENTITY view.single          "Single view">
-<!ENTITY view.single.a        "v">
-<!ENTITY view.multiple        "Multiple view">
-<!ENTITY view.multiple.a      "v">
+<!ENTITY dlselected.label     "Télécharger la sélection">
+<!ENTITY dlselected.accesskey "s">
+<!ENTITY dlselected.heading   "Téléchargement des résultats sélectionnés">
+<!ENTITY close.label          "Fermer">
+<!ENTITY close.accesskey      "F">
+<!ENTITY view.single          "Affichage unique">
+<!ENTITY view.single.a        "h">
+<!ENTITY view.multiple        "Affichage multiple">
+<!ENTITY view.multiple.a      "h">
 
