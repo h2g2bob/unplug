@@ -327,13 +327,25 @@ UnPlug2Variables.prototype = {
 				return this._subst_apply_functions(parts).replace(
 					/&(.*?);/g,
 					function (str, m, offset, s) {
-						switch (m) {
-							case "amp": return "&";
-							case "quot": return "\"";
+						try {
+							switch (m) {
+								case "amp": return "&";
+								case "quot": return "\"";
+								case "rlm": return ""; // right-to-left mark
+								case "lrm": return ""; // left-to-right mark
+							}
+							if (m[0] == "#") {
+								if (m[1] == "x") {
+									return String.fromCharCode(parseInt(m.substr(2), 16));
+								} else {
+									return String.fromCharCode(m.substr(1));
+								}
+							}
+							throw "Unknown htmldecode: entity " + m;
+						} catch (e) {
+							UnPlug2.log("Undefined htmldecode entity:" + m);
+							return m
 						}
-						if (m[0] == "#")
-							return String.fromCharCode(m.substr(1));
-						throw "Unknown htmldecode: entity " + m;
 					});
 			/**
 			 * Decodes \xNN javascript escape sequences
