@@ -744,12 +744,14 @@ UnPlug2SearchPage.MediaResult.prototype = {
 	update : (function (result) {
 		// should assert that result.download is the same
 		this.history.push(result.details);
+		var need_sort = false;
 		if (this.certainty === undefined || result.details.certainty > this.certainty) {
 			// can copy some fields (eg: default title) if they are unset, even if less certain
 			// NOTE: this is destructive to history!
 			result.name = result.name || this.result.name;
 			result.description = result.description || this.result.description;
 			result.thumbnail = result.thumbnail || this.result.thumbnail;
+			result.details.mediaid = result.details.mediaid || this.result.details.mediaid;
 
 			// update values we keep track of
 			this.result = result;
@@ -757,14 +759,25 @@ UnPlug2SearchPage.MediaResult.prototype = {
 			// update dom nodes
 			this._element_update();
 
-			// keychain changed?
-			if (this.check_keychain_changed()) {
-				var root = this.root();
-				this.parent.remove_child(this);
-				root.place_mediaresult(this);
-				return;
-			}
+			need_sort = true;
+		} else if (!this.result.name || !this.result.description || !this.result.thumbnail) {
+			// can copy some fields (eg: default title) if they are unset, even if less certain
+			// NOTE: this is destructive to history!
+			this.result.name = this.result.name || result.name;
+			this.result.description = this.result.description || result.description;
+			this.result.thumbnail = this.result.thumbnail || result.thumbnail;
+			this.result.details.mediaid = this.result.details.mediaid || result.details.mediaid;
+		}
 
+		// keychain changed (eg: if mediaid changed)
+		if (this.check_keychain_changed()) {
+			var root = this.root();
+			this.parent.remove_child(this);
+			root.place_mediaresult(this);
+			return;
+		}
+
+		if (need_sort) {
 			// sort
 			if (this.quality != this.result.details.quality || this.certainty != this.result.details.certainty) {
 				this.quality = this.result.details.quality;
@@ -773,12 +786,6 @@ UnPlug2SearchPage.MediaResult.prototype = {
 					this.parent.update_sorting_keys(this);
 				}
 			}
-		} else if (!this.result.name || !this.result.description || !this.result.thumbnail) {
-			// can copy some fields (eg: default title) if they are unset, even if less certain
-			// NOTE: this is destructive to history!
-			this.result.name = this.result.name || result.name;
-			this.result.description = this.result.description || result.description;
-			this.result.thumbnail = this.result.thumbnail || result.thumbnail;
 		}
 	})
 }
