@@ -202,8 +202,12 @@
 		</rule>
 	</rule>
 	<rule id="html5">
-		<each_element ref="vid" tagname="video" require_attrs="src" attrs="poster">
+		<each_element ref="vid" tagname="video" require_attrs="src" attrs="poster,data-youtube-id">
 			<media url="${vid.src}" thumbnail="${vid.poster}" certainty="mid" title="${origtitle.innerHTML}" />
+			<rule id="html5-youtube">
+				<if_re re=".+" string="${vid.data-youtube-id}" />
+				<media url="${vid.src}" thumbnail="${vid.poster}" certainty="high" quality="mid" title="${origtitle.innerHTML}" description="HTML5 Video" mediaid="${vid.data-youtube-id}" type="webm" />
+			</rule>
 		</each_element>
 		<each_element ref="aud" tagname="audio" require_attrs="src">
 			<media url="${aud.src}" certainty="mid" title="${origtitle.innerHTML}" description="Audio file" />
