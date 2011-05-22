@@ -427,6 +427,10 @@
 						<if_ext is_media="yes" filename="${embedelem.src}" />
 						<media url="${embedelem.src}" certainty="mid" />
 					</rule>
+					<rule ref="amp_fv">
+						<if_re ref="file" string="${embedelem.flashvars}" re="=([^=]+\.(flv|mp4|avi|wmv))(?:&amp;|$)" />
+						<media url="${urldecode:file.1}" type="${file.2}" certainty="mid" title="${origtitle.innerHTML}" />
+					</rule>
 					<rule id="flashvars">
 						<each_re ref="queryparam" string="${embed.flashvars}" re="([^&amp;]+)=([^&amp;]+)">
 							<rule ref="generic_fv">
