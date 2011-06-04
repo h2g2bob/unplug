@@ -1093,11 +1093,23 @@
 					<optional_re ref="title" string="${videoblock.1}" re="&quot;title&quot;\s*:\s*&quot;([^&quot;]+)&quot;," />
 					<if_re ref="time" string="${requestblock.1}" re="&quot;timestamp&quot;\s*:\s*(\d+)," />
 					<if_re ref="sig" string="${requestblock.1}" re="&quot;signature&quot;\s*:\s*&quot;([^&quot;]+)&quot;," />
-					<media
-						url="http://player.vimeo.com/play_redirect?clip_id=${mediaid.1}&amp;sig=${sig.1}&amp;time=${time.1}&amp;quality=hd&amp;codecs=H264,VP8,VP6&amp;type=moogaloop_local&amp;embed_location="
-						title="${jsdecode:either:title.1:origtitle.innerHTML}"
-						thumbnail="${jsdecode:thumbnail.1}"
-						mediaid="${mediaid.1}" />
+					<!-- "files":{"h264":["sd","mobile"]}}, -->
+					<if_re ref="qualblock" re="&quot;files&quot;:\{(.*?)\}\}," />
+					<each_re ref="qualsubblock" re="&quot;[^&quot;]+&quot;:\[(.*?)\]" string="${qualblock.1}">
+						<each_re ref="qualcode" re="&quot;([^&quot;]+)&quot;" string="${qualsubblock.1}">
+							<optional_switch ref="quality" input="${qualcode.1}"
+								k1="hd" v1="very-high"
+								k2="sd" v2="mid"
+								k3="mobile" v3="very-low"
+								default="low" />
+							<media
+								url="http://player.vimeo.com/play_redirect?clip_id=${mediaid.1}&amp;sig=${sig.1}&amp;time=${time.1}&amp;quality=${qualcode.1}&amp;codecs=H264,VP8,VP6&amp;type=moogaloop_local&amp;embed_location="
+								title="${jsdecode:either:title.1:origtitle.innerHTML}"
+								thumbnail="${jsdecode:thumbnail.1}"
+								description="${qualcode.1}" quality="${quality.1}"
+								mediaid="${mediaid.1}" />
+						</each_re>
+					</each_re>
 				</rule>
 			</each_re>
 		</rule>
