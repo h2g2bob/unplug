@@ -736,6 +736,19 @@
 						</rule>
 					</rule>
 				</each_re>
+				<rule id="youtube-subtitle">
+					<download url="http://www.youtube.com/api/timedtext?hl=en&amp;type=list&amp;tlangs=1&amp;v=${video_id.1}">
+						<!-- there's one track element
+						plus there's several "target" entries which list translation languages
+						use ?...&name=...&kind&tlang=de for translations -->
+						<each_element ref="track" tagname="track" require_attrs="lang_code" attrs="name,lang_original">
+							<media method="subtitle" url="http://www.youtube.com/api/timedtext?hl=en&amp;v=${video_id.1}&amp;type=track&amp;lang=${track.lang_code}&amp;name=${optional:track.name}&amp;kind" quality="subtitle"
+								title="${either:title.1:origtitle.innerHTML}" type="xml"
+								description="${translate:subtitle} ${optional:track.lang_original} ${optional:track.name}"
+								mediaid="${video_id.1}" />
+						</each_element>
+					</download>
+				</rule>
 			</rule>
 			<rule>
 				<if_re string="${url.path}" ref="username" re="^/user/([^#\?]+)" />

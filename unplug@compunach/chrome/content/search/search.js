@@ -1273,7 +1273,8 @@ UnPlug2Search = {
 	 * Download can be used to track duplicate results
 	 */
 	_make_response_object_result : function (nsiuri, download_method, variables, node, trace) {
-		var levels = { "very-low" : -20, "low" : -10, "mid" : 0, "high" : +10, "very-high" : +20 };
+		var levels = { "very-low" : -20, "low" : -10, "mid" : 0, "high" : +10, "very-high" : +20,
+			"subtitle" : -30, "subtitle-translated" : -40 };
 		var guesses = UnPlug2Search.guess_from_uri(nsiuri);
 		var default_quality = 0;
 		var default_certainty = +10; // high!
