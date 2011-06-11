@@ -492,6 +492,20 @@ UnPlug2Variables.prototype = {
 					value = prefixvalue + value;
 				return value;
 			/**
+			 * ${humanbytes:bytes}
+			 */
+			case "humanbytes":
+				var bytes = parseFloat(this._subst_apply_functions(parts));
+				if (bytes > 2 * 1e9) {
+					return (bytes / 1e9).toFixed(1) + " GB";
+				} else if (bytes > 2 * 1e6) {
+					return (bytes / 1e6).toFixed(1) + " MB";
+				} else if (bytes > 2 * 1e3) {
+					return (bytes / 1e3).toFixed(1) + " KB";
+				} else {
+					return bytes.toFixed(0) + " bytes";
+				}
+			/**
 			 * ${hextostr:varname}
 			 */
 			case "hextostr":

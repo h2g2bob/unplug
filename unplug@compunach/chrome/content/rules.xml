@@ -1130,6 +1130,39 @@
 				</each_element>
 			</download>
 		</rule>
+		<rule id="blip.tv">
+			<if_url ref="url" host="blip.tv" />
+			<rule>
+				<if_re ref="videoid" string="${url.url}" re="\-(\d+)(?:#|\?|;|$)" />
+				<if_re string="${url.protocol}" re="(?:http|https)" />
+				<download url="${url.protocol}://blip.tv/rss/flash/${videoid.1}">
+					<each_re ref="itemblock" re="&lt;item&gt;([\s\S]+?)&lt;/item&gt;">
+						<optional_re ref="title" string="${itemblock.1}" re="&lt;title&gt;(.*?)&lt;/title&gt;" />
+						<optional_re ref="thumb" string="${itemblock.1}" re="&lt;blip:thumbnail_src&gt;(.*?)&lt;/blip:thumbnail_src&gt;" />
+						<each_re ref="media" string="${itemblock.1}" re="&lt;media:content([^&gt;]+)">
+							<if_re ref="medialoc" string="${media.1}" re="\surl=&quot;([^&quot;]+)&quot;" />
+							<optional_re ref="role" string="${media.1}" re="\sblip:role=&quot;([^&quot;]+)&quot;" />
+							<optional_re ref="size" string="${media.1}" re="\sfileSize=&quot;([^&quot;]+)&quot;" />
+							<optional_re ref="type" string="${media.1}" re="\stype=&quot;([^&quot;]+)&quot;" />
+							<rule>
+								<optional_switch ref="qual" input="${role.1}"
+									k1="Source" v1="very-high"
+									k2="Blip SD" v2="mid"
+									k3="web" v3="low"
+									default="mid" />
+								<media
+									url="${medialoc.1}"
+									title="${either:title.1:origtitle.1}"
+									description="${optional:role.1} ${optional:humanbytes:size.1} ${optional:type.1}"
+									thumbnail="http://a.i.blip.tv/g?&amp;src=${thumb.1}&amp;w=40&amp;h=36&amp;fmt=jpg"
+									quality="${qual.1}"
+									mediaid="${videoid.1}" />
+							</rule>
+						</each_re>
+					</each_re>
+				</download>
+			</rule>
+		</rule>
 	</download><!-- flashblock workaround -->
 	<!--
 	Lower priority
