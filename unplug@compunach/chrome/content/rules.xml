@@ -846,9 +846,10 @@
 		</rule>
 		<rule id="xhamster.com">
 			<if_url host="xhamster.com" />
-			<if_re ref="movie" re="'file'\s*:\s*'(\d+:[^']+\.flv)'" />
+			<if_re ref="movie" re="'file'\s*:\s*'([^']+\.flv)'" />
 			<optional_re ref="thumb" re="'image'\s*:\s*'(http://[^']+.jpg)'" />
-			<media url="http://xhamster.com/flv2/${movie.1}" thumbnail="${thumb.1}" title="${origtitle.innerHTML}" />
+			<optional_re ref="title" re="&lt;h1&gt;\s*([^&lt;]*?)\s*&lt;/h1&gt;" />
+			<media url="http://xhamster.com/flv2/${movie.1}" thumbnail="${thumb.1}" title="${either:title.1:origtitle.innerHTML}" />
 		</rule>
 		<rule id="itsyourporn">
 			<!-- TODO unchecked -->
