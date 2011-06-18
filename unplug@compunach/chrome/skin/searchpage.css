@@ -79,6 +79,10 @@
 	visibility: hidden;
 }
 
+.unplug-result.subtitles {
+	color: #606060;
+}
+
 .unplug-result.file-ext-swf,
 .unplug-result.certainty-low {
 	opacity: 0.5;

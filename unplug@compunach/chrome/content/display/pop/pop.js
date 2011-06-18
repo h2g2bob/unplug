@@ -684,6 +684,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 		this.basic_css = [
 			"file-ext-" + (details.file_ext || "unknown"),
 			"certainty-" + (details.certainty < 0 ? "low" : "high"),
+			(details.subtitles ? "subtitles" : "not-subtitles"),
 			"unplug-result" ].join(" ")
 		this.element.className = this.basic_css;
 	}),

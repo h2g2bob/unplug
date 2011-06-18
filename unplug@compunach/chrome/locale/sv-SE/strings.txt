@@ -64,6 +64,7 @@ n_files=%s files
 trace=Debug
 trace.a=g
 trace.tip=Show information which can be used for debugging
+subtitles=Subtitles
 
 proc.status.error=Fel
 proc.status.running=Körs...

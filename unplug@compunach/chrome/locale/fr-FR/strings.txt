@@ -64,6 +64,7 @@ n_files=%s fichier(s)
 trace=Débogage
 trace.a=g
 trace.tip=Afficher les informations utiles au débogage.
+subtitles=Subtitles
 
 proc.status.error=Erreur
 proc.status.running=En cours

@@ -1273,8 +1273,7 @@ UnPlug2Search = {
 	 * Download can be used to track duplicate results
 	 */
 	_make_response_object_result : function (nsiuri, download_method, variables, node, trace) {
-		var levels = { "very-low" : -20, "low" : -10, "mid" : 0, "high" : +10, "very-high" : +20,
-			"subtitle" : -30, "subtitle-translated" : -40 };
+		var levels = { "very-low" : -20, "low" : -10, "mid" : 0, "high" : +10, "very-high" : +20 };
 		var guesses = UnPlug2Search.guess_from_uri(nsiuri);
 		var default_quality = 0;
 		var default_certainty = +10; // high!
@@ -1294,6 +1293,7 @@ UnPlug2Search = {
 				"playlistid"  : variables.subst_optional(node.getAttribute("playlistid")) || null,
 				"certainty"   : certainty === undefined ? default_certainty : certainty,
 				"quality"     : quality === undefined ? default_quality : quality,
+				"subtitles"   : false, // is this result a subtitles file?
 				
 				// IMPORTANT this is used for advice only (not used for downloading) !!
 				"protocol"    : nsiuri.scheme,
@@ -1306,7 +1306,11 @@ UnPlug2Search = {
 				"thumbnail"   : thumbnailurl || null,
 				"trace"       : trace },
 			"download" : download_method };
-		
+		if (node.getAttribute("subtitles") === "yes") {
+			result_object["details"]["subtitles"] = true;
+			result_object["details"]["quality"] = -30; // very low - this is really juse a hack to make subtitles appear at the bottom of the results list
+			result_object["details"]["description"] = UnPlug2.str("subtitles") + " " + (result_object["details"]["description"] || "");
+		}
 		return result_object;
 	},
 
