@@ -595,6 +595,10 @@
 							</download>
 						</rule>
 					</rule>
+					<rule id="videobb-embed">
+						<if_re ref="videoid" string="${p.value}" re="http://www.videobb.com/e/([^\?/;#]+)" />
+						<rule goto="videobb-videoid" />
+					</rule>
 				</rule>
 				<rule id="metacafe-param-2010">
 					<if_url host="metacafe.com" />
@@ -1172,19 +1176,39 @@
 			</download>
 		</rule>
 	</download><!-- flashblock workaround -->
-	<rule ref="url-only">
-		<rule ref="videobb">
+	<rule id="url-only">
+		<rule id="videobb">
 			<if_url host="videobb.com" ref="url" />
 			<rule>
 				<if_re string="${url.path}" re="/video/([^/\?#;]+)" ref="videoid" />
-				<download url="http://www.videobb.com/player_control/settings.php?v=${videoid.1}&amp;fv=v1.1.61">
-					<optional_re ref="thumb" re="&quot;thumbnail&quot;:&quot;http:\/\/[^&quot;]+\.jpg)&quot;" />
-					<optional_re ref="title" re="&quot;title&quot;:&quot;([^&quot;]+)" />
-					<each_re ref="vid" re="(?:&quot;l&quot;:&quot;([^&quot;]+)&quot;,)?&quot;u&quot;:&quot;([^&quot;]+)&quot;">
-						<media url="${b64decode:vid.2}&amp;start=0" description="${vid.1}"
-							title="${either:title.1:origtitle.innerHTML}" thumbnail="${jsdeocde:thumb.1}"
-							mediaid="${videoid.1}" />
-					</each_re>
+				<rule id="videobb-videoid" target="videobb-videoid">
+					<download url="http://www.videobb.com/player_control/settings.php?v=${videoid.1}&amp;fv=v1.1.61">
+						<optional_re ref="thumb" re="&quot;thumbnail&quot;:&quot;http:\/\/[^&quot;]+\.jpg)&quot;" />
+						<optional_re ref="title" re="&quot;title&quot;:&quot;([^&quot;]+)" />
+						<each_re ref="vid" re="(?:&quot;l&quot;:&quot;([^&quot;]+)&quot;,)?&quot;u&quot;:&quot;([^&quot;]+)&quot;">
+							<media url="${b64decode:vid.2}&amp;start=0" description="${vid.1}"
+								title="${either:title.1:origtitle.innerHTML}" thumbnail="${jsdeocde:thumb.1}"
+								mediaid="${videoid.1}" />
+						</each_re>
+					</download>
+				</rule>
+			</rule>
+		</rule>
+		<rule id="dpstream">
+			<if_url ref="url" host="dpstream.net" />
+			<rule>
+				<if_re string="${url.url}" re="#js(\d+)\-,\-(\d+)-,-(.*)$" ref="c" />
+				<download url="http://www.dpstream.net/fichiers/includes/inc_afficher_serie/changer_episode.php?changer_episod=1&amp;id_serie=${c.1}&amp;saison=${c.2}&amp;episode=${c.3}">
+					<rule id="dpstream-vbb">
+						<if_re ref="videoid" re="&quot;http://www\.videobb\.com/e/([^/#\?;&quot;]+)" />
+						<rule goto="videobb-videoid" />
+					</rule>
+					<rule id="dpstream-mv">
+						<if_re ref="videoid" re="href=&quot;http://www.megavideo.com/\?v=([^&quot;]+)" />
+						<download url="http://www.megavideo.com/?v=${videoid.1}">
+							<rule goto="megavideo.com" />
+						</download>
+					</rule>
 				</download>
 			</rule>
 		</rule>
