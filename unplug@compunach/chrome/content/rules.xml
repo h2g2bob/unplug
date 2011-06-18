@@ -450,6 +450,10 @@
 							</rule>
 						</each_re>
 					</rule>
+					<rule id="videobb-embed">
+						<if_re ref="videoid" re="^http://videobb.com/e/([^&amp;/;#\?]+)" string="${embedelem.src}" />
+						<rule goto="videobb-videoid" />
+					</rule>
 				</rule>
 				<rule id="magnatune.com.embed">
 					<if_re ref="playlisturl" string="${embedelem.src}"> magnatune\.com.*[&amp;\?]playlist_url=([^&amp;]+) </if_re>
@@ -1207,7 +1211,10 @@
 						<optional_re ref="thumb" re="&quot;thumbnail&quot;:&quot;http:\/\/[^&quot;]+\.jpg)&quot;" />
 						<optional_re ref="title" re="&quot;title&quot;:&quot;([^&quot;]+)" />
 						<each_re ref="vid" re="(?:&quot;l&quot;:&quot;([^&quot;]+)&quot;,)?&quot;u&quot;:&quot;([^&quot;]+)&quot;">
-							<media url="${b64decode:vid.2}&amp;start=0" description="${vid.1}"
+							<optional_switch ref="qual" default="mid" input="${vid.1}"
+								k1="240p" v1="mid"
+								k2="360p" v2="high" />
+							<media url="${b64decode:vid.2}&amp;start=0" description="${vid.1}"  quality="${qual.1}"
 								title="${either:title.1:origtitle.innerHTML}" thumbnail="${jsdeocde:thumb.1}"
 								mediaid="${videoid.1}" />
 						</each_re>
