@@ -877,12 +877,14 @@
 			Applies to many sites:
 				* xn-/-hentaienespaol-1nb.com
 				* www.movshare.net
+				* xritephoto.com
 			-->
 			<each_re ref="video" re="(addParam|addVariable)\s*\(\s*[&quot;'](file|content_video|video)[&quot;']\s*,\s*[&quot;'](.*?)[&quot;']\s*\)">
 				<optional_re ref="thumbnail">(addParam|addVariable)\s*\(\s*[&quot;'](image|thumbnail|preview)[&quot;']\s*,\s*[&quot;'](.*?)[&quot;']\s*\) </optional_re>
 				<rule>
 					<!-- same server == default -->
 					<ifnot_url host="xhamster.com" />
+					<ifnot_re re="\.xml$" string="${video.3}" />
 					<media url="${video.3}" thumbnail="${thumbnail.3}" certainty="mid" title="${origtitle.innerHTML}" />
 					<rule id="youjizz.com">
 						<if_url host="youjizz.com" />
@@ -894,6 +896,12 @@
 						<if_url host="jizzhut.com" />
 						<media url="${video.3}" thumbnail="${thumbnail.3}" title="${origtitle.innerHTML}" />
 					</rule>
+				</rule>
+				<rule>
+					<if_re re="\.xml$" string="${video.3}" />
+					<download url="${video.3}">
+						<rule goto="*" />
+					</download>
 				</rule>
 			</each_re>
 		</rule>
