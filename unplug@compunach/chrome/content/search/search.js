@@ -370,6 +370,11 @@ UnPlug2Variables.prototype = {
 						throw "Unknown escape in jsdecode " + esc;
 					});
 			/**
+			 * ${b64decode:data} decodes base64 encoded data
+			 */
+			case "b64decode":
+				return window.atob(this._subst_apply_functions(parts))
+			/**
 			 * ${randomfloat}
 			 */
 			case "randomfloat":
