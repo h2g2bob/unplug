@@ -255,7 +255,11 @@ UnPlug2SearchPage = {
 	report_status_cb : (function (working, result_item) {
 		return (function (evt) {
 			if (working === null) {
-				alert("The following information can be used for debugging:\n\nTraceback:\n" + result_item.trace() + "\n\nKeychain:\n" + result_item.keychain.toSource() + "\n\nHistory:\n" + result_item.history.toSource());
+				alert("The following information can be used for debugging:" +
+					"\n\nHow to download:\n" + result_item.result.download.toSource() +
+					"\n\nFound by (\"traceback\"):\n" + result_item.trace() +
+					"\n\nIdentifier and groupings (\"keychain\"):\n" + result_item.keychain.toSource() +
+					"\n\nDescription from each instance found (\"history\"):\n" + result_item.history.toSource());
 			} else {
 				alert("NOT IMPLEMENTED: Send this to server:\n\n" + working + "\n" + result_item.trace());
 			}
@@ -695,7 +699,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 
 	trace : (function () {
 		return this.history.map((function (h) {
-			return h.trace;
+			return ">>> " + h.trace;
 		})).join("\n");
 	}),
 
