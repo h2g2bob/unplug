@@ -890,12 +890,6 @@
 						<if_url host="jizzhut.com" />
 						<media url="${video.3}" thumbnail="${thumbnail.3}" title="${origtitle.innerHTML}" />
 					</rule>
-					<rule id="dailymotion.com">
-						<if_url host="dailymotion.com" />
-						<optional_re ref="dmthumb" re="&lt;link rel=&quot;image_src&quot; type=&quot;image/jpeg&quot; href=&quot;(http://www.dailymotion.com/thumbnail/[^&quot;]+)&quot; /&gt;" />
-						<optional_re ref="dmtitle" re="&lt;span class=&quot;title&quot;[^&gt;]*&gt;([^&lt;]+)" />
-						<media url="${video.3}" thumbnail="${either:dmthumb.1:thumbnail.3}" type="flv" title="${either:dmtitle.1:origtitle.innerHTML}" />
-					</rule>
 				</rule>
 			</each_re>
 		</rule>
@@ -1163,6 +1157,19 @@
 					</each_re>
 				</download>
 			</rule>
+		</rule>
+		<rule id="dailymotion.com">
+			<!-- can often fail with file, save as. I'd suggest DtA or wget using resume. -->
+			<if_url host="dailymotion.com" />
+			<if_re ref="pointerurl" re="%22url%22%3A%22(http%3A%5C%2F%5C%2Fcdn.dailymotion.com%5C%2Fcdn.*?)%22%7D" />
+			<optional_re ref="dmthumb" re="&lt;link rel=&quot;image_src&quot; type=&quot;image/jpeg&quot; href=&quot;(http://www.dailymotion.com/thumbnail/[^&quot;]+)&quot; /&gt;" />
+			<optional_re ref="dmtitle" re="&lt;span class=&quot;title&quot;[^&gt;]*&gt;([^&lt;]+)" />
+			<media url="${jsdecode:urldecode:pointerurl.1}&amp;redirect=1" thumbnail="${either:dmthumb.1:thumbnail.3}" type="mp4" title="${either:dmtitle.1:origtitle.innerHTML}" mediaid="${pointerurl.1}" />
+			<download url="${jsdecode:urldecode:pointerurl.1}&amp;redirect=0">
+				<!-- can expire, unlike pointerurl, so use low certainty -->
+				<if_re ref="media" re="^(http://.*)" />
+				<media url="${media.1}" thumbnail="${either:dmthumb.1:thumbnail.3}" type="mp4" title="${either:dmtitle.1:origtitle.innerHTML}" mediaid="${pointerurl.1}" certainty="low" />
+			</download>
 		</rule>
 	</download><!-- flashblock workaround -->
 	<!--
