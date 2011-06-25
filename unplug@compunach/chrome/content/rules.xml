@@ -603,6 +603,15 @@
 						<if_re ref="videoid" string="${p.value}" re="http://www.videobb.com/e/([^\?/;#]+)" />
 						<rule goto="videobb-videoid" />
 					</rule>
+					<rule id="maybe-sliverlight">
+						<!-- orig for generated html on http://www.badscience.net/2011/06/nerds-at-the-parliamentary-committee-on-the-draft-defamation-bill/ but that actually uses ukparl-embed -->
+						<if_re ref="playlisturl" string="${p.value}" re="(?:, |^)playlist=(https?://[^ ]+)(?:, |$)" />
+						<download url="${playlisturl.1}">
+							<each_element ref="src" tagname="MediaSource" require_attrs="innerHTML">
+								<media url="${src.innerHTML}" title="${origtitle.innerHTML}" />
+							</each_element>
+						</download>
+					</rule>
 				</rule>
 				<rule id="metacafe-param-2010">
 					<if_url host="metacafe.com" />
@@ -1199,6 +1208,22 @@
 				<if_re ref="media" re="^(http://.*)" />
 				<media url="${media.1}" thumbnail="${either:dmthumb.1:thumbnail.3}" type="mp4" title="${either:dmtitle.1:origtitle.innerHTML}" mediaid="${pointerurl.1}" certainty="low" />
 			</download>
+		</rule>
+		<rule id="ukparl-embed">
+			<each_re ref="parljs" re="www\.parliamentlive\.tv/Embed/js\.ashx\?(\d+)">
+				<download url="http://www.parliamentlive.tv/Embed/Playlist.ashx?x${parljs.1}">
+					<each_element ref="src" tagname="MediaSource" require_attrs="innerHTML">
+						<optional_element ref="time" tagname="BaseTime" require_attrs="innerHTML" />
+						<optional_element ref="title" tagname="Title" require_attrs="innerHTML" />
+						<optional_element ref="thumb" tagname="ThumbSource" require_attrs="innerHTML" />
+						<download url="${src.innerHTML}">
+							<each_re ref="mmslink" re="&lt;REF HREF=&quot;([^&quot;]+)&quot;">
+								<media url="${mmslink.1}" title="${either:title.innerHTML:origtitle.innerHTML} ${optional:time.innerHTML}" thumbnail="${thumb.innerHTML}" mediaid="${parljs.1}" />
+							</each_re>
+						</download>
+					</each_element>
+				</download>
+			</each_re>
 		</rule>
 	</download><!-- flashblock workaround -->
 	<rule id="url-only">
