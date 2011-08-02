@@ -690,7 +690,7 @@
 			<if_url ref="url" host="youtube.com" />
 			<rule id="youtube-single" target="youtube-single">
 				<if_re ref="fmt_stream_map" re="&quot;(fmt_stream_map|url_encoded_fmt_stream_map)&quot;\s*:\s*&quot;([^&quot;]+)&quot;" />
-				<optional_re ref="title" re="&lt;title&gt;\s*(?:&amp;#x202a;)?\s*(.*?)\s+\-\s+YouTube\s*(?:&amp;#x202c;)?(?:&amp;rlm;)?\s*&lt;/title&gt;" />
+				<optional_re ref="title" re="&lt;title&gt;\s*(?:&amp;#x202a;)?\s*(.*?)\s*(?:&amp;#x202c;)?(?:&amp;rlm;)?\s+\-\s+YouTube\s*&lt;/title&gt;" />
 				<optional_re ref="video_id" re="&lt;link rel=&quot;canonical&quot; href=&quot;/watch\?v=([^&quot;#]+)&quot;&gt;" />
 				<each_re ref="fmt_part" string="${jsdecode:fmt_stream_map.2}" re="([^,]+)">
 					<rule id="youtube-http">
@@ -768,7 +768,7 @@
 									k9="45" v9="webm"
 								/>
 								<media url="${urldecode:url.1}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-									quality="${quality.1}" title="${htmldecode:either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
+									quality="${quality.1}" certainty="very-high" title="${htmldecode:either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
 									description="${qstr.1} ${optional:type.1}" type="${type.1}" />
 							</rule>
 						</rule>
