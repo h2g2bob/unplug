@@ -689,10 +689,10 @@
 		<rule id="youtube.com" target="youtube.com">
 			<if_url ref="url" host="youtube.com" />
 			<rule id="youtube-single" target="youtube-single">
-				<if_re ref="fmt_stream_map" re="&quot;fmt_stream_map&quot;\s*:\s*&quot;([^&quot;]+)&quot;" />
-				<optional_re ref="title" re="&lt;title&gt;\s*YouTube\s+\-\s+(.*)\s*&lt;/title&gt;" />
+				<if_re ref="fmt_stream_map" re="&quot;(fmt_stream_map|url_encoded_fmt_stream_map)&quot;\s*:\s*&quot;([^&quot;]+)&quot;" />
+				<optional_re ref="title" re="&lt;title&gt;\s*(?:&amp;#x202a;)?\s*(.*?)\s+\-\s+YouTube\s*(?:&amp;#x202c;)?(?:&amp;rlm;)?\s*&lt;/title&gt;" />
 				<optional_re ref="video_id" re="&lt;link rel=&quot;canonical&quot; href=&quot;/watch\?v=([^&quot;#]+)&quot;&gt;" />
-				<each_re ref="fmt_part" string="${jsdecode:fmt_stream_map.1}" re="([^,]+)">
+				<each_re ref="fmt_part" string="${jsdecode:fmt_stream_map.2}" re="([^,]+)">
 					<rule id="youtube-http">
 						<if_re ref="fmt_url" re="^(\d+)\|(http[^\|]+)(?:\|.*)?$" string="${fmt_part.1}" />
 						<rule>
@@ -734,7 +734,39 @@
 								description="${description.1} ${optional:type.1}" type="${type.1}" />
 						</rule>
 					</rule>
+					<rule id="youtube-urlenc">
+						<if_re ref="url" re="(?:^|&amp;)url=(.*?)(?:$|&amp;)" string="${fmt_part.1}" />
+						<optional_re ref="itag" re="(?:^|&amp;)itag=(.*?)(?:$|&amp;)" string="${fmt_part.1}" />
+						<optional_re ref="qstr" re="(?:^|&amp;)quality=(.*?)(?:$|&amp;)" string="${fmt_part.1}" />
+						<rule>
+							<optional_switch ref="quality" input="${itag.1}"
+								k1="4" v1="mid"
+								k2="5" v2="low"
+								k3="18" v3="mid"
+								k4="22" v4="very-high"
+								k5="34" v5="mid"
+								k6="35" v6="high"
+								k7="37" v7="very-high"
+								k8="43" v8="mid"
+								k9="44" v9="high"
+							/>
+							<optional_switch ref="type" input="${itag.1}"
+								k1="4" v1="flv"
+								k2="5" v2="flv"
+								k3="18" v3="mp4"
+								k4="22" v4="mp4"
+								k5="34" v5="flv"
+								k6="35" v6="flv"
+								k7="43" v7="webm"
+								k8="44" v8="webm"
+							/>
+							<media url="${urldecode:url.1}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+								quality="${quality.1}" title="${htmldecode:either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
+								description="${qstr.1} ${optional:type.1}" type="${type.1}" />
+						</rule>
+					</rule>
 					<rule id="youtube-rtmp">
+						<!-- TODO: this is broken for updated youtube -->
 						<if_false /><!-- TODO - this doesn't work very well at the moment, because we're not able to use rtmpdump resume option -->
 						<if_re ref="fmt_url" re="^(\d+)\|([^\|]+)\|(rtmp[^\|]+)$" string="${fmt_part.1}" />
 						<rule>
