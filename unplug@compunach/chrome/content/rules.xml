@@ -704,6 +704,8 @@
 								k5="34" v5="mid"
 								k6="35" v6="high"
 								k7="37" v7="very-high"
+								k8="43" v8="mid"
+								k9="44" v9="high"
 							/>
 							<optional_switch ref="description" input="${fmt_url.1}"
 								k1="4" v1="${translate:mid_quality}"
@@ -713,6 +715,8 @@
 								k5="34" v5="${translate:mid_quality}"
 								k6="35" v6="${translate:high_quality}"
 								k7="37" v7="${translate:hd_quality} (very high)"
+								k8="43" v8="${translate:mid_quality}"
+								k9="44" v9="${translate:high_quality}"
 								default="Unknown quality code ${fmt_url.1}"
 							/>
 							<optional_switch ref="type" input="${fmt_url.1}"
@@ -722,6 +726,8 @@
 								k4="22" v4="mp4"
 								k5="34" v5="flv"
 								k6="35" v6="flv"
+								k7="43" v7="webm"
+								k8="44" v8="webm"
 							/>
 							<media url="${fmt_url.2}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
 								quality="${quality.1}" title="${htmldecode:either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
