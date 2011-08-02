@@ -735,34 +735,40 @@
 						</rule>
 					</rule>
 					<rule id="youtube-urlenc">
-						<if_re ref="url" re="(?:^|&amp;)url=(.*?)(?:$|&amp;)" string="${fmt_part.1}" />
-						<optional_re ref="itag" re="(?:^|&amp;)itag=(.*?)(?:$|&amp;)" string="${fmt_part.1}" />
-						<optional_re ref="qstr" re="(?:^|&amp;)quality=(.*?)(?:$|&amp;)" string="${fmt_part.1}" />
+						<!-- /user/ links are handled below by downloading individual video pages -->
+						<if_url ref="url" />
 						<rule>
-							<optional_switch ref="quality" input="${itag.1}"
-								k1="4" v1="mid"
-								k2="5" v2="low"
-								k3="18" v3="mid"
-								k4="22" v4="very-high"
-								k5="34" v5="mid"
-								k6="35" v6="high"
-								k7="37" v7="very-high"
-								k8="43" v8="mid"
-								k9="44" v9="high"
-							/>
-							<optional_switch ref="type" input="${itag.1}"
-								k1="4" v1="flv"
-								k2="5" v2="flv"
-								k3="18" v3="mp4"
-								k4="22" v4="mp4"
-								k5="34" v5="flv"
-								k6="35" v6="flv"
-								k7="43" v7="webm"
-								k8="44" v8="webm"
-							/>
-							<media url="${urldecode:url.1}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
-								quality="${quality.1}" title="${htmldecode:either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
-								description="${qstr.1} ${optional:type.1}" type="${type.1}" />
+							<ifnot_re string="${url.path}" re="^/user/([^#\?]+)" />
+
+							<if_re ref="url" re="(?:^|&amp;)url=(.*?)(?:$|&amp;)" string="${fmt_part.1}" />
+							<optional_re ref="itag" re="(?:^|&amp;)itag=(.*?)(?:$|&amp;)" string="${fmt_part.1}" />
+							<optional_re ref="qstr" re="(?:^|&amp;)quality=(.*?)(?:$|&amp;)" string="${fmt_part.1}" />
+							<rule>
+								<optional_switch ref="quality" input="${itag.1}"
+									k1="4" v1="mid"
+									k2="5" v2="low"
+									k3="18" v3="mid"
+									k4="22" v4="very-high"
+									k5="34" v5="mid"
+									k6="35" v6="high"
+									k7="37" v7="very-high"
+									k8="43" v8="mid"
+									k9="44" v9="high"
+								/>
+								<optional_switch ref="type" input="${itag.1}"
+									k1="4" v1="flv"
+									k2="5" v2="flv"
+									k3="18" v3="mp4"
+									k4="22" v4="mp4"
+									k5="34" v5="flv"
+									k6="35" v6="flv"
+									k7="43" v7="webm"
+									k8="44" v8="webm"
+								/>
+								<media url="${urldecode:url.1}" thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
+									quality="${quality.1}" title="${htmldecode:either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
+									description="${qstr.1} ${optional:type.1}" type="${type.1}" />
+							</rule>
 						</rule>
 					</rule>
 					<rule id="youtube-rtmp">
