@@ -658,6 +658,7 @@ UnPlug2DownloadMethods.add_button("vlc", {
 		var argv = [
 			"--no-one-instance",
 			"-Isignals", // no gui
+			"--http-user-agent=" + window.navigator.userAgent, // Note: uses "_" instead of "(" and appends VLC/1.0 to the end
 			]
 		if (UnPlug2.get_root_pref("network.proxy.type") == 1) {
 			argv.push("--socks=" + UnPlug2.get_root_pref("network.proxy.socks") + ":" + UnPlug2.get_root_pref("network.proxy.socks_port"));
