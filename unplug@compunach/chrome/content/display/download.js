@@ -548,8 +548,8 @@ UnPlug2DownloadMethods.add_button("rtmpdump", {
 			"--swfUrl", res.download.swfurl || res.download.referer, // this is invalid, but good enough most of the time.
 			"--flv", savefile.path ];
 		if  (UnPlug2.get_root_pref("network.proxy.type") == 1) {
-			cmds.push("--socks")
-			cmds.push(UnPlug2.get_root_pref("network.proxy.socks") + ":" + UnPlug2.get_root_pref("network.proxy.socks_port"))
+			cmds.push("--socks");
+			cmds.push(UnPlug2.get_root_pref("network.proxy.socks") + ":" + UnPlug2.get_root_pref("network.proxy.socks_port"));
 		}
 		if (res.download.rtmp) {
 			if (res.download.playpath) {
@@ -628,7 +628,7 @@ UnPlug2DownloadMethods.add_button("copyurl", {
 
 UnPlug2DownloadMethods.add_button("vlc", {
 	avail : (function (res) {
-		if (UnPlug2.get_root_pref("network.proxy.type") != 0) {
+		if (UnPlug2.get_root_pref("network.proxy.type") != 0 && UnPlug2.get_root_pref("network.proxy.type") != 1) {
 			return false;
 		}
 		var url = res.download.url;
@@ -639,14 +639,19 @@ UnPlug2DownloadMethods.add_button("vlc", {
 		return (["mms", "http", "https", "rtsp"].indexOf(proto) != -1);
 	}),
 	signal_get_argv : (function (res, savefile) {
-		return [
+		var argv = [
 			"--no-one-instance",
 			"-Isignals", // no gui
+			]
+		if (UnPlug2.get_root_pref("network.proxy.type") == 1) {
+			argv.push("--socks=" + UnPlug2.get_root_pref("network.proxy.socks") + ":" + UnPlug2.get_root_pref("network.proxy.socks_port"));
+		}
+		return argv.concat([
 			res.download.url,
 			":demux=dump",
             		":demuxdump-file=" + savefile.path,
 			":sout-all",
-			"vlc://quit" ];
+			"vlc://quit" ]);
 	}),
 	exec_file_list : [
 		"/usr/bin/vlc" ],
