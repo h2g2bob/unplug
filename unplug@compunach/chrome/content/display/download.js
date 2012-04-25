@@ -501,7 +501,7 @@ UnPlug2DownloadMethods.add_button("flashgot", {
 			return false;
 		}
 		// flashgot is installed
-		return (res.download.url && (
+		return (res.download.url && UnPlug2.get_root_pref("network.proxy.type") == 0 && (
 			res.download.url.indexOf("http://") == 0
 			|| res.download.url.indexOf("https://") == 0))
 	}),
@@ -532,6 +532,10 @@ UnPlug2DownloadMethods.add_button("flashgot", {
 UnPlug2DownloadMethods.add_button("rtmpdump", {
 	avail : (function (res) {
 		var url = res.download.rtmp || res.download.url;
+		// only compatible with socks proxies
+		if (UnPlug2.get_root_pref("network.proxy.type") != 0 && UnPlug2.get_root_pref("network.proxy.type") != 1) {
+			return false;
+		}
 		return url && (
 			url.indexOf("rtmp://") == 0
 			|| url.indexOf("rtmpe://") == 0);
@@ -543,6 +547,10 @@ UnPlug2DownloadMethods.add_button("rtmpdump", {
 			"--pageUrl", res.download.referer,
 			"--swfUrl", res.download.swfurl || res.download.referer, // this is invalid, but good enough most of the time.
 			"--flv", savefile.path ];
+		if  (UnPlug2.get_root_pref("network.proxy.type") == 1) {
+			cmds.push("--socks")
+			cmds.push(UnPlug2.get_root_pref("network.proxy.socks") + ":" + UnPlug2.get_root_pref("network.proxy.socks_port"))
+		}
 		if (res.download.rtmp) {
 			if (res.download.playpath) {
 				cmds.push("--playpath");
@@ -620,6 +628,9 @@ UnPlug2DownloadMethods.add_button("copyurl", {
 
 UnPlug2DownloadMethods.add_button("vlc", {
 	avail : (function (res) {
+		if (UnPlug2.get_root_pref("network.proxy.type") != 0) {
+			return false;
+		}
 		var url = res.download.url;
 		if (!url) {
 			return false;
