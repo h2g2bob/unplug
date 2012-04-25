@@ -1136,13 +1136,21 @@
 				<media url="${urldecode:lowqual.2}" thumbnail="${urldecode:thumb.1}" title="${urldecode:either:title.1:origtitle.innerHTML}" mediaid="${lowqual.1}" quality="low" description="${translate:low_quality}" />
 			</rule>
 		</rule>
-		<rule id="pluzz.fr">
+		<rule id="pluzz.fr-201204">
 			<if_url host="pluzz.fr" />
-			<if_re ref="vidid" re="&lt;a href=&quot;http://info\.francetelevisions\.fr/\?id-video=([^&quot;&amp;]+)&quot; id=&quot;current_video&quot;" />
-			<download url="http://www.pluzz.fr/appftv/webservices/video/getInfosVideo.php?src=cappuccino&amp;video-type=simple&amp;template=ftvi&amp;template-format=complet&amp;id-externe=${vidid.1}">
-				<if_element tagname="nom" ref="nom" require_attrs="innerHTML" />
-				<if_element tagname="chemin" ref="chemin" require_attrs="innerHTML" />
-				<media url="rtsp://videozones.francetv.fr/${chemin.innerHTML}${nom.innerHTML}" title="${origtitle.innerHTML}" />
+			<if_re re="&lt;meta name=&quot;programme_image&quot; content=&quot;/staticftv/ref_emissions/\d{4}-\d{2}-\d{2}/(\d+)_" ref="video_id" />	
+			<download url="http://www.pluzz.fr/appftv/webservices/video/getInfosOeuvre.php?mode=zeri&amp;id-diffusion=${video_id.1}">
+				<optional_re re="&lt;titre&gt;&lt;!\[CDATA\[([^&lt;]+)\]\]&gt;&lt;/titre&gt;" ref="title"/>
+				<optional_re re="&lt;image&gt;&lt;!\[CDATA\[/([^&lt;]+)\]\]&gt;&lt;/image&gt;" ref="image"/>
+				<!--
+				also has http download like this:
+					&lt;url&gt;&lt;![CDATA[http://ftvodhdsecz-f.akamaihd.net/z/streaming-adaptatif_france-dom-tom/2012/S17/J2/62411438-20120424-,398,632,934,k.mp4.csmil/manifest.f4m]]&gt;&lt;/url&gt;
+				but don't know what it contains
+				-->
+				<rule id="pluzz-mms">
+					<if_re re="&lt;url&gt;&lt;!\[CDATA\[(mms://[^&lt;&gt;]+)\]\]&gt;&lt;/url&gt;" ref="mmsurl" />
+					<media url="${mmsurl.1}" thumbnail="http://www.pluzz.fr/${image.1}" title="${either:title.1:origtitle.innerHTML}" geolocate="FR" />
+				</rule>
 			</download>
 		</rule>
 		<rule id="keezmovies.com-2010">
