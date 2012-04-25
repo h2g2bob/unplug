@@ -548,6 +548,16 @@
 						<media url="${jsdecode:vidurl.1}" videoid="${jsdecode:videoid.1}" title="${origtitle.innerHTML}" thumbnail="${jsdecode:imgurl.1}" />
 					</download>
 				</rule>
+				<rule id="embed.springboard">
+					<!-- http://cinemassacre.com/2009/04/08/metal-gear/ -->
+					<if_re re="http://([^/]+)\.springboardplatform\.com/mediaplayer/springboard/video/([A-Za-z0-9]+)/(\d+)/(\d+)/" ref="spring"/>
+					<download url="http://cms.springboard.gorillanation.com/xml_feeds_advanced/index/${spring.3}/rss3/${spring.4}/">
+						<if_re re="&lt;media:content [^&gt;]*url=&quot;([^&quot;]+)&quot;" ref="content" />
+						<optional_re re="&lt;media:title&gt;([^&lt;]+)&lt;/media:title&gt;" ref="title" />
+						<optional_re re="&lt;media:thumbnail [^&gt;]*url=&quot;([^&quot;]+)&quot;" ref="thumb" />
+						<media url="${content.1}" title="${either:title.1:origtitle.innerHTML}" thumbnail="${thumb.1}" />
+					</download>
+				</rule>
 			</each_element>
 		</rule>
 		<rule id="each_param">
