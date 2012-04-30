@@ -1138,7 +1138,8 @@
 		</rule>
 		<rule id="pluzz.fr-201204">
 			<if_url host="pluzz.fr" />
-			<if_re re="&lt;meta name=&quot;programme_image&quot; content=&quot;/staticftv/ref_emissions/\d{4}-\d{2}-\d{2}/(\d+)_" ref="video_id" />	
+			<!-- alternative location? <if_re re="&lt;meta name=&quot;programme_image&quot; content=&quot;/staticftv/ref_emissions/\d{4}-\d{2}-\d{2}/(\d+)_" ref="video_id" /> -->
+			<if_re re="&lt;a href=&quot;http://info\.francetelevisions\.fr/\?id\-video=(\d+)&quot; id=&quot;current_video&quot;" ref="video_id" />
 			<download url="http://www.pluzz.fr/appftv/webservices/video/getInfosOeuvre.php?mode=zeri&amp;id-diffusion=${video_id.1}">
 				<optional_re re="&lt;titre&gt;&lt;!\[CDATA\[([^&lt;]+)\]\]&gt;&lt;/titre&gt;" ref="title"/>
 				<optional_re re="&lt;image&gt;&lt;!\[CDATA\[/([^&lt;]+)\]\]&gt;&lt;/image&gt;" ref="image"/>
