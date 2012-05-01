@@ -1290,6 +1290,14 @@
 				</download>
 			</each_re>
 		</rule>
+		<rule id="soundcloud">
+			<if_url host="soundcloud.com" />
+			<each_re re="push\(\{(.*?)\}\);" ref="push">
+				<if_re ref="mediaurl" string="${push.1}" re="&quot;streamUrl&quot;\s*:\s*&quot;(http://media\.soundcloud\.com/stream/[^&quot;]+)&quot;" />
+				<optional_re ref="title" string="${push.1}" re="&quot;title&quot;\s*:\s*&quot;([^&quot;]+)&quot;" />
+				<media url="${mediaurl.1}" title="${either:title.1:origtitle.innerHTML}" />
+			</each_re>
+		</rule>
 	</download><!-- flashblock workaround -->
 	<rule id="url-only">
 		<rule id="videobb">
