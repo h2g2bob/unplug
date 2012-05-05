@@ -1298,6 +1298,11 @@
 				<media url="${mediaurl.1}" title="${either:title.1:origtitle.innerHTML}" />
 			</each_re>
 		</rule>
+		<rule id="bandcamp">
+			<if_url host="bandcamp.com"/>
+			<if_re ref="bc" re="(?:&quot;title&quot;:&quot;([^&quot;]+).*?)?&quot;file&quot;:&quot;(http[^&quot;]+)&quot;" />
+			<media url="${jsdecode:bc.2}" title="${jsdecode:either:bc.1:origtitle.innerHTML}" type="mp3" />
+		</rule>
 	</download><!-- flashblock workaround -->
 	<rule id="url-only">
 		<rule id="videobb">
