@@ -55,6 +55,18 @@ function set_extern_tools() {
 		elem.appendItem(UnPlug2.str("dmethod." + names[i]), names[i]);
 	}
 	elem.selectedIndex = 0;
+
+	var elem = document.getElementById("allowviaproxy");
+	if (elem.value == false && UnPlug2.get_root_pref("network.proxy.type") == 1) {
+		switch (UnPlug2.get_root_pref("network.proxy.socks_port")) {
+			// don't allow enabling of this while using tor.
+			case 8123:
+			case 8118:
+			case 9050:
+			case 9051:
+				elem.disabled = true;
+		}
+	}
 }
 
 function edit_extern_tool() {

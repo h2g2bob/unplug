@@ -66,6 +66,9 @@
 <!ENTITY extern.edit.a "d">
 <!ENTITY extern.browse "Parcourir">
 <!ENTITY extern.browse.a "P">
+<!ENTITY extern.allowviaproxy "Allow use when a proxy is set">
+<!ENTITY extern.allowviaproxy.a "p">
+<!ENTITY extern.allowviaproxywarning "Using external tools may remove your privacy when using an anonymous proxy, such as Tor.">
 
 <!-- discovery tab -->
 <!ENTITY showall.title "Résultats supplémentaires">

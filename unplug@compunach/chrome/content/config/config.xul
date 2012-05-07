@@ -133,6 +133,8 @@
 				</menulist>
 				<button label="&extern.edit;" accesskey="&extern.edit.a;" oncommand="edit_extern_tool();" />
 			</hbox>
+			<checkbox id="allowviaproxy" label="&extern.allowviaproxy;" accesskey="&extern.allowviaproxy.a;" preference="allow_external_via_proxy" />
+			<description> &extern.allowviaproxywarning; </description>
 		</groupbox>
 		<spacer flex="1" />
 	</prefpane>

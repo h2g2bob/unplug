@@ -533,8 +533,16 @@ UnPlug2DownloadMethods.add_button("rtmpdump", {
 	avail : (function (res) {
 		var url = res.download.rtmp || res.download.url;
 		// only compatible with socks proxies
-		if (UnPlug2.get_root_pref("network.proxy.type") != 0 && UnPlug2.get_root_pref("network.proxy.type") != 1) {
-			return false;
+		switch (UnPlug2.get_root_pref("network.proxy.type")) {
+			case 0:
+				break;
+			case 1:
+				if (!UnPlug2.get_pref("allow_external_via_proxy")) {
+					return false;
+				}
+				break;
+			default:
+				return false;
 		}
 		return url && (
 			url.indexOf("rtmp://") == 0
@@ -628,8 +636,16 @@ UnPlug2DownloadMethods.add_button("copyurl", {
 
 UnPlug2DownloadMethods.add_button("vlc", {
 	avail : (function (res) {
-		if (UnPlug2.get_root_pref("network.proxy.type") != 0 && UnPlug2.get_root_pref("network.proxy.type") != 1) {
-			return false;
+		switch (UnPlug2.get_root_pref("network.proxy.type")) {
+			case 0:
+				break;
+			case 1:
+				if (!UnPlug2.get_pref("allow_external_via_proxy")) {
+					return false;
+				}
+				break;
+			default:
+				return false;
 		}
 		var url = res.download.url;
 		if (!url) {
