@@ -6,7 +6,7 @@
 	<RDF:Description
 		RDF:about="urn:mozilla:install-manifest"
 		em:id="unplug@compunach"
-		em:version="2.050"
+		em:version="0.0"
 		em:type="2"
 		em:name="UnPlug"
 		em:description="Find and download media from websites"
@@ -24,7 +24,7 @@
 				<!-- Firefox -->
 				<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
 				<em:minVersion>3.0</em:minVersion>
-				<em:maxVersion>6.*</em:maxVersion>
+				<em:maxVersion>*</em:maxVersion><!-- firefox -->
 			</Description>
 		</em:targetApplication>
 		<em:targetApplication>
@@ -32,7 +32,7 @@
 				<!-- SeaMonkey -->
 				<em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id>
 				<em:minVersion>2.0</em:minVersion>
-				<em:maxVersion>2.1b1</em:maxVersion>
+				<em:maxVersion>*</em:maxVersion><!-- seamonkey -->
 			</Description>
 		</em:targetApplication>
 	</RDF:Description>
