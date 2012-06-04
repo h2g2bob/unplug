@@ -1303,6 +1303,25 @@
 			<if_re ref="bc" re="(?:&quot;title&quot;:&quot;([^&quot;]+).*?)?&quot;file&quot;:&quot;(http[^&quot;]+)&quot;" />
 			<media url="${jsdecode:bc.2}" title="${jsdecode:either:bc.1:origtitle.innerHTML}" type="mp3" />
 		</rule>
+		<rule id="msn">
+			<if_url host="msn.com"/>
+			<!-- from meta property="og:image" in headers -->
+			<if_re ref="uuid" re="http://img[0-9]+\.catalog\.video\.msn\.com/Image\.aspx\?uuid=([0-9a-f-]+)&amp;" />
+			<download url="http://video.uk.msn.com/services/videodata/?callback=jsonp1338966936132&amp;responseEncoding=json&amp;ids=${uuid.1}&amp;detailed=true&amp;v=2">
+				<optional_re ref="title" re="&quot;title&quot;\s*:\s*'([^']+)'," />
+				<optional_re ref="thumb" re="&quot;thumb&quot;\s*:\s*'(http[^']+)'," />
+				<each_re ref="format" re="\{&quot;formatCode&quot;\s*:\s*'(\d+)',&quot;url&quot;\s*:\s*'([^']+)'\}">
+					<optional_switch ref="qual" input="${format.1}"
+						k1="104" v1="very-high"
+						k2="103" v2="high"
+						k3="102" v3="low"
+						k4="1002" v4="low"
+						k5="101" v5="very-low"
+						default="mid" />
+					<media url="${urldecode:jsdecode:format.2}" title="${jsdecode:either:title.1:origtitle.innerHTML}" thumbnail="${urldecode:jsdecode:thumb.1}" description="${format.1}" quality="${qual.1}" mediaid="${uuid.1}" />
+				</each_re>
+			</download>
+		</rule>
 	</download><!-- flashblock workaround -->
 	<rule id="url-only">
 		<rule id="videobb">
