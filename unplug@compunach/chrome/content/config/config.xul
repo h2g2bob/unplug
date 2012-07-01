@@ -109,6 +109,7 @@
 	<prefpane id="tabdownload" label="&tab.title.downloads;" image="chrome://unplug/skin/tango-32/document-save-as.png">
 		<preferences>
 			<preference id="downloader" name="extensions.unplug2.downloader" type="string"/>
+			<preference id="allow_external_via_proxy" name="extensions.unplug2.allow_external_via_proxy" type="bool" />
 		</preferences>
 		<groupbox>
 			<caption label="&downloader.title;" />

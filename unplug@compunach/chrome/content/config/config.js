@@ -57,14 +57,10 @@ function set_extern_tools() {
 	elem.selectedIndex = 0;
 
 	var elem = document.getElementById("allowviaproxy");
-	if (elem.value == false && UnPlug2.get_root_pref("network.proxy.type") == 1) {
-		switch (UnPlug2.get_root_pref("network.proxy.socks_port")) {
+	if (UnPlug2.get_pref("allow_external_via_proxy") == false) {
+		if (UnPlug2.get_root_pref("extensions.torbutton.banned_ports", null) !== null) {
 			// don't allow enabling of this while using tor.
-			case 8123:
-			case 8118:
-			case 9050:
-			case 9051:
-				elem.disabled = true;
+			elem.disabled = true;
 		}
 	}
 }
