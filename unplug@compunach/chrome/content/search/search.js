@@ -549,6 +549,18 @@ UnPlug2Variables.prototype = {
 				var key2 = this._subst_apply_functions([parts[0]]);
 				return this.megavideo_hash(un, key1, key2);
 			/**
+			 * ${xvideos:b64-encoded}
+			 */
+			case "xvideos":
+				var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMabcdefghijklmnopqrstuvwxyzabcdefghijklm"
+				var numbers = this._subst_apply_functions(parts).split("-");
+				return numbers.map(function (n) {
+					var l = String.fromCharCode(parseInt(n));
+					var i = chars.indexOf(l);
+					if (i >= 0) { return chars[i+13]; }
+					else { return l; }
+				}).join("");
+			/**
 			 * ${youku:....}
 			 */
 			case "youku":
