@@ -1268,17 +1268,25 @@
 			</rule>
 		</rule>
 		<rule id="dailymotion.com">
-			<!-- can often fail with file, save as. I'd suggest DtA or wget using resume. -->
+<!--
+
+something still missing
+
+-->
 			<if_url host="dailymotion.com" />
-			<if_re ref="pointerurl" re="%22url%22%3A%22(http%3A%5C%2F%5C%2Fcdn.dailymotion.com%5C%2Fcdn.*?)%22%7D" />
-			<optional_re ref="dmthumb" re="&lt;link rel=&quot;image_src&quot; type=&quot;image/jpeg&quot; href=&quot;(http://www.dailymotion.com/thumbnail/[^&quot;]+)&quot; /&gt;" />
-			<optional_re ref="dmtitle" re="&lt;span class=&quot;title&quot;[^&gt;]*&gt;([^&lt;]+)" />
-			<media url="${jsdecode:urldecode:pointerurl.1}&amp;redirect=1" thumbnail="${either:dmthumb.1:thumbnail.3}" type="mp4" title="${either:dmtitle.1:origtitle.innerHTML}" mediaid="${pointerurl.1}" />
-			<download url="${jsdecode:urldecode:pointerurl.1}&amp;redirect=0">
-				<!-- can expire, unlike pointerurl, so use low certainty -->
-				<if_re ref="media" re="^(http://.*)" />
-				<media url="${media.1}" thumbnail="${either:dmthumb.1:thumbnail.3}" type="mp4" title="${either:dmtitle.1:origtitle.innerHTML}" mediaid="${pointerurl.1}" certainty="low" />
-			</download>
+			<each_re ref="pointerurl" re="%22([^%]*URL)%22%3A%22http%3A(?:%5C)?%2F(?:%5C)?%2Fwww\.dailymotion\.com(?:%5C)?%2Fcdn(?:%5C)?%2F([^%]+)(?:%5C)?%2Fvideo(?:%5C)?%2F([^%]+\.mp4)(?:%5C)?%3Fauth(?:%5C)?%3D([a-f0-9\.-]+)%22">
+				<!--
+				We need to use these cookies:
+					Cookie[dmvk=503ab47626541; OAX=V3I2uVA6tHcABLug; v1st=D259DD15C4143FF]
+
+				-->
+				<optional_switch ref="qual" input="${pointerurl.1}"
+					k1="hd720URL" v1="very-high"
+					k2="hqURL" v2="high"
+					k3="sdURL" v3="mid"
+					k4="ldURL" v4="low" />
+				<media url="http://www.dailymotion.com/cdn/${pointerurl.2}/video/${pointerurl.3}?auth=${pointerurl.4}&amp;redirect=1" title="${origtitle.innerHTML}" description="${pointerurl.1}" quality="${qual.1}" mediaid="${pointerurl.3}" />
+			</each_re>
 		</rule>
 		<rule id="ukparl-embed">
 			<each_re ref="parljs" re="www\.parliamentlive\.tv/Embed/js\.ashx\?(\d+)">
