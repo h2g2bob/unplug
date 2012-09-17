@@ -50,7 +50,7 @@
 	
 	<!-- firefox add-ons bar (status-bar will also match seamonkey task buttons) -->
 	<statusbar id="status-bar">
-		<statusbarpanel id="unplug2_addonsbar" role="button" onclick="UnPlug2Overlay.run();" tooltiptext="&toolbarbutton.unplug.tip;">
+		<statusbarpanel class="statusbarpanel-iconic" id="unplug2_addonsbar" role="button" onclick="UnPlug2Overlay.run();" tooltiptext="&toolbarbutton.unplug.tip;">
 			<image src="chrome://unplug/skin/unplug-16.png" style="height: 16px; width: 16px;" />
 		</statusbarpanel>
 	</statusbar>
