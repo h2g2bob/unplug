@@ -4,7 +4,7 @@ echo "What version?"
 read version
 
 # Mozilla addons require a version number
-firefox_max="14.*"
+firefox_max="16.*"
 seamonkey_max="2.9.*"
 
 revision="$( date +"%04Y%02m%02d%02H%02M" )";
@@ -42,14 +42,15 @@ function check_locales {
 
 [ "0" = "$( git diff | wc -l )" ] || exit
 
+echo "Preparing release branch"
 git checkout release || exit
 git merge master || exit
 set_version "$version" "$revision" "" || exit
 git add --update || exit
 
-echo "Tagging"
-git commit -m "Release ${version}" || exit
+echo "Releasing standard (website) version"
 git tag "${version}" -m "Release ${version}" -s -u unplug@dbatley.com || exit
+git commit -m "Release ${version}" || exit
 
 echo "Building official archive"
 git archive "${version}:unplug@compunach" --format=zip --output="unplug-${version}.xpi" || exit
