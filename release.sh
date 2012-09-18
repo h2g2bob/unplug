@@ -42,6 +42,10 @@ function check_locales {
 
 [ "0" = "$( git diff | wc -l )" ] || exit
 
+# make sure I remember the password before making any changes!
+git tag "test-${version}" -m "This is only a test: delete me" -s -u unplug@dbatley.com || exit
+git tag -d "test-${version}" || exit
+
 echo "Preparing release branch"
 git checkout release || exit
 git merge master || exit
@@ -49,8 +53,8 @@ set_version "$version" "$revision" "" || exit
 git add --update || exit
 
 echo "Releasing standard (website) version"
-git tag "${version}" -m "Release ${version}" -s -u unplug@dbatley.com || exit
 git commit -m "Release ${version}" || exit
+git tag "${version}" -m "Release ${version}" -s -u unplug@dbatley.com || exit
 
 echo "Building official archive"
 git archive "${version}:unplug@compunach" --format=zip --output="unplug-${version}.xpi" || exit
@@ -79,3 +83,8 @@ gpg -u unplug@dbatley.com --armour --detach-sign "unplug-${version}-amo-beta.xpi
 git reset --hard release
 git checkout master
 echo "Done!"
+echo ""
+echo "Now do:"
+echo "  git push www"
+echo "  git push www ${version}"
+echo "  scp into .../releases/"
