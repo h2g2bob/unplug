@@ -897,7 +897,7 @@ UnPlug2Search = {
 		}
 		return UnPlug2Search._hooks[hookname] || [];
 	},
-	
+
 	/**
 	 * Load the xml document containing the rules
 	 * Returns the <unplug> element of the document (which contains a number of <rule> elements as children)
@@ -905,17 +905,25 @@ UnPlug2Search = {
 	get_rules_xml : function () {
 		if (!UnPlug2Search._search_xml) {
 			var req = new XMLHttpRequest();  
-			var filename = "chrome://unplug/content/rules.xml";
-			
-			// this response is synchronous (not async) because it's a local file.
-			// sync by use of false in 3rd arg
-			req.open('GET', filename, false);   
-			req.send(null);  
-			if (req.status != 0) {
-				UnPlug2.log("Cannot open " + filename);
-				throw "Cannot open " + filename;
-			}
-			var xmldoc = req.responseXML;
+			var chrome_url = "chrome://unplug/content/rules.xml";
+
+			var chrome_uri = this._io_service.newURI(chrome_url, "utf8", null);
+			var registry = Components.classes['@mozilla.org/chrome/chrome-registry;1']
+				.getService(Components.interfaces.nsIChromeRegistry);
+			var filename = registry.convertChromeURL(chrome_uri).path;
+
+			var rulesfile = Components.classes["@mozilla.org/file/local;1"]
+				.createInstance(Components.interfaces.nsILocalFile);
+			rulesfile.initWithPath(filename);
+
+			var stream = Components.classes["@mozilla.org/network/file-input-stream;1"]
+				.createInstance(Components.interfaces.nsIFileInputStream);
+			const PR_RDONLY = 0x01;
+			stream.init(rulesfile, 0, PR_RDONLY, 0);
+
+			var xmlparser = Components.classes["@mozilla.org/xmlextras/domparser;1"]
+				.createInstance(Components.interfaces.nsIDOMParser);
+			var xmldoc = xmlparser.parseFromStream(stream, "utf8", -1, "application/xml"); // stream charset length mime
 			var unplugnode = null;
 			for each (node in xmldoc.childNodes) {
 				if (node.tagName && node.tagName.toLowerCase() == "unplug") {
