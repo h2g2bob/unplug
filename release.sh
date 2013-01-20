@@ -4,7 +4,7 @@ echo "What version?"
 read version
 
 # Mozilla addons require a version number
-firefox_max="16.*"
+firefox_max="19.*"
 seamonkey_max="2.9.*"
 
 revision="$( date +"%04Y%02m%02d%02H%02M" )";
@@ -40,7 +40,10 @@ function check_locales {
 	done
 }
 
-[ "0" = "$( git diff | wc -l )" ] || exit
+[ "0" = "$( git diff | wc -l )" ] || {
+	git diff
+	exit
+}
 
 # make sure I remember the password before making any changes!
 git tag "test-${version}" -m "This is only a test: delete me" -s -u unplug@dbatley.com || exit
