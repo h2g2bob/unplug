@@ -904,22 +904,34 @@ UnPlug2Search = {
 	 */
 	get_rules_xml : function () {
 		if (!UnPlug2Search._search_xml) {
-			var req = new XMLHttpRequest();  
+			UnPlug2Search._search_xml = this._get_rules_xml_nocache()
+		}
+		return UnPlug2Search._search_xml;
+	},
+
+	_get_rules_xml_nocache : function () {
+		try {
 			var chrome_url = "chrome://unplug/content/rules.xml";
 
 			var chrome_uri = this._io_service.newURI(chrome_url, "utf8", null);
 			var registry = Components.classes['@mozilla.org/chrome/chrome-registry;1']
 				.getService(Components.interfaces.nsIChromeRegistry);
 			var filename = registry.convertChromeURL(chrome_uri).path;
+			if (filename.charAt(2) == ":") { // windows path is "/C:/..."
+				filename = filename.substring(1, filename.length).replace("/", "\\", "g");
+			}
 
 			var rulesfile = Components.classes["@mozilla.org/file/local;1"]
 				.createInstance(Components.interfaces.nsILocalFile);
 			rulesfile.initWithPath(filename);
+			if (!rulesfile.exists() || !rulesfile.isFile() || !rulesfile.isReadable()) {
+				alert(filename + " does not exist or is unreadable");
+			}
 
 			var stream = Components.classes["@mozilla.org/network/file-input-stream;1"]
 				.createInstance(Components.interfaces.nsIFileInputStream);
 			const PR_RDONLY = 0x01;
-			stream.init(rulesfile, 0, PR_RDONLY, 0);
+			stream.init(rulesfile, PR_RDONLY, PR_RDONLY, false);
 
 			var xmlparser = Components.classes["@mozilla.org/xmlextras/domparser;1"]
 				.createInstance(Components.interfaces.nsIDOMParser);
@@ -935,11 +947,12 @@ UnPlug2Search = {
 				UnPlug2.log("Invalid root node for document " + xmldoc);
 				throw "Cannot load xml rules - no root node";
 			}
-			UnPlug2Search._search_xml = unplugnode;
+			return unplugnode;
+		} catch (e) {
+			alert("Problem finding rules.xml: " + e);
 		}
-		return UnPlug2Search._search_xml;
 	},
-	
+
 	/**
 	 * Find media in window "win", and call function "callback" for eac result found.
 	 * Callback may be called both immediately, and after additional files are downloaded.
@@ -1434,8 +1447,5 @@ UnPlug2Search = {
 
 // init
 UnPlug2Search.UnPlug2Search()
-
-
-
 
 
