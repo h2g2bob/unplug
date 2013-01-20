@@ -45,6 +45,11 @@ function check_locales {
 	exit
 }
 
+for branch in master release amo; do
+	echo "$branch:"
+	git log --pretty=oneline -n 1 "$branch"
+done
+
 # make sure I remember the password before making any changes!
 git tag "test-${version}" -m "This is only a test: delete me" -s -u unplug@dbatley.com || exit
 git tag -d "test-${version}" || exit
