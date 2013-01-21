@@ -910,32 +910,38 @@ UnPlug2Search = {
 	},
 
 	_get_rules_xml_nocache : function () {
+		var filename="(unset)";
 		try {
 			var chrome_url = "chrome://unplug/content/rules.xml";
 
 			var chrome_uri = this._io_service.newURI(chrome_url, "utf8", null);
 			var registry = Components.classes['@mozilla.org/chrome/chrome-registry;1']
 				.getService(Components.interfaces.nsIChromeRegistry);
-			var filename = registry.convertChromeURL(chrome_uri).path;
-			if (filename.charAt(2) == ":") { // windows path is "/C:/..."
-				filename = filename.substring(1, filename.length).replace("/", "\\", "g");
+			filename = registry.convertChromeURL(chrome_uri).path;
+			if (filename.indexOf("file://") != 0) {
+				filename = "file://" + filename;
 			}
 
-			var rulesfile = Components.classes["@mozilla.org/file/local;1"]
-				.createInstance(Components.interfaces.nsILocalFile);
-			rulesfile.initWithPath(filename);
-			if (!rulesfile.exists() || !rulesfile.isFile() || !rulesfile.isReadable()) {
-				alert(filename + " does not exist or is unreadable");
+			var protohand = Components.classes["@mozilla.org/network/protocol;1?name=file"]
+				.createInstance(Components.interfaces.nsIFileProtocolHandler);
+			var rulesfile = protohand.getFileFromURLSpec(filename);
+			rulesfile = rulesfile.QueryInterface(Components.interfaces.nsILocalFile);
+
+			var req = new XMLHttpRequest();
+
+			// this response is synchronous (not async) because it's a local file.
+			// sync by use of false in 3rd arg
+			req.open('GET', filename, false);
+			req.send(null);
+			if (req.status != 0) {
+				UnPlug2.log("Cannot open " + filename);
+				throw "Cannot open " + filename;
 			}
 
-			var stream = Components.classes["@mozilla.org/network/file-input-stream;1"]
-				.createInstance(Components.interfaces.nsIFileInputStream);
-			const PR_RDONLY = 0x01;
-			stream.init(rulesfile, PR_RDONLY, PR_RDONLY, false);
+			var xmldoc = Components.classes["@mozilla.org/xmlextras/domparser;1"]
+				.createInstance(Components.interfaces.nsIDOMParser)
+				.parseFromString(req.responseText, "application/xml")
 
-			var xmlparser = Components.classes["@mozilla.org/xmlextras/domparser;1"]
-				.createInstance(Components.interfaces.nsIDOMParser);
-			var xmldoc = xmlparser.parseFromStream(stream, "utf8", -1, "application/xml"); // stream charset length mime
 			var unplugnode = null;
 			for each (node in xmldoc.childNodes) {
 				if (node.tagName && node.tagName.toLowerCase() == "unplug") {
@@ -949,7 +955,7 @@ UnPlug2Search = {
 			}
 			return unplugnode;
 		} catch (e) {
-			alert("Problem finding rules.xml: " + e);
+			alert("Problem finding rules.xml at " + filename + " because " + e);
 		}
 	},
 
