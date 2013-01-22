@@ -897,51 +897,27 @@ UnPlug2Search = {
 		}
 		return UnPlug2Search._hooks[hookname] || [];
 	},
-
+	
 	/**
 	 * Load the xml document containing the rules
 	 * Returns the <unplug> element of the document (which contains a number of <rule> elements as children)
 	 */
 	get_rules_xml : function () {
 		if (!UnPlug2Search._search_xml) {
-			UnPlug2Search._search_xml = this._get_rules_xml_nocache()
-		}
-		return UnPlug2Search._search_xml;
-	},
-
-	_get_rules_xml_nocache : function () {
-		var filename="(unset)";
-		try {
-			var chrome_url = "chrome://unplug/content/rules.xml";
-
-			var chrome_uri = this._io_service.newURI(chrome_url, "utf8", null);
-			var registry = Components.classes['@mozilla.org/chrome/chrome-registry;1']
-				.getService(Components.interfaces.nsIChromeRegistry);
-			filename = registry.convertChromeURL(chrome_uri).path;
-			if (filename.indexOf("file://") != 0) {
-				filename = "file://" + filename;
-			}
-
-			var protohand = Components.classes["@mozilla.org/network/protocol;1?name=file"]
-				.createInstance(Components.interfaces.nsIFileProtocolHandler);
-			var rulesfile = protohand.getFileFromURLSpec(filename);
-			rulesfile = rulesfile.QueryInterface(Components.interfaces.nsILocalFile);
-
 			var req = new XMLHttpRequest();
+			var filename = "chrome://unplug/content/rules.xml";
 
 			// this response is synchronous (not async) because it's a local file.
 			// sync by use of false in 3rd arg
+			// TODO: should not use synchronous requests in main thread!!
 			req.open('GET', filename, false);
 			req.send(null);
-			if (req.status != 0) {
-				UnPlug2.log("Cannot open " + filename);
+			if (req.responseText === null) {
+				// status from chrome:// requests can be 0 (firefox < 18) or 200 (firefox >= 18)
+				UnPlug2.log("Cannot open " + filename + " (status=" + req.status + ")");
 				throw "Cannot open " + filename;
 			}
-
-			var xmldoc = Components.classes["@mozilla.org/xmlextras/domparser;1"]
-				.createInstance(Components.interfaces.nsIDOMParser)
-				.parseFromString(req.responseText, "application/xml")
-
+			var xmldoc = req.responseXML;
 			var unplugnode = null;
 			for each (node in xmldoc.childNodes) {
 				if (node.tagName && node.tagName.toLowerCase() == "unplug") {
@@ -953,10 +929,9 @@ UnPlug2Search = {
 				UnPlug2.log("Invalid root node for document " + xmldoc);
 				throw "Cannot load xml rules - no root node";
 			}
-			return unplugnode;
-		} catch (e) {
-			alert("Problem finding rules.xml at " + filename + " because " + e);
+			UnPlug2Search._search_xml = unplugnode;
 		}
+		return UnPlug2Search._search_xml;
 	},
 
 	/**
