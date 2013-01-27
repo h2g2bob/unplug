@@ -8,6 +8,7 @@
  * 
  *  Compunach UnPlug
  *  Copyright (C) 2010, 2011 David Batley <unplug@dbatley.com>
+ *  Copyright (C) 2013 Alex Rosseel
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -422,11 +423,11 @@ UnPlug2DownloadMethods.add_button("saveas", {
 
 		// Create download and initiate it (below)
 		var tr = Components.classes["@mozilla.org/transfer;1"].createInstance(Components.interfaces.nsITransfer);
-
+		var privacyContext = null;
 		tr.init(persistArgs.source, persistArgs.target, "", null, null, null, persist);
 
 		persist.progressListener = tr;
-		persist.saveURI(persistArgs.source, null, nsireferer, persistArgs.postData, null, persistArgs.target);
+		persist.saveURI(persistArgs.source, null, nsireferer, persistArgs.postData, null, persistArgs.target, privacyContext);
 	}),
 	obscurity : 0,
 	css : "saveas",
