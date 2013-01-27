@@ -401,7 +401,7 @@ UnPlug2DownloadMethods.add_button("saveas", {
 		} catch(e) {
 			// pass
 		}
-		
+
 		var persistArgs = {
 			source      : nsiurl,
 			contentType : "application/octet-stream",
@@ -421,13 +421,9 @@ UnPlug2DownloadMethods.add_button("saveas", {
 			nsIWBP.PERSIST_FLAGS_FROM_CACHE |
 			nsIWBP.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION );
 
-		// Create download and initiate it (below)
-		var tr = Components.classes["@mozilla.org/transfer;1"].createInstance(Components.interfaces.nsITransfer);
 		var privacyContext = null;
-		tr.init(persistArgs.source, persistArgs.target, "", null, null, null, persist);
-
-		persist.progressListener = tr;
 		persist.saveURI(persistArgs.source, null, nsireferer, persistArgs.postData, null, persistArgs.target, privacyContext);
+
 	}),
 	obscurity : 0,
 	css : "saveas",
