@@ -746,7 +746,7 @@
 								k8="44" v8="webm"
 							/>
 							<!-- no idea what ptk=machinima is. There's also ptchn=name_of_channel, which I omit -->
-							<media url="${qparam:url:fmt_part.1}&amp;signature=${qparam:sig:fmt_part.1}&amp;ptk=machinima"
+							<media url="${qparam:url:fmt_part.1}"
 								thumbnail="http://i4.ytimg.com/vi/${video_id.1}/default.jpg"
 								quality="${quality.1}" title="${htmldecode:either:title.1:origtitle.innerHTML}" mediaid="${video_id.1}"
 								description="${description.1} ${optional:type.1} (${optional:qparam:quality:fmt_part.1})" type="${type.1}" />
