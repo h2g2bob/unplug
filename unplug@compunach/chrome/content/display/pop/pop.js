@@ -164,6 +164,7 @@ UnPlug2SearchPage = {
 	_search_callback : (function (obj) {
 		switch (obj.type) {
 			case "result":
+				document.getElementById("noresults").style.display = "none";
 				return UnPlug2SearchPage._search_callback_result(obj);
 			case "progress":
 				return UnPlug2SearchPage._search_callback_progress(obj);

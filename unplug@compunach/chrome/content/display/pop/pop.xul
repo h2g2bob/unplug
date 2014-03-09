@@ -61,6 +61,7 @@
 	
 	<dialogheader title="&header.title;" description="&header.subtitle;" style="margin: 0; margin-bottom: 0.5em;" />
 	<vbox id="results-container" flex="1">
+		<label id="noresults" value="No results" style="width: 100%; font-size: 300%; font-weight: bold; text-align: center; opacity: 0.5;" />
 		<vbox id="results" />
 	</vbox>
 	<radiogroup id="views">
