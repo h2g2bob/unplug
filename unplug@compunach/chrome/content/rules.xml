@@ -1379,17 +1379,6 @@ something still missing
 			</rule>
 		</each_element>
 	</rule>
-	<!--
-	=====================================================================
-	NOTICE: rules below this line are for testing only
-	=====================================================================
-	-->
-	<rule id="show_all">
-		<if_config name="show_all" value="true" />
-		<rule id="test_only">
-			<media url="http://example.com/example_result" description="You have enabled showing additional results." post="NODOWNLOAD" />
-		</rule>
-	</rule>
 	<rule id="local-testing-scripts">
 		<if_url host="localhost.example.com" />
 		<media url="http://localhost.example.com/media-files/1" description="low quality, low certainty" quality="low" certainty="low" title="One" mediaid="testing" />
