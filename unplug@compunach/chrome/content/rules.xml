@@ -1339,6 +1339,15 @@ something still missing
 				</download>
 			</rule>
 		</rule>
+		<rule id="embed-youtube-2014">
+			<if_url ref="url" />
+			<rule>
+				<if_re ref="video_id" string="${url.url}" re="https?://(?:www\.)?youtube(?:-nocookie)?\.com/(?:embed|v)/([a-zA-Z0-9_\-]+)" />
+				<download url="http://www.youtube.com/watch?v=${video_id.1}">
+					<rule goto="youtube-single" />
+				</download>
+			</rule>
+		</rule>
 	</rule>
 	<!--
 	Lower priority
