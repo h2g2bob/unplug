@@ -384,7 +384,7 @@ var UnPlug2ExternDownloader = {
 
 // ----- download method definitions follow -----
 
-UnPlug2DownloadMethods.add_button("saveas", {
+UnPlug2DownloadMethods.add_button("saveas_traditional", {
 	avail : (function (res) {
 		return res.download.url && (
 			res.download.url.indexOf("http://") == 0
@@ -424,6 +424,36 @@ UnPlug2DownloadMethods.add_button("saveas", {
 		var privacyContext = null;
 		persist.saveURI(persistArgs.source, null, nsireferer, persistArgs.postData, null, persistArgs.target, privacyContext);
 
+	}),
+	obscurity : 0,
+	css : "saveas",
+	group : "main"
+});
+
+UnPlug2DownloadMethods.add_button("saveas", {
+	avail : (function (res) {
+		return res.download.url && (
+			res.download.url.indexOf("http://") == 0
+			|| res.download.url.indexOf("https://") == 0
+			|| res.download.url.indexOf("ftp://") == 0);
+	}),
+	exec_fp : (function (res, file) {
+		Components.utils.import("resource://gre/modules/Downloads.jsm");
+		Downloads.getList(Downloads.PUBLIC).then(function (dlist) {
+			Downloads.createDownload({
+				source : {
+					url : res.download.url,
+					referer : res.download.url,
+					contentType : "application/octet-stream",
+					postData : null,
+					bypassCache : false
+				},
+				target : file
+			}).then(function success(dld) {
+				dlist.add(dld);
+				dld.start();
+			});
+		});
 	}),
 	obscurity : 0,
 	css : "saveas",
