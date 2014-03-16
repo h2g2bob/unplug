@@ -28,6 +28,7 @@
 
 <!ENTITY notfound.label       "Nic nie znaleziono ?">
 <!ENTITY notfound.accesskey   "N">
+<!ENTITY noresults.banner     "Nothing found">
 <!ENTITY stop.label           "Stop">
 <!ENTITY stop.accesskey       "S">
 <!ENTITY config.label         "Konfiguruj">

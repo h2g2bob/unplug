@@ -28,6 +28,7 @@
 
 <!ENTITY notfound.label       "Hittades ingenting?">
 <!ENTITY notfound.accesskey   "H">
+<!ENTITY noresults.banner     "Nothing found">
 <!ENTITY stop.label           "Stopp">
 <!ENTITY stop.accesskey       "S">
 <!ENTITY config.label         "Konfigurera">

@@ -26,9 +26,10 @@
  */
 -->
 
-<!ENTITY notfound.label       " Rien trouvé ?">
+<!ENTITY notfound.label       "Rien trouvé ?">
 <!ENTITY notfound.accesskey   "R">
-<!ENTITY stop.label           " Arrêter">
+<!ENTITY noresults.banner     "Nothing found">
+<!ENTITY stop.label           "Arrêter">
 <!ENTITY stop.accesskey       "A">
 <!ENTITY config.label         "Configurer">
 <!ENTITY config.accesskey     "C">
