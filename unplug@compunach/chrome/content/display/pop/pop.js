@@ -431,7 +431,7 @@ UnPlug2SearchPage.MediaResultGroup = (function (keychain) {
 UnPlug2SearchPage.MediaResultGroup.prototype = {
 	element_create : (function () {
 		this.element = document.createElement("vbox");
-		this.element.className = "container";
+		this.element.className = "container visible";
 	}),
 
 
@@ -442,6 +442,7 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 		this.element.appendChild(child.element);
 		this.sort(); // could be more efficient by inserting in the correct place to begin with
 		this.update_auto_ticked(); // sort doesn't always call this
+		this.element.className = "container visible";
 		child.parent = this;
 	}),
 
@@ -450,6 +451,7 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 		delete this.lookup[key];
 		this.children = this.children.splice(this.children.indexOf(this), 1);
 		this.element.removeChild(child.element);
+		this.element.className = this.lookup.length > 0 ? "container visible" : "container hidden";
 		child.parent = null;
 	}),
 
