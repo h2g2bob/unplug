@@ -383,6 +383,40 @@ var UnPlug2ExternDownloader = {
 
 
 // ----- download method definitions follow -----
+UnPlug2DownloadMethods.saveas_traditional = (function (res, file) {
+	var io_service = Components.classes["@mozilla.org/network/io-service;1"]
+		.getService(Components.interfaces.nsIIOService)
+	var nsiurl = io_service.newURI(res.download.url, null, null);
+	var nsireferer = nsiurl;
+	try {
+		nsireferer = io_service.newURI(res.download.referer, null, null);
+	} catch(e) {
+		// pass
+	}
+
+	var persistArgs = {
+		source      : nsiurl,
+		contentType : "application/octet-stream",
+		target      : io_service.newFileURI(file),
+		postData    : null,
+		bypassCache : false
+	};
+
+	// var persist = makeWebBrowserPersist();
+	var persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].
+		createInstance(Components.interfaces.nsIWebBrowserPersist);
+
+	// Calculate persist flags.
+	const nsIWBP = Components.interfaces.nsIWebBrowserPersist;
+	persist.persistFlags = (
+		nsIWBP.PERSIST_FLAGS_REPLACE_EXISTING_FILES |
+		nsIWBP.PERSIST_FLAGS_FROM_CACHE |
+		nsIWBP.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION );
+
+	var privacyContext = null;
+	persist.saveURI(persistArgs.source, null, nsireferer, persistArgs.postData, null, persistArgs.target, privacyContext);
+
+});
 
 UnPlug2DownloadMethods.add_button("saveas_traditional", {
 	avail : (function (res) {
@@ -391,40 +425,7 @@ UnPlug2DownloadMethods.add_button("saveas_traditional", {
 			|| res.download.url.indexOf("https://") == 0
 			|| res.download.url.indexOf("ftp://") == 0);
 	}),
-	exec_fp : (function (res, file) {
-		var io_service = Components.classes["@mozilla.org/network/io-service;1"]
-			.getService(Components.interfaces.nsIIOService)
-		var nsiurl = io_service.newURI(res.download.url, null, null);
-		var nsireferer = nsiurl;
-		try {
-			nsireferer = io_service.newURI(res.download.referer, null, null);
-		} catch(e) {
-			// pass
-		}
-
-		var persistArgs = {
-			source      : nsiurl,
-			contentType : "application/octet-stream",
-			target      : io_service.newFileURI(file),
-			postData    : null,
-			bypassCache : false
-		};
-
-		// var persist = makeWebBrowserPersist();
-		var persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].
-			createInstance(Components.interfaces.nsIWebBrowserPersist);
-
-		// Calculate persist flags.
-		const nsIWBP = Components.interfaces.nsIWebBrowserPersist;
-		persist.persistFlags = (
-			nsIWBP.PERSIST_FLAGS_REPLACE_EXISTING_FILES |
-			nsIWBP.PERSIST_FLAGS_FROM_CACHE |
-			nsIWBP.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION );
-
-		var privacyContext = null;
-		persist.saveURI(persistArgs.source, null, nsireferer, persistArgs.postData, null, persistArgs.target, privacyContext);
-
-	}),
+	exec_fp : UnPlug2DownloadMethods.saveas_traditional,
 	obscurity : 0,
 	css : "saveas",
 	group : "main"
@@ -439,21 +440,26 @@ UnPlug2DownloadMethods.add_button("saveas", {
 	}),
 	exec_fp : (function (res, file) {
 		Components.utils.import("resource://gre/modules/Downloads.jsm");
-		Downloads.getList(Downloads.PUBLIC).then(function (dlist) {
-			Downloads.createDownload({
-				source : {
-					url : res.download.url,
-					referer : res.download.url,
-					contentType : "application/octet-stream",
-					postData : null,
-					bypassCache : false
-				},
-				target : file
-			}).then(function success(dld) {
-				dlist.add(dld);
-				dld.start();
+		if (window.Downloads === undefined) {
+			// firefox less than FF26
+			UnPlug2DownloadMethods.saveas_traditional(res, file);
+		} else {
+			Downloads.getList(Downloads.PUBLIC).then(function (dlist) {
+				Downloads.createDownload({
+					source : {
+						url : res.download.url,
+						referer : res.download.url,
+						contentType : "application/octet-stream",
+						postData : null,
+						bypassCache : false
+					},
+					target : file
+				}).then(function success(dld) {
+					dlist.add(dld);
+					dld.start();
+				});
 			});
-		});
+		}
 	}),
 	obscurity : 0,
 	css : "saveas",
