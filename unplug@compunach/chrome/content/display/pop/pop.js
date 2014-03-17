@@ -164,7 +164,7 @@ UnPlug2SearchPage = {
 	_search_callback : (function (obj) {
 		switch (obj.type) {
 			case "result":
-				document.getElementById("noresults_banner").style.display = "none";
+				document.getElementById("searching_banner").style.display = "none";
 				return UnPlug2SearchPage._search_callback_result(obj);
 			case "progress":
 				return UnPlug2SearchPage._search_callback_progress(obj);
@@ -184,6 +184,12 @@ UnPlug2SearchPage = {
 				document.getElementById("stop_button").disabled = true;
 				document.getElementById("search_active_buttons").collapsed = true;
 				document.getElementById("search_finished_buttons").collapsed = false;
+
+				document.getElementById("searching_banner").style.display = "none";
+				if (this.results_lookup_length == 0) {
+					document.getElementById("noresults_banner").style.display = "block";
+				}
+
 			} else {
 				if (info.percent == 0 || info.percent == 100) {
 					searchbar.mode = "undetermined";

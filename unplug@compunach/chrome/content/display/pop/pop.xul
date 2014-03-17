@@ -61,7 +61,8 @@
 	
 	<dialogheader title="&header.title;" description="&header.subtitle;" style="margin: 0; margin-bottom: 0.5em;" />
 	<vbox id="results-container" flex="1">
-		<label id="noresults_banner" value="&noresults.banner;" />
+		<label class="banner" id="searching_banner" value="&searching.banner;" />
+		<label class="banner" id="noresults_banner" value="&noresults.banner;" style="display: none;" />
 		<vbox id="results" />
 	</vbox>
 	<radiogroup id="views">

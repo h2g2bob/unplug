@@ -28,7 +28,8 @@
 
 <!ENTITY notfound.label       "Rien trouvé ?">
 <!ENTITY notfound.accesskey   "R">
-<!ENTITY noresults.banner     "Nothing found">
+<!ENTITY searching.banner     "Occupé">
+<!ENTITY noresults.banner     "Aucun résultat">
 <!ENTITY stop.label           "Arrêter">
 <!ENTITY stop.accesskey       "A">
 <!ENTITY config.label         "Configurer">

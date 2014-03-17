@@ -153,7 +153,7 @@ vbox.container:last-child {
 	border-bottom: 0;
 }
 
-#noresults_banner {
+.banner {
 	width: 100%;
 	font-size: 300%;
 	font-weight: bold;

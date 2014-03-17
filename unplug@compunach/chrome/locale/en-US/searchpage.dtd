@@ -29,6 +29,7 @@
 <!ENTITY notfound.label       "No useful results?">
 <!ENTITY notfound.accesskey   "N">
 <!ENTITY noresults.banner     "Nothing found">
+<!ENTITY searching.banner     "Searching">
 <!ENTITY stop.label           "Stop">
 <!ENTITY stop.accesskey       "S">
 <!ENTITY config.label         "Configure">

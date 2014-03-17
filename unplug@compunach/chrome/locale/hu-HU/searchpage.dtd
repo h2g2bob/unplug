@@ -28,7 +28,8 @@
 
 <!ENTITY notfound.label       "Nincs találat?">
 <!ENTITY notfound.accesskey   "N">
-<!ENTITY noresults.banner     "Nothing found">
+<!ENTITY searching.banner     "Dolgozik">
+<!ENTITY noresults.banner     "Nincs találat">
 <!ENTITY stop.label           "Leállítás">
 <!ENTITY stop.accesskey       "L">
 <!ENTITY config.label         "Beállítások">
