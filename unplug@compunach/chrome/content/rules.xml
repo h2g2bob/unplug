@@ -1299,6 +1299,14 @@ something still missing
 				</each_re>
 			</download>
 		</rule>
+		<rule id="gplus-picassa">
+			<if_url host="plus.google.com" />
+			<each_re ref="vidloc" re="&quot;(https?://redirector\.googlevideo\.com/videoplayback\?[^&quot;]+)&quot;">
+				<optional_re ref="source" re="source=([^&amp;]+)" string="${jsdecode:vidloc.1}" />
+				<optional_re ref="vidid" re="id=([^&amp;]+)" string="${jsdecode:vidloc.1}" />
+				<media url="${jsdecode:vidloc.1}" title="${optional:origtitle.innerHTML} ${optional:source.1} ${optional:vidid.1}" mediaid="${optional:source.1}-${vidid.1}" />
+			</each_re>
+		</rule>
 	</download><!-- flashblock workaround -->
 	<rule id="url-only">
 		<rule id="videobb">
@@ -1348,7 +1356,19 @@ something still missing
 				</download>
 			</rule>
 		</rule>
-	</rule>
+		<rule id="bonbon">
+			<if_url ref="url" />
+			<rule>
+				<if_re ref="vidpart" re="player/plus\.php\?vid=([^&amp;]+)&amp;" string="${url.url}" />
+				<rule>
+					<if_re string="${b64decode:b64decode:vidpart.1}" ref="real_loc" re="^(https?://plus\.google\.com/.*)$" />
+					<download url="${real_loc.1}">
+						<rule goto="*" />
+					</download>
+				</rule>
+			</rule>
+		</rule>
+	</rule><!-- url only end -->
 	<!--
 	Lower priority
 	-->
