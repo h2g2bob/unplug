@@ -149,7 +149,7 @@ UnPlug2Rules = {
 		if (!rule)
 			throw "Rule " + rule + " is not a rule which has been implemented in " + UnPlug2.version + " " + UnPlug2.revision;
 		if (node.hasAttribute("debug")) {
-			alert("Rule: " + rule + " Node: " + node + "\nVar: " + variables.toSource() + "\nUrl: " + url + "\nDoc: " + doc + "\n\n" + text);
+			UnPlug2.log("Rule: " + rule + " Node: " + node + "\nVar: " + variables.toSource() + "\nUrl: " + url + "\nDoc: " + doc + "\n\n" + text);
 		}
 		
 		// use rule.required and rule.optional to make a data object to feed to rule.execute
