@@ -963,7 +963,7 @@ UnPlug2Search = {
 		if (UnPlug2.get_pref("popularity_contest")) {
 			var dl = new UnPlug2Download(
 				null, // ref
-				"http://unplug.dbatley.com/popularity_contest/submit.cgi",
+				"https://unplug.dbatley.com/popularity_contest/submit.cgi",
 				"useragent=" +  escape(window.navigator.userAgent) + "&url="  + escape(win.location.href) + "&version=" + UnPlug2.version + "&revision=" + UnPlug2.revision + "&codename=" + UnPlug2.codename,
 				null, null, // callbacks
 				10000);

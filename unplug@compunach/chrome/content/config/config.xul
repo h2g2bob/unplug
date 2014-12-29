@@ -65,7 +65,7 @@
 		<groupbox>
 			<caption label="&privacy.title;" />
 			<checkbox label="&privacy.popcontest;" accesskey="&privacy.popcontest.a;" preference="popularity_contest" />
-			<label onclick="window.open(&quot;http://unplug.dbatley.com/popularity_contest/&quot;);" class="text-link" value="&privacy.infolink;" accesskey="&privacy.infolink.a;" />
+			<label onclick="window.open(&quot;https://unplug.dbatley.com/popularity_contest/&quot;);" class="text-link" value="&privacy.infolink;" accesskey="&privacy.infolink.a;" />
 		</groupbox>
 		<spacer flex="1" />
 		<label id="version" />

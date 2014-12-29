@@ -252,7 +252,7 @@ UnPlug2SearchPage = {
 		
 		var dl = new UnPlug2Download(
 				null, // ref
-				"http://unplug.dbatley.com/popularity_contest/submit.cgi",
+				"https://unplug.dbatley.com/popularity_contest/submit.cgi",
 				"problem=yes&useragent=" +  escape(window.navigator.userAgent) + "&url="  + escape(UnPlug2SearchPage._win.location.href) + "&version=" + UnPlug2.version + "&revision=" + UnPlug2.revision + "&codename=" + UnPlug2.codename,
 				null, null, // callbacks
 				10000);

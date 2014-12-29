@@ -11,7 +11,7 @@
 		em:name="UnPlug"
 		em:description="Find and download media from websites"
 		em:creator="h2g2bob &lt;unplug@dbatley.com&gt;"
-		em:homepageURL="http://unplug.dbatley.com/"
+		em:homepageURL="https://unplug.dbatley.com/"
 		em:iconURL="chrome://unplug/skin/unplug-32.png"
 		em:optionsURL="chrome://unplug/content/config/config.xul" >
 		<em:translator>Ushi (de-DE)</em:translator>
