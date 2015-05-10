@@ -1306,6 +1306,20 @@ something still missing
 				<optional_re ref="vidid" re="id=([^&amp;]+)" string="${jsdecode:vidloc.1}" />
 				<media url="${jsdecode:vidloc.1}" title="${optional:origtitle.innerHTML} ${optional:source.1} ${optional:vidid.1}" mediaid="${optional:source.1}-${vidid.1}" />
 			</each_re>
+			<rule id="gplus-picassa-main">
+				<if_re ref="mainid" re="property=&quot;og:url&quot;[^&gt;]+pid=([0-9]+)" />
+				<rule>
+					<if_re ref="mainloc" re="&quot;${mainid.1}&quot;[^\}]+&quot;(https?://redirector\.googlevideo\.com/videoplayback\?[^&quot;]+)&quot;" />
+					<media url="${jsdecode:vidloc.1}" description="Main link" />
+				</rule>
+			</rule>
+			<rule id="gplus-picassa-img">
+				<each_re ref="block" re="\{[^\{\}]+&quot;(https://lh\d+\.googleusercontent\.com/[^&quot;]+)&quot;([^\{\}]+)\}">
+					<each_re ref="vidloc" re="&quot;(https?://redirector\.googlevideo\.com/videoplayback\?[^&quot;]+)&quot;" string="${block.2}">
+						<media url="${jsdecode:vidloc.1}" thumbnail="${block.1}" />
+					</each_re>
+				</each_re>
+			</rule>
 		</rule>
 	</download><!-- flashblock workaround -->
 	<rule id="url-only">
