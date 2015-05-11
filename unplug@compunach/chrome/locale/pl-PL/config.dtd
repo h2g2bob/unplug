@@ -74,6 +74,8 @@
 <!ENTITY showall.title "Poka¿ dodatkowe rezultaty">
 <!ENTITY showall.label "Poka¿ rezultaty które mog¹ dzia³aæ le">
 <!ENTITY showall.label.a "D">
+<!ENTITY prefer.title "Preferred format">
+<!ENTITY prefer.best "Best quality">
 
 <!-- about tab -->
 <!ENTITY about.title "Dziêkujê Ci za zainstalowanie UnPlug">

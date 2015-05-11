@@ -74,6 +74,8 @@
 <!ENTITY showall.title "Zeige zus&#228;tzliche Ergebnisse">
 <!ENTITY showall.label "Zeige Ergebnisse, die nicht korrekt funktionieren">
 <!ENTITY showall.label.a "f">
+<!ENTITY prefer.title "Preferred format">
+<!ENTITY prefer.best "Best quality">
 
 <!-- about tab -->
 <!ENTITY about.title "Danke, dass Sie UnPlug installiert haben">

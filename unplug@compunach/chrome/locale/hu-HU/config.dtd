@@ -74,6 +74,8 @@
 <!ENTITY showall.title "További eredmények megjelenítése">
 <!ENTITY showall.label "A hibásan működő eredményeket is megjeleníti">
 <!ENTITY showall.label.a "h">
+<!ENTITY prefer.title "Preferred format">
+<!ENTITY prefer.best "Best quality">
 
 <!-- about tab -->
 <!ENTITY about.title "Köszönet az UnPlug telepítéséért">

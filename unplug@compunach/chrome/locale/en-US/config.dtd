@@ -74,6 +74,8 @@
 <!ENTITY showall.title "Show additional results">
 <!ENTITY showall.label "Show results which do not work correctly">
 <!ENTITY showall.label.a "S">
+<!ENTITY prefer.title "Preferred format">
+<!ENTITY prefer.best "Best quality">
 
 <!-- about tab -->
 <!ENTITY about.title "Thanks for installing UnPlug">

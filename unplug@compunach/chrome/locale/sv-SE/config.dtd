@@ -74,6 +74,8 @@
 <!ENTITY showall.title "Visa ytterligare resultat">
 <!ENTITY showall.label "Visa resultat som inte fungerar korrekt">
 <!ENTITY showall.label.a "V">
+<!ENTITY prefer.title "Preferred format">
+<!ENTITY prefer.best "Best quality">
 
 <!-- about tab -->
 <!ENTITY about.title "Tack för att du installerar UnPlug">

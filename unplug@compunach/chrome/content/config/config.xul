@@ -90,6 +90,7 @@
 	<prefpane id="tabdiscovery" label="&tab.title.discovery;" image="chrome://unplug/skin/tango-32/system-search.png">
 		<preferences>
 			<preference id="show_all" name="extensions.unplug2.show_all" type="bool" />
+			<preference id="prefer_fmt" name="extensions.unplug2.prefer_fmt" type="string" />
 		</preferences>
 		<groupbox>
 			<caption label="&rulesxml.title;" />
@@ -99,6 +100,16 @@
 				<spacer flex="1" />
 				<button label="&rulesxml.default;" accesskey="&rulesxml.default.a;" disabled="true" />
 			</hbox>
+		</groupbox>
+		<groupbox>
+			<caption label="&prefer.title;" />
+			<menulist preference="prefer_fmt">
+				<menupopup>
+					<menuitem value="" label="&prefer.best;" />
+					<menuitem value="mp4" label="mp4" />
+					<menuitem value="webm" label="webm" />
+				</menupopup>
+			</menulist>
 		</groupbox>
 		<groupbox>
 			<caption label="&showall.title;" />
