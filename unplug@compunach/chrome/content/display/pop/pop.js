@@ -513,7 +513,6 @@ UnPlug2SearchPage.MediaResultGroup.prototype = {
 		var r;
 		var prefer_fmt = UnPlug2.get_pref("prefer_fmt");
 		if (prefer_fmt) {
-			UnPlug2.log(">>" + prefer_fmt + "<<" + c1.file_ext + ">>" + c2.file_ext + "@ @" + c1.toSource());
 			r = ((c2.file_ext == prefer_fmt ? 1 : 0) - (c1.file_ext == prefer_fmt ? 1 : 0));
 			if (r) { return r; }
 		}
