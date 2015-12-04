@@ -26,6 +26,18 @@
 
 UnPlug2SearchPage = {
 	UnPlug2SearchPage : function (args) {
+		// * deprecate this._win
+		// * replace with this._orig_url and this._orig_html
+		// this means do serialization in the parent window
+		// note: this stops us doing DOM queries like getElementsByTagName, but we already cope with that by doing regexp searches.
+
+		// this doesn't work, the XMLSerializer really want to be run in the context of the current tab (I think), and even running it in overlay/all.js doesn't help
+		// so instead I plan to fix how integration with the UI happens by using the high level APIs
+		// this is documented in
+		// https://developer.mozilla.org/en-US/Add-ons/Working_with_multiprocess_Firefox#Run_a_script_in_the_active_tab
+		// https://developer.mozilla.org/en-US/Add-ons/SDK/High-Level_APIs/ui
+
+
 		// parent window (the one we want to search)
 		this._win = args.tgt_window;
 		
