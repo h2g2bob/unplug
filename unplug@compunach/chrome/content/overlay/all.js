@@ -29,14 +29,11 @@
  * Things the overlay needs, such as opening the popup window.
  */
 UnPlug2Overlay = {
-	UnPlug2Overlay : function () {
-		// TODO - don't use a flag, just use:
-		//    window.removeEventListener("load", Flashblock.onInstall, true);
-		this._have_loaded_browser = false;
-		
-		// popup window (if not closed) from last button click
-		this._popup_window_ref = null;
-	},
+	// TODO: we could use window.removeEventListener instead
+	have_loaded_browser : false,
+
+	// popup window (if not closed) from last button click
+	_popup_window_ref : null,
 	
 	/**
 	 * Run a search (by opening a popup window and giving it the page to work with)
@@ -88,9 +85,9 @@ UnPlug2Overlay = {
 	 * Function which is called each time a page is loaded
 	 */
 	page_loaded : function () {
-		if ( !this._have_loaded_browser ) {
+		if ( !this.have_loaded_browser ) {
 			this.browser_loaded();
-			this._have_loaded_browser = true;
+			this.have_loaded_browser = true;
 		}
 	},
 	
@@ -114,8 +111,7 @@ UnPlug2Overlay = {
 	
 	version : 2.0 };
 
-// init
-UnPlug2Overlay.UnPlug2Overlay();
+UnPlug2Overlay.init();
 
 window.addEventListener("load", function () { UnPlug2Overlay.page_loaded(); }, false);
 
