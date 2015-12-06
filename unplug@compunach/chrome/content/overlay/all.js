@@ -39,16 +39,21 @@ UnPlug2Overlay = {
 	 * Run a search (by opening a popup window and giving it the page to work with)
 	 */
 	run : function () {
+		var brtab = this.get_current_brtab();
+		var mm = brtab.messageManager;
+		mm.addMessageListener("unplug:gethtml", this.mm_callback, false);
+		mm.loadFrameScript('chrome://unplug/content/webpagecontext/gethtml.js', false);
+	},
+
+	mm_callback : function (ev) {
 		try {
-			var data = {
-				// window of document to examine
-				"tgt_window"     : this.get_current_window() }
+			// close previous popup window
 			try {
 				UnPlug2Overlay._popup_win_ref.close();
 			} catch(e) {
 				// pass
 			}
-			UnPlug2Overlay._popup_win_ref = window.openDialog("chrome://unplug/content/display/pop/pop.xul", "unplug_window", "chrome,centerscreen", data );
+			UnPlug2Overlay._popup_win_ref = window.openDialog("chrome://unplug/content/display/pop/pop.xul", "unplug_window", "chrome,centerscreen", ev.data);
 			UnPlug2Overlay._popup_win_ref.focus();
 		} catch (e) {
 			UnPlug2.log(e.toSource());
@@ -94,15 +99,15 @@ UnPlug2Overlay = {
 	/**
 	 * Returns the window in the curently open tab
 	 */
-	get_current_window : function () {
+	get_current_brtab : function () {
 		var br = getBrowser();
 		var br_tab = br.getBrowserAtIndex(br.mTabContainer.selectedIndex);
 		if (!br_tab) {
 			// can happen for pop-up windows, eg: pop-out radio player
-			UnPlug2.log("overlay.get_current_window() assuming tab 0 because selectedIndex is " + br.mTabContainer.selectedIndex);
+			UnPlug2.log("overlay.get_current_brtab() assuming tab 0 because selectedIndex is " + br.mTabContainer.selectedIndex);
 			br_tab = br.getBrowserAtIndex(0);
 		}
-		return br_tab.contentWindow;
+		return br_tab;
 	},
 	
 	toString : function () {
@@ -110,8 +115,6 @@ UnPlug2Overlay = {
 	},
 	
 	version : 2.0 };
-
-UnPlug2Overlay.init();
 
 window.addEventListener("load", function () { UnPlug2Overlay.page_loaded(); }, false);
 

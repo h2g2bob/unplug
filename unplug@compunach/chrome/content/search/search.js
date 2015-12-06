@@ -938,7 +938,7 @@ UnPlug2Search = {
 	 * Find media in window "win", and call function "callback" for eac result found.
 	 * Callback may be called both immediately, and after additional files are downloaded.
 	 */
-	search : function (win, callback) {
+	search : function (serialized_pages, callback) {
 		if (!this.statusinfo().finished) {
 			throw "Already in search";
 		}
@@ -946,17 +946,28 @@ UnPlug2Search = {
 		// start search poller
 		this._reset();
 		this.callback = callback;
+
 		// don't let UnPlug2Search.poll suggest we've finished before we really start
 		// (ie: fix race condition). This gets decremented later.
 		UnPlug2Search._defered_rules_count += 1;
 		if (!UnPlug2Search._poll_timer) {
 			UnPlug2Search._poll_timer = window.setInterval(UnPlug2Search.poll, 100);
 		}
+
+		var rules_xml = this.get_rules_xml();
+		var variables = this.blank_variables;
+		var main_url = serialized_pages[0].url;
 		
-		this._apply_rules_to_window(
-			win,
-			this.get_rules_xml(),
-			this.blank_variables);
+		for (var i = 0; i < serialized_pages.length; ++i) {
+			var serialized = serialized_pages[i];
+			var url = this._io_service.newURI(serialized.url, null, null);
+			UnPlug2Search._apply_rules_to_document(
+				url,                   // url (a nsiURI)
+				serialized.html,       // we need to serialize the document into text
+				null,                  // the xml of the document
+				rules_xml,             // a <ruleset> to apply
+				variables);            // for ${...} substitution in the rules.
+		}
 		
 		UnPlug2Search._defered_rules_count -= 1; // see above
 		
@@ -964,33 +975,11 @@ UnPlug2Search = {
 			var dl = new UnPlug2Download(
 				null, // ref
 				"https://unplug.dbatley.com/popularity_contest/submit.cgi",
-				"useragent=" +  escape(window.navigator.userAgent) + "&url="  + escape(win.location.href) + "&version=" + UnPlug2.version + "&revision=" + UnPlug2.revision + "&codename=" + UnPlug2.codename,
+				"useragent=" +  escape(window.navigator.userAgent) + "&url="  + escape(main_url) + "&version=" + UnPlug2.version + "&revision=" + UnPlug2.revision + "&codename=" + UnPlug2.codename,
 				null, null, // callbacks
 				10000);
 			dl.start()
 		}
-	},
-	
-	/**
-	 * apply rules in a <ruleset>-type element to a window.
-	 */
-	_apply_rules_to_window : function (win, rules_xml, variables) {
-		var serializer = new XMLSerializer();
-		var xml_text = serializer.serializeToString(win.document);
-		//var xml_text = win.document.body.innerHTML;
-		
-		var url = this._io_service.newURI(String(win.location), null, null);
-		UnPlug2Search._apply_rules_to_document(
-			url,                   // url (a nsiURI)
-			xml_text,              // we need to serialize the document into text
-			win.document,          // the xml of the document
-			rules_xml,             // a <ruleset> to apply
-			variables);            // for ${...} substitution in the rules.
-		
-		// also search in frames
-		for (var i = 0; i < win.frames.length; i++) {
-			UnPlug2Search._apply_rules_to_window(win.frames[i], rules_xml, variables);
-		} 
 	},
 	
 	/**
@@ -1231,7 +1220,7 @@ UnPlug2Search = {
 							if (node.hasAttribute("referer")) {
 								download_method.referer = updated_variables.subst_optional(node.getAttribute("referer"));
 							}
-							download_method.referer = download_method.referer || String(UnPlug2SearchPage._win.location);
+							download_method.referer = download_method.referer || String(UnPlug2SearchPage.main_url);
 							
 							switch (node.getAttribute("method")) {
 								case "rtmp":

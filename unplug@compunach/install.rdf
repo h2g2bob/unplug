@@ -13,7 +13,8 @@
 		em:creator="h2g2bob &lt;unplug@dbatley.com&gt;"
 		em:homepageURL="https://unplug.dbatley.com/"
 		em:iconURL="chrome://unplug/skin/unplug-32.png"
-		em:optionsURL="chrome://unplug/content/config/config.xul" >
+		em:optionsURL="chrome://unplug/content/config/config.xul"
+		em:multiprocessCompatible="true" >
 		<em:translator>Ushi (de-DE)</em:translator>
 		<em:translator>DenB (fr-FR)</em:translator>
 		<em:translator>Juhász Zsolt (hu-HU)</em:translator>
