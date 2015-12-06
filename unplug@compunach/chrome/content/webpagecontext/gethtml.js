@@ -4,10 +4,10 @@
 
 	var response = [];
 	function data_for_window(win) {
-		response.push{
+		response.push({
 			"url" : win.location.href,
 			"html" : domSerializer.serializeToString(win.document),
-		}
+		});
 
 		// iterate (recursively) through iframes
 		for (var i = 0; i < win.frames.length; i++) {
