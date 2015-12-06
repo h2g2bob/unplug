@@ -641,18 +641,6 @@ UnPlug2DownloadMethods.add_button("open-new", {
 	group : "open"
 });
 
-UnPlug2DownloadMethods.add_button("open-over", {
-	avail : (function (res) {
-		return (res.download.url ? true : false);
-	}),
-	exec  : (function (res) {
-		UnPlug2SearchPage._win.location = res.download.url;
-	}),
-	obscurity : 110,
-	css : "open open-over",
-	group : "open"
-});
-
 UnPlug2DownloadMethods.add_button("copyurl", {
 	avail : (function (res) {
 		return (res.download.url ? true : false);
