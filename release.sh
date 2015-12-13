@@ -4,7 +4,7 @@ echo "What version?"
 read version
 
 # Mozilla addons require a version number
-firefox_max="39.*"
+firefox_max="43.*"
 seamonkey_max="2.9.*"
 
 revision="$( date +"%04Y%02m%02d%02H%02M" )";
