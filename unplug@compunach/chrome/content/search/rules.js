@@ -158,7 +158,7 @@ UnPlug2Rules = {
 			for (var i=0; i < rule.required.length; i++) {
 				var attrname = rule.required[i];
 				var value = null;
-				if (attrname == "innerHTML") {
+				if (attrname == "inner_html") {
 					value = UnPlug2.trim(node.textContent);
 				} else {
 					value = node.getAttribute(attrname);
@@ -172,7 +172,7 @@ UnPlug2Rules = {
 			for (var i=0; i < rule.optional.length; i++) {
 				var attrname = rule.optional[i];
 				var value = null;
-				if (attrname == "innerHTML") {
+				if (attrname == "inner_html") {
 					value = UnPlug2.trim(node.textContent);
 				} else {
 					value = node.getAttribute(attrname);
@@ -271,19 +271,19 @@ UnPlug2Rules = {
 	},
 	
 	/*
-	 * Matches a regular expression contained in innerHTML
+	 * Matches a regular expression contained in inner_html
 	 */
 	if_re : {
 		order     : 90,
-		optional  : ["string", "flags", "tagname", "innerHTML", "re"],
+		optional  : ["string", "flags", "tagname", "inner_html", "re"],
 		enforce   : ["string"],
 		apply_ref : true,
 		execute   : function (data, url, text, doc) {
-			if (!data.innerHTML && !data.re) {
-				throw "Needs innerHTML or re in if_re";
+			if (!data.inner_html && !data.re) {
+				throw "Needs inner_html or re in if_re";
 			}
 			
-			var re = RegExp(data.re || data.innerHTML, data.flags);
+			var re = RegExp(data.re || data.inner_html, data.flags);
 			
 			if (data.tagname && !doc)
 				UnPlug2.log("No document for if_re with elemname - searching page");
@@ -522,8 +522,8 @@ UnPlug2Rules = {
 					var single_rtn = {};
 					
 					var require_attrs = data.require_attrs.split(",");
-					if (require_attrs.indexOf("innerHTML") > -1)
-						throw "innerHTML not supported by <each_element> without a doc.";
+					if (require_attrs.indexOf("inner_html") > -1)
+						throw "inner_html not supported by <each_element> without a doc.";
 					var got_all_req = true;
 					for (var i = 0; i < require_attrs.length; i++) {
 						var x = UnPlug2Rules._get_attrib_from_tagname_string(tag, require_attrs[i]);
@@ -574,9 +574,9 @@ UnPlug2Rules = {
 				var got_all_required = true;
 				for each (req_attr in data.require_attrs.split(",")) {
 					switch (req_attr) {
-						case "innerHTML" : 
-							result.innerHTML = elem.textContent;
-							if (!result.innerHTML) {
+						case "inner_html" :
+							result.inner_html = elem.textContent;
+							if (!result.inner_html) {
 								got_all_required = false;
 							}
 							break;
@@ -596,8 +596,8 @@ UnPlug2Rules = {
 				}
 				for each (attr in data.attrs.split(",")) {
 					switch (attr) {
-						case "innerHTML" : 
-							result.innerHTML = elem.textContent;
+						case "inner_html":
+							result.inner_html = elem.textContent;
 							break;
 						case "":
 							break;
