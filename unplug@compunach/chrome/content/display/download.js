@@ -514,13 +514,10 @@ UnPlug2DownloadMethods.add_button("dta", {
 		}
 
 		UnPlug2.log("Hello DTA, I'm sending you: " + links.toSource());
-		if (window.DTA) {
-			// DTA 2.0
-			DTA.sendLinksToManager(window, true, links);
-		} else {
-			// DTA 1.0
-			window.opener.DTA_AddingFunctions.sendToDown(true, link);
-		}
+
+		// DTA 2.0
+		DTA.sendLinksToManager(window, true, links);
+
 	}),
 	obscurity : 25,
 	css : "dta",
