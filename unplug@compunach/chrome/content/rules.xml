@@ -203,6 +203,12 @@
 	</rule>
 	<rule id="html5">
 		<each_element ref="vid" tagname="video" require_attrs="src" attrs="poster,data-youtube-id">
+			<!--
+			videos created using https://developer.mozilla.org/en-US/docs/Web/API/MediaSource
+			eg: downloaded in chunks, live video streaming, etc
+			the url isn't real, it's just a placeholder: javascript code feeds the <media/> tag with data
+			-->
+			<ifnot_re re="^mediasource:" string="${vid.src}" />
 			<media url="${vid.src}" thumbnail="${vid.poster}" certainty="mid" title="${origtitle.inner_html}" />
 			<rule id="html5-youtube">
 				<if_re re=".+" string="${vid.data-youtube-id}" />
