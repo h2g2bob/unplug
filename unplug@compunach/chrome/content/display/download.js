@@ -124,7 +124,7 @@ var UnPlug2DownloadMethods = {
 				window.openDialog(UnPlug2ExternDownloader.url, "", "chrome");
 				return false;
 			}
-			return extern_window.loaded;
+			return extern_window.UnPlug2Extern.loaded;
 		}
 		// others -- nothing to do
 		return true;

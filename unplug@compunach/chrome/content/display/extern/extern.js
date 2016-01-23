@@ -27,6 +27,8 @@
 UnPlug2Extern = {
 	watching : [],
 	
+	loaded : false,
+
 	add_program_box : (function (download_method, filename) {
 		var template = document.getElementById("program-template");
 		var container = document.getElementById("program-container");
@@ -178,7 +180,7 @@ UnPlug2Extern = {
 	})
 }
 
-window.addEventListener("load", (function () {window.loaded = true;}), false);
+window.addEventListener("load", (function () {window.UnPlug2Extern.loaded = true;}), false);
 window.addEventListener("message", UnPlug2Extern.receive_signal_callback(), false);
 window.setInterval((function () { UnPlug2Extern.poll() }), 3000);
 
