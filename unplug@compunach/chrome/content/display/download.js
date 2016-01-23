@@ -138,9 +138,10 @@ var UnPlug2DownloadMethods = {
 				UnPlug2.log("prerq_then_exec on " + method + " res " + result.toSource() + " error " + e.toSource());
 			}
 		} else {
-			window.setTimeout((function (that, method, result) {
+			var f = (function (that, method, result) {
 				return (function () {that.prereq_then_exec(method, result); });
-			})(this, method, result), 200);
+			})(this, method, result)
+			window.setTimeout(function () { f(); }, 200);
 		}
 	}),
 

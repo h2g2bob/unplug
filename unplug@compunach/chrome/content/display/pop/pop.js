@@ -597,7 +597,7 @@ UnPlug2SearchPage.MediaResult.prototype = {
 				that.element.className = that.basic_css;
 				var f = that.root().signal_user_change_checkbox;
 				if (f) {
-					window.setTimeout(f, 10); // tickbox change hasn't been applied at this point
+					window.setTimeout(function () { f(); }, 10); // tickbox change hasn't been applied at this point
 				}
 			});
 		});

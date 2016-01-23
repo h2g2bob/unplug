@@ -84,11 +84,12 @@ UnPlug2Download.prototype = {
 		}
 		this._started = true;
 		if (delay) {
-			window.setTimeout((function (that) {
+			var f = (function (that) {
 				return (function () {
 					that._do_start();
 				})
-			})(this), delay);
+			})(this);
+			window.setTimeout(function () { f(); }, delay);
 		} else {
 			this._do_start();
 		}
@@ -1109,7 +1110,7 @@ UnPlug2Search = {
 								but it is a rather insane
 								*/
 								UnPlug2Search._defered_rules_count += 1;
-								window.setTimeout((function (args) {
+								var f = (function (args) {
 									return (function () {
 									UnPlug2Search._defered_rules_count -= 1;
 									UnPlug2Search._apply_rules_to_document.apply(UnPlug2Search, args);
@@ -1119,8 +1120,8 @@ UnPlug2Search = {
 										text,
 										doc,
 										referenced_node,
-										updated_variables ])
-									, 500)
+										updated_variables ]);
+								window.setTimeout(function () { f(); }, 500)
 							} else {
 								UnPlug2Search._apply_rules_to_document(
 									url,
