@@ -58,7 +58,7 @@ function set_extern_tools() {
 
 	var elem = document.getElementById("allowviaproxy");
 	if (UnPlug2.get_pref("allow_external_via_proxy") == false) {
-		if (UnPlug2.get_root_pref("extensions.torbutton.banned_ports", null) !== null) {
+		if (UnPlug2.user_using_tor()) {
 			// don't allow enabling of this while using tor.
 			elem.disabled = true;
 		}

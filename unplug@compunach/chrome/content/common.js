@@ -49,17 +49,7 @@ UnPlug2 = {
 	 * return value of an unplug setting (or def if it doesn't exist)
 	 */
 	get_pref : function (name, def) {
-		return UnPlug2._get_pref(name, def, UnPlug2._prefs);
-	},
-	
-	/**
-	 * return value of a pref (or def if it doesn't exist
-	 */
-	get_root_pref : function (name, def) {
-		return UnPlug2._get_pref(name, def, UnPlug2._root_prefs);
-	},
-	
-	_get_pref : function (name, def, prefs) {
+		var prefs = UnPlug2._prefs;
 		switch (prefs.getPrefType(name)) {
 			case prefs.PREF_STRING:
 				return prefs.getCharPref(name);
@@ -133,7 +123,45 @@ UnPlug2 = {
 		this._unicodeconvert.charset = encoding
 		return this._unicodeconvert.ConvertToUnicode(s);
 	},
-	
+
+	user_using_tor : function () {
+		/* tor browser (actually, torbutton) sets this value */
+		return this._root_prefs.getPrefType("extensions.torbutton.banned_ports");
+	},
+
+	proxy_settings : function () {
+		/* returns the different proxy types in a more usable format */
+		var proxy_type = null;
+		try {
+			proxy_type = this._root_prefs.getIntPref("network.proxy.type")
+			switch (proxy_type) {
+				case 0:
+					// no proxy required
+					return {
+						socks_proxy : null,
+						direct : true
+					};
+				case 1:
+					if (UnPlug2.get_pref("allow_external_via_proxy")) {
+						// via http proxy
+						var http_proxy = this._root_prefs.getCharPref("network.proxy.socks") + ":" + this._root_prefs.getIntPref("network.proxy.socks_port");
+						return {
+							socks_proxy : http_proxy,
+							direct : false
+						};
+					}
+			}
+		} catch (e) {
+			UnPlug2.log("Error detecting proxy settings " + e)
+		}
+
+		// unknown type of proxy (or proxy use disabled)
+		return {
+			socks_proxy : null,
+			direct : false
+		}
+	},
+
 	toString : function () {
 		return "<js:UnPlug2>";
 	},

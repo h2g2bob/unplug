@@ -527,12 +527,13 @@ UnPlug2DownloadMethods.add_button("dta", {
 
 UnPlug2DownloadMethods.add_button("flashgot", {
 	avail : (function (res) {
+		var proxy_settings = UnPlug2.proxy_settings();
 		if (! Components.classes["@maone.net/flashgot-service;1"]) {
 			// flashgot not installed
 			return false;
 		}
 		// flashgot is installed
-		return (res.download.url && UnPlug2.get_root_pref("network.proxy.type") == 0 && (
+		return (res.download.url && proxy_settings.direct && (
 			res.download.url.indexOf("http://") == 0
 			|| res.download.url.indexOf("https://") == 0))
 	}),
@@ -563,32 +564,22 @@ UnPlug2DownloadMethods.add_button("flashgot", {
 UnPlug2DownloadMethods.add_button("rtmpdump", {
 	avail : (function (res) {
 		var url = res.download.rtmp || res.download.url;
-		// only compatible with socks proxies
-		switch (UnPlug2.get_root_pref("network.proxy.type")) {
-			case 0:
-				break;
-			case 1:
-				if (!UnPlug2.get_pref("allow_external_via_proxy")) {
-					return false;
-				}
-				break;
-			default:
-				return false;
-		}
-		return url && (
+		var proxy_settings = UnPlug2.proxy_settings();
+		return (proxy_settings.direct || proxy_settings.socks_proxy) && url && (
 			url.indexOf("rtmp://") == 0
 			|| url.indexOf("rtmpe://") == 0);
 	}),
 	signal_get_argv : (function (res, savefile) {
+		var proxy_settings = UnPlug2.proxy_settings();
 		var cmds = [
 			"--verbose",
 			"--rtmp", res.download.rtmp || res.download.url,
 			"--pageUrl", res.download.referer,
 			"--swfUrl", res.download.swfurl || res.download.referer, // this is invalid, but good enough most of the time.
 			"--flv", savefile.path ];
-		if  (UnPlug2.get_root_pref("network.proxy.type") == 1) {
+		if  (proxy_settings.socks_proxy !== null) {
 			cmds.push("--socks");
-			cmds.push(UnPlug2.get_root_pref("network.proxy.socks") + ":" + UnPlug2.get_root_pref("network.proxy.socks_port"));
+			cmds.push(proxy_settings.socks_proxy);
 		}
 		if (res.download.rtmp) {
 			if (res.download.playpath) {
@@ -655,16 +646,9 @@ UnPlug2DownloadMethods.add_button("copyurl", {
 
 UnPlug2DownloadMethods.add_button("vlc", {
 	avail : (function (res) {
-		switch (UnPlug2.get_root_pref("network.proxy.type")) {
-			case 0:
-				break;
-			case 1:
-				if (!UnPlug2.get_pref("allow_external_via_proxy")) {
-					return false;
-				}
-				break;
-			default:
-				return false;
+		var proxy_settings = UnPlug2.proxy_settings();
+		if (!proxy_settings.direct && !proxy_settings.socks_proxy) {
+			return false;
 		}
 		var url = res.download.url;
 		if (!url) {
@@ -674,13 +658,14 @@ UnPlug2DownloadMethods.add_button("vlc", {
 		return (["mms", "http", "https", "rtsp"].indexOf(proto) != -1);
 	}),
 	signal_get_argv : (function (res, savefile) {
+		var proxy_settings = UnPlug2.proxy_settings();
 		var argv = [
 			"--no-one-instance",
 			"-Isignals", // no gui
 			"--http-user-agent=" + window.navigator.userAgent, // Note: uses "_" instead of "(" and appends VLC/1.0 to the end
 			]
-		if (UnPlug2.get_root_pref("network.proxy.type") == 1) {
-			argv.push("--socks=" + UnPlug2.get_root_pref("network.proxy.socks") + ":" + UnPlug2.get_root_pref("network.proxy.socks_port"));
+		if (proxy_settings.socks_proxy !== null) {
+			argv.push("--socks=" + proxy_settings.socks_proxy);
 		}
 		return argv.concat([
 			res.download.url,
