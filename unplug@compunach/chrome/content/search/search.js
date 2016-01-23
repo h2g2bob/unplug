@@ -885,7 +885,7 @@ UnPlug2Search = {
 	get_hooks : function (hookname) {
 		if (UnPlug2Search._hooks === undefined) {
 			UnPlug2Search._hooks = {};
-			var hooknodes = UnPlug2Search.get_rules_xml().getElementsByTagName("hook");
+			var hooknodes = UnPlug2Search.rules_xml.getElementsByTagName("hook");
 			for (var i = 0; i < hooknodes.length; ++i) {
 				var hooknode = hooknodes[i];
 				var hookname = hooknode.getAttribute("for");
@@ -899,46 +899,26 @@ UnPlug2Search = {
 	},
 	
 	/**
-	 * Load the xml document containing the rules
-	 * Returns the <unplug> element of the document (which contains a number of <rule> elements as children)
-	 */
-	get_rules_xml : function () {
-		if (!UnPlug2Search._search_xml) {
-			var req = new XMLHttpRequest();
-			var filename = "chrome://unplug/content/rules.xml";
-
-			// this response is synchronous (not async) because it's a local file.
-			// sync by use of false in 3rd arg
-			// TODO: should not use synchronous requests in main thread!!
-			req.open('GET', filename, false);
-			req.send(null);
-			if (req.responseText === null) {
-				// status from chrome:// requests can be 0 (firefox < 18) or 200 (firefox >= 18)
-				UnPlug2.log("Cannot open " + filename + " (status=" + req.status + ")");
-				throw "Cannot open " + filename;
-			}
-			var xmldoc = req.responseXML;
-			var unplugnode = null;
-			for each (node in xmldoc.childNodes) {
-				if (node.tagName && node.tagName.toLowerCase() == "unplug") {
-					unplugnode = node;
-					break;
-				}
-			}
-			if (!unplugnode) {
-				UnPlug2.log("Invalid root node for document " + xmldoc);
-				throw "Cannot load xml rules - no root node";
-			}
-			UnPlug2Search._search_xml = unplugnode;
-		}
-		return UnPlug2Search._search_xml;
-	},
-
-	/**
 	 * Find media in window "win", and call function "callback" for eac result found.
 	 * Callback may be called both immediately, and after additional files are downloaded.
 	 */
 	search : function (serialized_pages, callback) {
+		var filename = "chrome://unplug/content/rules.xml";
+		var that = this;
+
+		var rules_file_downloaded = (function () {
+			var xmldoc = req.responseXML;
+			UnPlug2Search.rules_xml = xmldoc.getElementsByTagName("unplug")[0];
+			that._search(serialized_pages, callback);
+		});
+
+		var req = new XMLHttpRequest();
+		req.addEventListener("load", rules_file_downloaded);
+		req.open('GET', filename, false);
+		req.send();
+	},
+
+	_search : function (serialized_pages, callback) {
 		if (!this.statusinfo().finished) {
 			throw "Already in search";
 		}
@@ -954,7 +934,7 @@ UnPlug2Search = {
 			UnPlug2Search._poll_timer = window.setInterval(UnPlug2Search.poll, 100);
 		}
 
-		var rules_xml = this.get_rules_xml();
+		var rules_xml = this.rules_xml;
 		var variables = this.blank_variables;
 		var main_url = serialized_pages[0].url;
 		
@@ -1115,9 +1095,9 @@ UnPlug2Search = {
 							if (node.hasAttribute("goto")) {
 								// getElementById is broken on firefox! gah!
 								if (node.getAttribute("goto") === "*") {
-									referenced_node = UnPlug2Search.get_rules_xml()
+									referenced_node = UnPlug2Search.rules_xml
 								} else {
-									referenced_node = UnPlug2.get_element(UnPlug2Search.get_rules_xml(), "rule", node.getAttribute("goto"));
+									referenced_node = UnPlug2.get_element(UnPlug2Search.rules_xml, "rule", node.getAttribute("goto"));
 								}
 								if (!referenced_node)
 									throw "Cannot find node to goto " + node.getAttribute("goto");
